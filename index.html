@@ -1,0 +1,158 @@
+<!doctype html>
+<html class="dark" lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#000000" />
+  <meta name="color-scheme" content="dark" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="MITCAN" />
+  <meta name="application-name" content="MITCAN" />
+  <meta name="format-detection" content="telephone=no" />
+  <meta name="description" content="MITCAN — Club de recompensas premium. Acumula puntos, canjea beneficios y rastrea tus pedidos." />
+  <meta property="og:title" content="MITCAN — Club de Recompensas" />
+  <meta property="og:description" content="Acumula puntos y disfruta beneficios exclusivos." />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="/icons/icon-512.png" />
+  <title>MITCAN — Inicio</title>
+
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <link rel="icon" type="image/svg+xml" href="/icons/favicon.svg" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon-180.png" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" />
+
+  <script src="/assets/tailwind.config.js"></script>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link rel="stylesheet" href="/assets/theme.css" />
+</head>
+<body>
+  <header class="app-header">
+    <div class="app-header-inner">
+      <div class="flex items-center gap-3">
+        <button class="text-on-surface-variant hover:text-primary transition-colors" aria-label="Menú">
+          <span class="material-symbols-outlined">menu</span>
+        </button>
+        <h1 class="text-headline-lg font-extrabold text-on-surface tracking-widest uppercase">MITCAN</h1>
+      </div>
+      <button class="relative text-on-surface-variant hover:text-primary transition-colors" aria-label="Notificaciones">
+        <span class="material-symbols-outlined">notifications</span>
+        <span class="absolute top-0 right-0 w-2 h-2 bg-primary-container rounded-full ring-2 ring-background"></span>
+      </button>
+    </div>
+  </header>
+
+  <main class="w-full max-w-md mx-auto px-margin-main flex flex-col gap-6 mt-2">
+    <section class="flex justify-between items-end">
+      <div>
+        <p class="text-on-surface-variant text-body-md mb-1">Hola, Luis 👋</p>
+        <h2 class="text-headline-xl text-on-surface">Mi Perfil</h2>
+      </div>
+      <div class="bg-primary-container/20 px-3 py-1.5 rounded-full border border-primary-container/30">
+        <p class="text-primary text-label-md">Nivel Oro Parrillero</p>
+      </div>
+    </section>
+
+    <section class="relative overflow-hidden rounded-2xl p-6 orange-glow bg-gradient-to-br from-[#2a1700] to-[#131313] border border-white/5">
+      <div class="absolute -top-10 -right-10 w-40 h-40 bg-primary-container/10 blur-[60px] rounded-full"></div>
+      <p class="text-on-surface-variant text-label-md uppercase tracking-widest mb-1">Tus puntos</p>
+      <div class="flex items-baseline gap-2 mb-4">
+        <span class="text-5xl font-bold text-primary tracking-tight">2,450</span>
+        <span class="text-lg font-medium text-on-surface/60">pts</span>
+      </div>
+      <p class="text-primary-fixed-dim text-headline-md mb-6">¡Vas muy bien!</p>
+      <div class="space-y-3">
+        <div class="h-3 w-full bg-surface-container-high rounded-full overflow-hidden" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="82">
+          <div class="h-full bg-primary-container rounded-full relative" style="width: 82%;">
+            <div class="absolute top-0 right-0 h-full w-4 bg-white/20 blur-sm"></div>
+          </div>
+        </div>
+        <div class="flex justify-between items-center text-label-md">
+          <p class="text-on-surface-variant">Te faltan 550 pts para subir a <span class="text-on-surface font-bold">Nivel Diamante</span></p>
+          <span class="material-symbols-outlined text-primary-container text-base" style="font-variation-settings: 'FILL' 1;">diamond</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="glass rounded-[2rem] p-8 flex flex-col items-center gap-6 shadow-2xl relative">
+      <div class="qr-gradient p-6 rounded-3xl border border-white/10 relative">
+        <div class="absolute top-2 left-2 w-4 h-4 border-t-2 border-l-2 border-primary-container/50"></div>
+        <div class="absolute top-2 right-2 w-4 h-4 border-t-2 border-r-2 border-primary-container/50"></div>
+        <div class="absolute bottom-2 left-2 w-4 h-4 border-b-2 border-l-2 border-primary-container/50"></div>
+        <div class="absolute bottom-2 right-2 w-4 h-4 border-b-2 border-r-2 border-primary-container/50"></div>
+        <img alt="Código QR de membresía" loading="lazy" decoding="async" class="w-56 h-56 opacity-90 rounded-lg filter drop-shadow-lg"
+             src="https://api.qrserver.com/v1/create-qr-code/?size=240x240&bgcolor=0e0e0e&color=ffb77d&qzone=1&data=MITCAN-CLUB-LUIS-2450" />
+        <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+          <div class="bg-background w-12 h-12 rounded-xl flex items-center justify-center border border-primary-container shadow-lg">
+            <span class="text-primary font-black text-xl">M</span>
+          </div>
+        </div>
+      </div>
+      <div class="text-center space-y-2">
+        <p class="text-headline-md text-on-surface">Escanea en caja</p>
+        <p class="text-body-md text-on-surface-variant max-w-[240px]">Acumula puntos y disfruta beneficios exclusivos de club.</p>
+      </div>
+      <div class="w-full h-px bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
+      <button class="flex items-center gap-2 text-primary text-label-md group">
+        VER CÓDIGO NUMÉRICO
+        <span class="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">arrow_forward</span>
+      </button>
+    </section>
+
+    <section class="flex flex-col gap-4">
+      <div class="flex justify-between items-center">
+        <h3 class="text-headline-md text-on-surface">Promociones para ti</h3>
+        <a href="/recompensas" class="text-primary text-label-md">Ver todas</a>
+      </div>
+      <div class="flex gap-4 overflow-x-auto pb-4 -mx-margin-main px-margin-main snap-x no-scrollbar">
+        <article class="snap-start min-w-[280px] bg-surface-container-high rounded-2xl overflow-hidden flex border border-white/5 relative h-32">
+          <div class="flex-1 p-4 flex flex-col justify-between">
+            <div>
+              <h4 class="text-headline-md font-bold text-on-surface leading-tight">Doble puntos</h4>
+              <p class="text-body-md text-on-surface-variant">en cortes selectos</p>
+            </div>
+            <p class="text-label-md text-primary font-medium">Válido hoy</p>
+          </div>
+          <div class="w-32 relative">
+            <img loading="lazy" decoding="async" alt="Ribeye marmoleado premium" class="absolute inset-0 w-full h-full object-cover"
+                 src="https://lh3.googleusercontent.com/aida-public/AB6AXuCE00Hp20oNegJg4YS425yJuGsOulg0PJDgpn4S3j4SSD3CttSSJl1b9ApJMdmKljDKfovgnAzlICnJCndcyKa-4XCqJp64JxsfyNwPNGyCQpvKT7WJRno-bhc94zSr9ZP5l-CIzc5zsCXqiOgE9SXwlXr2LvXb1l2QLM-TZ71-1m6lrevYiVhw3gOYnTaNZc1lOvwkI6OkoKI-_BwsDM3korQLtwYUefbc--dwrG8F1LBL1ArK-4u7sm7QrHHhiKGYJMB7wHTs4bOG" />
+            <div class="absolute inset-0 bg-gradient-to-r from-surface-container-high via-surface-container-high/20 to-transparent"></div>
+            <div class="absolute bottom-2 right-2 bg-primary-container text-on-primary font-bold px-2 py-1 rounded text-sm">2X</div>
+          </div>
+        </article>
+        <article class="snap-start min-w-[280px] bg-surface-container-high rounded-2xl overflow-hidden flex border border-white/5 relative h-32">
+          <div class="flex-1 p-4 flex flex-col justify-between">
+            <div>
+              <h4 class="text-headline-md font-bold text-on-surface leading-tight">Envío Gratis</h4>
+              <p class="text-body-md text-on-surface-variant">en compras &gt; $500</p>
+            </div>
+            <p class="text-label-md text-primary font-medium">Fin de semana</p>
+          </div>
+          <div class="w-32 relative">
+            <img loading="lazy" decoding="async" alt="Van de entrega nocturna" class="absolute inset-0 w-full h-full object-cover"
+                 src="https://lh3.googleusercontent.com/aida-public/AB6AXuAdaFeFRVLVegudJnVwag_Ue89735ZuKCpG_5xbbvx1iUn8Djih8Cvn88WAS-sb-Q2fz_UXVcxzmwU3lwy14xQb7nZWJ8Vml_ZIynUl5WNJXkrRnDFaG0l6ORvM2vSxW9y4q3sdsSzlMzCkP0JebMt6x6baHqepIo-e1SOkzK5yW-1q1qb-PBiXtemFeIUWZ9EF9AizrN-eOIwAlINzqFbJnID9qXdJDF70eLXgnAg6_SuVA0OWFoy3ZeD_7UGlh9PNqsw8I1h5Akhe" />
+            <div class="absolute inset-0 bg-gradient-to-r from-surface-container-high via-surface-container-high/20 to-transparent"></div>
+          </div>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <nav class="bottom-nav" aria-label="Navegación principal">
+    <a href="/" aria-current="page"><span class="material-symbols-outlined">home</span><span>Inicio</span></a>
+    <a href="/catalogo"><span class="material-symbols-outlined">grid_view</span><span>Catálogo</span></a>
+    <a href="/pedido"><span class="material-symbols-outlined">shopping_bag</span><span>Pedidos</span></a>
+    <a href="#"><span class="material-symbols-outlined">location_on</span><span>Sucursales</span></a>
+    <a href="/recompensas"><span class="material-symbols-outlined">redeem</span><span>Premios</span></a>
+  </nav>
+
+  <script src="/assets/app.js" defer></script>
+</body>
+</html>
