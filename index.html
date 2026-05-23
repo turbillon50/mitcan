@@ -24,6 +24,8 @@
   <link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16.png" />
   <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon-180.png" />
 
+  <link rel="preload" as="image" href="/assets/qr-membership.png" fetchpriority="high" />
+
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" />
@@ -87,13 +89,9 @@
         <div class="absolute top-2 right-2 w-4 h-4 border-t-2 border-r-2 border-primary-container/50"></div>
         <div class="absolute bottom-2 left-2 w-4 h-4 border-b-2 border-l-2 border-primary-container/50"></div>
         <div class="absolute bottom-2 right-2 w-4 h-4 border-b-2 border-r-2 border-primary-container/50"></div>
-        <img alt="Código QR de membresía" loading="lazy" decoding="async" class="w-56 h-56 opacity-90 rounded-lg filter drop-shadow-lg"
-             src="https://api.qrserver.com/v1/create-qr-code/?size=240x240&bgcolor=0e0e0e&color=ffb77d&qzone=1&data=MITCAN-CLUB-LUIS-2450" />
-        <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
-          <div class="bg-background w-12 h-12 rounded-xl flex items-center justify-center border border-primary-container shadow-lg">
-            <span class="text-primary font-black text-xl">M</span>
-          </div>
-        </div>
+        <img alt="Código QR de membresía MITCAN" decoding="async" fetchpriority="high" width="240" height="240"
+             class="w-56 h-56 rounded-lg filter drop-shadow-[0_0_18px_rgba(255,140,0,0.35)]"
+             src="/assets/qr-membership.png" />
       </div>
       <div class="text-center space-y-2">
         <p class="text-headline-md text-on-surface">Escanea en caja</p>
