@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>MITCAN - Mis Recompensas</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-surface-variant": "#ddc1ae",
+                        "on-surface": "#e2e2e2",
+                        "surface": "#131313",
+                        "primary-fixed-dim": "#ffb77d",
+                        "tertiary-container": "#aba9ab",
+                        "primary-fixed": "#ffdcc3",
+                        "outline-variant": "#564334",
+                        "on-tertiary-container": "#3e3e40",
+                        "on-secondary": "#313030",
+                        "on-secondary-fixed-variant": "#474746",
+                        "primary-container": "#ff8c00",
+                        "on-primary-fixed": "#2f1500",
+                        "error": "#ffb4ab",
+                        "secondary-fixed": "#e5e2e1",
+                        "surface-bright": "#393939",
+                        "surface-container": "#1f1f1f",
+                        "secondary": "#c8c6c5",
+                        "on-tertiary-fixed": "#1b1b1d",
+                        "outline": "#a48c7a",
+                        "on-secondary-container": "#b7b5b4",
+                        "surface-container-high": "#2a2a2a",
+                        "tertiary-fixed-dim": "#c8c6c8",
+                        "on-secondary-fixed": "#1c1b1b",
+                        "on-primary-fixed-variant": "#6e3900",
+                        "surface-container-lowest": "#0e0e0e",
+                        "on-error": "#690005",
+                        "error-container": "#93000a",
+                        "inverse-surface": "#e2e2e2",
+                        "on-primary": "#4d2600",
+                        "surface-variant": "#353535",
+                        "on-tertiary": "#303032",
+                        "inverse-primary": "#904d00",
+                        "on-background": "#e2e2e2",
+                        "surface-container-low": "#1b1b1b",
+                        "on-primary-container": "#623200",
+                        "on-tertiary-fixed-variant": "#474649",
+                        "background": "#131313",
+                        "secondary-fixed-dim": "#c8c6c5",
+                        "tertiary": "#c8c6c8",
+                        "on-error-container": "#ffdad6",
+                        "secondary-container": "#474746",
+                        "surface-tint": "#ffb77d",
+                        "primary": "#ffb77d",
+                        "surface-container-highest": "#353535",
+                        "tertiary-fixed": "#e4e2e4",
+                        "inverse-on-surface": "#303030",
+                        "surface-dim": "#131313"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "stack-md": "16px",
+                        "gutter": "12px",
+                        "stack-lg": "24px",
+                        "unit": "4px",
+                        "stack-sm": "8px",
+                        "margin-main": "20px"
+                    },
+                    "fontFamily": {
+                        "headline-lg-mobile": ["Inter"],
+                        "label-md": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "headline-xl": ["Inter"],
+                        "body-md": ["Inter"],
+                        "body-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-lg-mobile": ["22px", {"lineHeight": "28px", "fontWeight": "700"}],
+                        "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                        "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                        "headline-lg": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "headline-xl": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .glass-card {
+            background: rgba(26, 26, 26, 0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .active-glow {
+            box-shadow: 0 0 15px rgba(255, 140, 0, 0.3);
+        }
+        .inner-glow {
+            box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.2);
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-surface font-body-md min-h-screen flex flex-col items-center">
+<!-- Top App Bar -->
+<header class="bg-background dark:bg-background flex justify-between items-center px-margin-main h-16 w-full max-w-md mx-auto sticky top-0 z-50">
+<button class="flex items-center justify-center w-10 h-10 hover:text-primary transition-colors active:opacity-80 scale-95 transition-all">
+<span class="material-symbols-outlined text-on-surface-variant">arrow_back</span>
+</button>
+<h1 class="text-headline-md font-headline-md text-on-surface">Mis recompensas</h1>
+<div class="w-10 h-10"></div> <!-- Spacer for balance -->
+</header>
+<main class="w-full max-w-md px-margin-main flex flex-col gap-stack-lg pb-32">
+<!-- Summary Stats Bento -->
+<section class="grid grid-cols-2 gap-gutter">
+<div class="glass-card p-gutter rounded-xl flex flex-col items-start gap-unit">
+<span class="text-label-md font-label-md text-on-surface-variant">Disponibles</span>
+<span class="text-headline-xl font-headline-xl text-primary">3</span>
+</div>
+<div class="glass-card p-gutter rounded-xl flex flex-col items-start gap-unit">
+<span class="text-label-md font-label-md text-on-surface-variant">Canjeadas</span>
+<span class="text-headline-xl font-headline-xl text-on-surface">12</span>
+</div>
+</section>
+<!-- Segmented Control Chips -->
+<nav class="flex gap-stack-sm overflow-x-auto py-2 custom-scrollbar">
+<button class="bg-primary-container text-on-primary-container px-stack-md py-stack-sm rounded-full text-label-md font-label-md active-glow whitespace-nowrap">Todas</button>
+<button class="bg-surface-variant text-on-surface-variant px-stack-md py-stack-sm rounded-full text-label-md font-label-md hover:text-primary transition-colors whitespace-nowrap">Cupones</button>
+<button class="bg-surface-variant text-on-surface-variant px-stack-md py-stack-sm rounded-full text-label-md font-label-md hover:text-primary transition-colors whitespace-nowrap">Descuentos</button>
+<button class="bg-surface-variant text-on-surface-variant px-stack-md py-stack-sm rounded-full text-label-md font-label-md hover:text-primary transition-colors whitespace-nowrap">Envío</button>
+</nav>
+<!-- Rewards List -->
+<div class="flex flex-col gap-stack-md">
+<!-- Reward Item 1 -->
+<div class="glass-card p-stack-md rounded-xl flex items-center gap-stack-md relative overflow-hidden group">
+<div class="w-16 h-16 rounded-lg bg-surface-container-high flex items-center justify-center overflow-hidden shrink-0">
+<img class="w-full h-full object-cover" data-alt="A macro close-up of a perfectly marbled raw ribeye steak resting on a dark slate board. The lighting is cinematic noir style, highlighting the rich red tones and ivory fat textures with a warm orange glow from the side. The overall aesthetic is premium, moody, and sophisticated, consistent with a high-end steakhouse brand." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD-eFVLq6vAd6nLyyimJKXjaaTi2vgfMyW1zduEb6kG2Vh6OIsxAz8coDdLKVODDPZQz0fj9z4ROz-ZAs1JQVh7dsHUuR3_TyK8DQRK7dcLimMRSj4Z7Lu7uawiNJwhFnOlRz4N1Y3418xR9ceOFp0CML1_-r1DI84Uj4IdPpNPskgTdFtU9AE2g68ZrDgnMlOU01KPgRlR8U9_3Sh2A2RJ5lGu8Ag4fvnkgpiAe_mzr0IwqoQKlgJIzbHI1gqzskzUjJROxHdh-Irs"/>
+</div>
+<div class="flex-1 flex flex-col gap-unit">
+<h3 class="text-body-lg font-headline-md leading-tight">10% de descuento</h3>
+<p class="text-label-md font-label-md text-on-surface-variant">En tu próxima compra</p>
+<p class="text-[10px] font-label-md text-on-surface-variant/60 uppercase tracking-wider">Válido hasta 20/05/2025</p>
+</div>
+<button class="bg-primary-container text-on-primary-container px-stack-md py-unit rounded-lg text-label-md font-label-md inner-glow hover:scale-105 active:opacity-80 transition-all">Usar</button>
+</div>
+<!-- Reward Item 2 -->
+<div class="glass-card p-stack-md rounded-xl flex items-center gap-stack-md relative overflow-hidden group">
+<div class="w-16 h-16 rounded-lg bg-surface-container-high flex items-center justify-center overflow-hidden shrink-0">
+<div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-surface-container-high to-surface-container">
+<span class="material-symbols-outlined text-primary text-3xl">local_shipping</span>
+</div>
+</div>
+<div class="flex-1 flex flex-col gap-unit">
+<h3 class="text-body-lg font-headline-md leading-tight">Envío gratis</h3>
+<p class="text-label-md font-label-md text-on-surface-variant">En compras mayores a $500</p>
+<p class="text-[10px] font-label-md text-on-surface-variant/60 uppercase tracking-wider">Válido hasta 18/05/2025</p>
+</div>
+<button class="bg-primary-container text-on-primary-container px-stack-md py-unit rounded-lg text-label-md font-label-md inner-glow hover:scale-105 active:opacity-80 transition-all">Usar</button>
+</div>
+<!-- Reward Item 3 -->
+<div class="glass-card p-stack-md rounded-xl flex items-center gap-stack-md relative overflow-hidden group">
+<div class="w-16 h-16 rounded-lg bg-surface-container-high flex items-center justify-center overflow-hidden shrink-0">
+<img class="w-full h-full object-cover" data-alt="Gourmet raw meat skewers prepared with premium cuts and vibrant vegetables, photographed in a dark, atmospheric setting. The scene features deep tonal depth with soft, cinematic warm lighting that emphasizes the quality of the ingredients. The visual style is polished and expensive, using deep blacks and amber highlights." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBfvRLyUmKcAnldL7c7Ydup_yuygMZbXMtOFCrmeiXDRFo2KPK17_uXrr_cA_X4w5VksxBDPfb1UWik4ONemMl0yXuoLQY7D7EXUaYjfl6Z3SMeaGQtK6uOamjY6mi46JwSZ98_6JZ5LyjDC7OD3Z_i_NsUX_DQK8V5BQ2TN0WBEndJw-iFoq2vlg0Zl6amqCzKg8dGMhQYbeY4NN4PfhjgydX_6onA-MXHSOG6X1w7MT1T_qCIxHjPKAtssZOxgYutvMJ2ehqSqF9e"/>
+</div>
+<div class="flex-1 flex flex-col gap-unit">
+<h3 class="text-body-lg font-headline-md leading-tight">$100 de descuento</h3>
+<p class="text-label-md font-label-md text-on-surface-variant">En cortes premium</p>
+<p class="text-[10px] font-label-md text-on-surface-variant/60 uppercase tracking-wider">Válido hasta 25/05/2025</p>
+</div>
+<button class="bg-primary-container text-on-primary-container px-stack-md py-unit rounded-lg text-label-md font-label-md inner-glow hover:scale-105 active:opacity-80 transition-all">Usar</button>
+</div>
+<!-- Reward Item 4 (Locked/New) -->
+<div class="glass-card p-stack-md rounded-xl flex items-center gap-stack-md relative opacity-50 grayscale">
+<div class="w-16 h-16 rounded-lg bg-surface-container-high flex items-center justify-center shrink-0 border border-white/5">
+<span class="material-symbols-outlined text-on-surface-variant text-3xl">redeem</span>
+</div>
+<div class="flex-1 flex flex-col gap-unit">
+<h3 class="text-body-lg font-headline-md leading-tight">Postre gratis</h3>
+<p class="text-label-md font-label-md text-on-surface-variant">Faltan 250 pts para desbloquear</p>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant">lock</span>
+</div>
+</div>
+<!-- Loyalty Card Promo -->
+<div class="relative w-full aspect-[16/9] rounded-2xl overflow-hidden shadow-2xl active:scale-[0.98] transition-transform">
+<div class="absolute inset-0 bg-gradient-to-br from-[#2a1705] via-[#1a1a1a] to-black"></div>
+<div class="absolute inset-0 opacity-20" style="background-image: radial-gradient(circle at 2px 2px, rgba(255,140,0,0.1) 1px, transparent 0); background-size: 24px 24px;"></div>
+<div class="relative h-full p-stack-lg flex flex-col justify-between">
+<div class="flex justify-between items-start">
+<div class="flex flex-col">
+<span class="text-primary font-bold tracking-widest text-[10px] uppercase">Nivel Oro Parrillero</span>
+<h2 class="text-headline-lg font-headline-lg text-on-surface">Luis García</h2>
+</div>
+<div class="w-12 h-12 rounded-full border-2 border-primary p-0.5">
+<div class="w-full h-full rounded-full bg-surface flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-xl" style="font-variation-settings: 'FILL' 1;">workspace_premium</span>
+</div>
+</div>
+</div>
+<div class="flex justify-between items-end">
+<div class="flex flex-col">
+<span class="text-on-surface-variant text-label-md font-label-md">Balance de puntos</span>
+<span class="text-headline-xl font-headline-xl text-primary drop-shadow-[0_0_10px_rgba(255,183,125,0.4)]">2,450 <small class="text-label-md uppercase">pts</small></span>
+</div>
+<div class="bg-white p-2 rounded-lg">
+<img alt="QR Code" class="w-12 h-12 grayscale opacity-90" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCeEy-Fv9N6jRNw0wjveSfxljV3xK7FIASIhDZsJrYOFcoZur7mckXZ_KFcJLH6LqJBGQCSGjxApsj9AvXo7ZgUKNqxqAEvWnKfXSL9taVHeJsYWSqhCbwYh4IxOLJ-jzIx4bvqm-vVIuoLYchuR8doKaf5mlUSGNPxwGqhzdPBoozr65euTUnAYCNhJkJKXrxE4xMCOrF16tVi_vVKehQkx214RuC2xozyiqfWtJExAOIjk6l_44cyISd-BLfxVYT0t1nOR1vGaedj"/>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Bottom Navigation Bar -->
+<nav class="fixed bottom-0 left-0 right-0 flex justify-around items-center px-4 pt-3 pb-6 max-w-md mx-auto bg-surface-container/80 backdrop-blur-xl border-t border-white/5 z-50 rounded-t-xl shadow-[0_-4px_20px_rgba(255,140,0,0.15)]">
+<button class="flex flex-col items-center justify-center text-on-secondary-fixed-variant hover:text-primary-fixed-dim transition-all group">
+<span class="material-symbols-outlined group-active:scale-110 transition-transform">home</span>
+<span class="text-label-md font-label-md">Inicio</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-secondary-fixed-variant hover:text-primary-fixed-dim transition-all group">
+<span class="material-symbols-outlined group-active:scale-110 transition-transform">grid_view</span>
+<span class="text-label-md font-label-md">Catálogo</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-secondary-fixed-variant hover:text-primary-fixed-dim transition-all group">
+<span class="material-symbols-outlined group-active:scale-110 transition-transform">shopping_bag</span>
+<span class="text-label-md font-label-md">Pedidos</span>
+</button>
+<button class="flex flex-col items-center justify-center text-primary drop-shadow-[0_0_8px_rgba(255,183,125,0.6)] group scale-110">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">redeem</span>
+<span class="text-label-md font-label-md">Premios</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-secondary-fixed-variant hover:text-primary-fixed-dim transition-all group">
+<span class="material-symbols-outlined group-active:scale-110 transition-transform">person</span>
+<span class="text-label-md font-label-md">Perfil</span>
+</button>
+</nav>
+<script>
+        // Micro-interaction for buttons
+        document.querySelectorAll('button').forEach(button => {
+            button.addEventListener('mousedown', () => {
+                button.classList.add('scale-95');
+            });
+            button.addEventListener('mouseup', () => {
+                button.classList.remove('scale-95');
+            });
+        });
+    </script>
+</body></html>

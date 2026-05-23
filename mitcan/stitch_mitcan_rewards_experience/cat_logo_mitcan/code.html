@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>MITCAN - Catálogo</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-surface-variant": "#ddc1ae",
+                        "on-surface": "#e2e2e2",
+                        "surface": "#131313",
+                        "primary-fixed-dim": "#ffb77d",
+                        "tertiary-container": "#aba9ab",
+                        "primary-fixed": "#ffdcc3",
+                        "outline-variant": "#564334",
+                        "on-tertiary-container": "#3e3e40",
+                        "on-secondary": "#313030",
+                        "on-secondary-fixed-variant": "#474746",
+                        "primary-container": "#ff8c00",
+                        "on-primary-fixed": "#2f1500",
+                        "error": "#ffb4ab",
+                        "secondary-fixed": "#e5e2e1",
+                        "surface-bright": "#393939",
+                        "surface-container": "#1f1f1f",
+                        "secondary": "#c8c6c5",
+                        "on-tertiary-fixed": "#1b1b1d",
+                        "outline": "#a48c7a",
+                        "on-secondary-container": "#b7b5b4",
+                        "surface-container-high": "#2a2a2a",
+                        "tertiary-fixed-dim": "#c8c6c8",
+                        "on-secondary-fixed": "#1c1b1b",
+                        "on-primary-fixed-variant": "#6e3900",
+                        "surface-container-lowest": "#0e0e0e",
+                        "on-error": "#690005",
+                        "error-container": "#93000a",
+                        "inverse-surface": "#e2e2e2",
+                        "on-primary": "#4d2600",
+                        "surface-variant": "#353535",
+                        "on-tertiary": "#303032",
+                        "inverse-primary": "#904d00",
+                        "on-background": "#e2e2e2",
+                        "surface-container-low": "#1b1b1b",
+                        "on-primary-container": "#623200",
+                        "on-tertiary-fixed-variant": "#474649",
+                        "background": "#131313",
+                        "secondary-fixed-dim": "#c8c6c5",
+                        "tertiary": "#c8c6c8",
+                        "on-error-container": "#ffdad6",
+                        "secondary-container": "#474746",
+                        "surface-tint": "#ffb77d",
+                        "primary": "#ffb77d",
+                        "surface-container-highest": "#353535",
+                        "tertiary-fixed": "#e4e2e4",
+                        "inverse-on-surface": "#303030",
+                        "surface-dim": "#131313"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "stack-md": "16px",
+                        "gutter": "12px",
+                        "stack-lg": "24px",
+                        "unit": "4px",
+                        "stack-sm": "8px",
+                        "margin-main": "20px"
+                    },
+                    "fontFamily": {
+                        "headline-lg-mobile": ["Inter"],
+                        "label-md": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "headline-xl": ["Inter"],
+                        "body-md": ["Inter"],
+                        "body-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-lg-mobile": ["22px", {"lineHeight": "28px", "fontWeight": "700"}],
+                        "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                        "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                        "headline-lg": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "headline-xl": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            background-color: #131313;
+            color: #e2e2e2;
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .glass-card {
+            background: rgba(26, 26, 26, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .orange-glow {
+            box-shadow: 0 4px 15px rgba(255, 140, 0, 0.3);
+        }
+        .active-tab-glow {
+            filter: drop-shadow(0 0 8px rgba(255, 183, 125, 0.6));
+        }
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="dark selection:bg-primary-container selection:text-on-primary-container">
+<!-- Top AppBar -->
+<header class="fixed top-0 left-0 right-0 z-50 bg-background flex justify-between items-center px-margin-main h-16 w-full max-w-md mx-auto">
+<div class="flex items-center gap-4">
+<button class="text-primary active:scale-95 transition-all">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<h1 class="text-headline-lg-mobile font-headline-lg-mobile font-bold text-on-surface tracking-widest uppercase">MITCAN</h1>
+</div>
+<button class="text-primary active:scale-95 transition-all">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+</header>
+<main class="pt-20 pb-28 px-margin-main max-w-md mx-auto">
+<!-- Page Title & Search -->
+<div class="mb-stack-lg">
+<h2 class="text-headline-lg-mobile font-headline-lg-mobile mb-stack-md text-on-surface">Catálogo</h2>
+<div class="relative group">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant group-focus-within:text-primary transition-colors">search</span>
+<input class="w-full bg-surface-container border-none rounded-xl py-3 pl-12 pr-4 text-body-md focus:ring-1 focus:ring-primary transition-all placeholder:text-on-surface-variant/50" placeholder="Buscar productos" type="text"/>
+</div>
+</div>
+<!-- Horizontal Category Scroll -->
+<div class="flex gap-stack-md overflow-x-auto no-scrollbar mb-stack-lg -mx-margin-main px-margin-main">
+<!-- Category Item Active -->
+<button class="flex flex-col items-center gap-2 group">
+<div class="w-16 h-16 rounded-xl bg-primary-container flex items-center justify-center orange-glow">
+<span class="material-symbols-outlined text-on-primary-container text-3xl">restaurant</span>
+</div>
+<span class="text-label-md font-label-md text-primary">Res</span>
+</button>
+<!-- Category Item -->
+<button class="flex flex-col items-center gap-2 group">
+<div class="w-16 h-16 rounded-xl bg-surface-container flex items-center justify-center hover:bg-surface-variant transition-colors">
+<span class="material-symbols-outlined text-on-surface-variant text-3xl">set_meal</span>
+</div>
+<span class="text-label-md font-label-md text-on-surface-variant">Cerdo</span>
+</button>
+<button class="flex flex-col items-center gap-2 group">
+<div class="w-16 h-16 rounded-xl bg-surface-container flex items-center justify-center hover:bg-surface-variant transition-colors">
+<span class="material-symbols-outlined text-on-surface-variant text-3xl">egg_alt</span>
+</div>
+<span class="text-label-md font-label-md text-on-surface-variant">Pollo</span>
+</button>
+<button class="flex flex-col items-center gap-2 group">
+<div class="w-16 h-16 rounded-xl bg-surface-container flex items-center justify-center hover:bg-surface-variant transition-colors">
+<span class="material-symbols-outlined text-on-surface-variant text-3xl">chess</span>
+</div>
+<span class="text-label-md font-label-md text-on-surface-variant">Lácteos</span>
+</button>
+<button class="flex flex-col items-center gap-2 group">
+<div class="w-16 h-16 rounded-xl bg-surface-container flex items-center justify-center hover:bg-surface-variant transition-colors">
+<span class="material-symbols-outlined text-on-surface-variant text-3xl">inventory_2</span>
+</div>
+<span class="text-label-md font-label-md text-on-surface-variant">Despensa</span>
+</button>
+</div>
+<!-- Section: Cortes de Res -->
+<section class="mb-stack-lg">
+<div class="flex justify-between items-end mb-stack-md">
+<h3 class="text-headline-md font-headline-md text-on-surface">Cortes de Res</h3>
+<button class="text-label-md font-label-md text-primary uppercase tracking-wider">Ver todas</button>
+</div>
+<!-- Products Grid -->
+<div class="grid grid-cols-2 gap-stack-md">
+<!-- Product Card -->
+<article class="glass-card rounded-xl overflow-hidden flex flex-col group active:scale-95 transition-transform duration-200">
+<div class="relative h-32 overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" data-alt="A macro cinematic photograph of a raw, heavily marbled premium ribeye steak resting on a dark basalt slab. Warm, low-key lighting highlights the rich texture and deep red tones of the beef, with glowing orange accents reflecting off subtle fat deposits. The atmosphere is sophisticated and high-end, evoking a professional steakhouse aesthetic with deep shadows and sharp focus." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCGy3gBF8M6yLCJ3q7OI1t4HgooJvHpYH3d2iI6k9Jn8dBHQJjKQC_7XVnPQhaFOTZT4ZOkdvPFL9FFLiGnCnWh6ISaRg7QWyyVaq35sXZh68CkDHCdr4G1n9Wj8sMzEhGXRVGEZMZPzmMOT5Fyltnx8hbh-PrABgyX1b7AyOcx0KxTbJBs1e7gw37yN1ovZZKgJBiH35vx-cMXS_fc0jAq8QGMDVDOJeLA57o4GBABMmPavOkc9jEtUp3UMBUMIEk9tSPw1n8e5vrN"/>
+</div>
+<div class="p-stack-sm flex flex-col flex-grow">
+<h4 class="text-body-md font-bold text-on-surface mb-1">Ribeye</h4>
+<div class="flex justify-between items-center mt-auto">
+<span class="text-label-md font-label-md text-primary">$359 <span class="text-on-surface-variant/60">/ kg</span></span>
+<button class="bg-primary-container w-8 h-8 rounded-lg flex items-center justify-center orange-glow">
+<span class="material-symbols-outlined text-on-primary-container text-sm">add</span>
+</button>
+</div>
+</div>
+</article>
+<!-- Product Card -->
+<article class="glass-card rounded-xl overflow-hidden flex flex-col group active:scale-95 transition-transform duration-200">
+<div class="relative h-32 overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" data-alt="A close-up of a fresh raw New York strip steak on a dark textured surface. The meat features vibrant red fibers and a pristine white fat cap, illuminated by a warm glow from the side that creates deep cinematic shadows. Minimalist composition focuses on quality and freshness with a dark noir atmosphere and luxury presentation." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB-QEodaEmm2Bbm3F_5Wgk_kHI0oklEeTXSuIHxLd54M5TvCzkfus7pNhpsf_p5dmy-uTSh81u8ojRyUAo59HKALsRSi6GMpWvnEpMbsqy4_S_DPdUTUqxOCuoWeNw4cHEdpQA4nhHaiT-t4joTv6ycV3bOzBG5pqwj1sdQc-kmCh2itxFIa-ovlS5lXbi_y_wybq-AxF7giP52jNOnO_XlJrHE0JinEqfcVzZA4575Be2DxDZtUpHitFb2k-OlGcZCMlXDjf27TWny"/>
+</div>
+<div class="p-stack-sm flex flex-col flex-grow">
+<h4 class="text-body-md font-bold text-on-surface mb-1">New York</h4>
+<div class="flex justify-between items-center mt-auto">
+<span class="text-label-md font-label-md text-primary">$329 <span class="text-on-surface-variant/60">/ kg</span></span>
+<button class="bg-primary-container w-8 h-8 rounded-lg flex items-center justify-center orange-glow">
+<span class="material-symbols-outlined text-on-primary-container text-sm">add</span>
+</button>
+</div>
+</div>
+</article>
+<!-- Product Card -->
+<article class="glass-card rounded-xl overflow-hidden flex flex-col group active:scale-95 transition-transform duration-200">
+<div class="relative h-32 overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" data-alt="Cinematic food photography of a large T-Bone steak raw and seasoned with coarse salt on a black slate background. The lighting is moody and warm, emphasizing the massive bone structure and high-quality beef texture. Dramatic shadows and bright orange specular highlights give the image a premium, exclusive feel suitable for a high-end butcher shop app." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAxTV_4sDWsetpTUY7zgOVemf1hJrpXgXmDM7YjPzdEsJ53xtIqCPDAZtItsxTXWojqpay79POZuBgTudfstfFuUzvBtZJglsbrm5v--CJpfRXDWEqHI_KzDR4sw6tftzECzAF9PX9J8BfXGLUu4t9qB12-FdoRSN0BBJ0NbDw6i_GoW2IOGpsRIJo-kaG7t1DosT2NioJpRO8acNdJRvLplcv35W9uInKkJz3g1n4X5_Q6YVORN0Mb-cIHRC5mEAb8v1oDuCzVb8s8"/>
+</div>
+<div class="p-stack-sm flex flex-col flex-grow">
+<h4 class="text-body-md font-bold text-on-surface mb-1">T-Bone</h4>
+<div class="flex justify-between items-center mt-auto">
+<span class="text-label-md font-label-md text-primary">$338 <span class="text-on-surface-variant/60">/ kg</span></span>
+<button class="bg-primary-container w-8 h-8 rounded-lg flex items-center justify-center orange-glow">
+<span class="material-symbols-outlined text-on-primary-container text-sm">add</span>
+</button>
+</div>
+</div>
+</article>
+</div>
+</section>
+<!-- Section: Combos -->
+<section class="mb-stack-lg">
+<div class="flex justify-between items-end mb-stack-md">
+<h3 class="text-headline-md font-headline-md text-on-surface">Combos</h3>
+<button class="text-label-md font-label-md text-primary uppercase tracking-wider">Ver todas</button>
+</div>
+<!-- Featured Large Card -->
+<article class="glass-card rounded-2xl overflow-hidden relative group active:scale-[0.98] transition-all duration-300">
+<div class="h-48 relative">
+<img class="w-full h-full object-cover" data-alt="An expansive bento-style arrangement of assorted high-end meats including ribeye, arrachera, spicy chorizo, and melting queso on a rustic grill. The scene is shot from an overhead cinematic angle with steam rising and embers glowing in warm orange tones. The background is a dark, moody wood texture, and the entire composition exudes a premium, social dining experience vibe." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA_Vsg8Htnsi3FrEypOVFOphaWoUG7rLQZ9-zdkkW1DEiDA9MBtHsSf0SoPrMPavs4_BUuR8q4HOPjbAwwJ047m053W8dV_Jdjrc5e6LPuyFaPCjY5ctAXbrq5qUKBriJFeCdfgyIYdEFyevsaS3kvdxmLnrrf1XkFy4OVG2vC959xb_JwRuae8GLe6UTrHNrOyw0LJ1MLluqT_FjTa7wL8wCpaxBpFsNgsePijXGpWqcMaOdC2IprVgvySLE8iesaYdhRFpHTyEQmK"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent"></div>
+</div>
+<div class="p-stack-md relative -mt-12">
+<div class="flex justify-between items-end">
+<div class="flex-grow">
+<h4 class="text-headline-md font-headline-md text-on-surface">Combo Parrillero</h4>
+<p class="text-body-md text-on-surface-variant/80 mt-1">Ribeye, arrachera, chorizo, queso</p>
+<span class="text-headline-md font-bold text-primary block mt-2">$899</span>
+</div>
+<button class="bg-primary-container w-12 h-12 rounded-xl flex items-center justify-center orange-glow mb-1">
+<span class="material-symbols-outlined text-on-primary-container text-2xl font-bold">add</span>
+</button>
+</div>
+</div>
+<!-- Badge -->
+<div class="absolute top-4 right-4 bg-primary-container/90 backdrop-blur text-on-primary-container text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-tighter">
+                    Best Seller
+                </div>
+</article>
+</section>
+</main>
+<!-- Bottom Navigation Bar -->
+<nav class="fixed bottom-0 left-0 right-0 flex justify-around items-center px-4 pt-3 pb-6 max-w-md mx-auto z-50 rounded-t-xl bg-surface-container/80 backdrop-blur-xl border-t border-white/5 shadow-[0_-4px_20px_rgba(255,140,0,0.15)]">
+<a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant hover:text-primary-fixed-dim transition-all" href="#">
+<span class="material-symbols-outlined">home</span>
+<span class="text-label-md font-label-md mt-1">Inicio</span>
+</a>
+<a class="flex flex-col items-center justify-center text-primary drop-shadow-[0_0_8px_rgba(255,183,125,0.6)] scale-110 duration-300 ease-out" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">grid_view</span>
+<span class="text-label-md font-label-md mt-1">Catálogo</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant hover:text-primary-fixed-dim transition-all" href="#">
+<span class="material-symbols-outlined">shopping_bag</span>
+<span class="text-label-md font-label-md mt-1">Pedidos</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant hover:text-primary-fixed-dim transition-all" href="#">
+<span class="material-symbols-outlined">location_on</span>
+<span class="text-label-md font-label-md mt-1">Sucursales</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant hover:text-primary-fixed-dim transition-all" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="text-label-md font-label-md mt-1">Perfil</span>
+</a>
+</nav>
+<script>
+        // Micro-interaction for add buttons
+        document.querySelectorAll('button').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                const rect = btn.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                const ripple = document.createElement('span');
+                ripple.style.position = 'absolute';
+                ripple.style.width = '2px';
+                ripple.style.height = '2px';
+                ripple.style.background = 'rgba(255,255,255,0.4)';
+                ripple.style.borderRadius = '50%';
+                ripple.style.left = `${x}px`;
+                ripple.style.top = `${y}px`;
+                ripple.style.transform = 'scale(0)';
+                ripple.style.transition = 'transform 0.5s ease-out, opacity 0.5s ease-out';
+                
+                btn.classList.add('relative', 'overflow-hidden');
+                btn.appendChild(ripple);
+                
+                setTimeout(() => {
+                    ripple.style.transform = 'scale(100)';
+                    ripple.style.opacity = '0';
+                }, 10);
+                
+                setTimeout(() => {
+                    ripple.remove();
+                }, 600);
+            });
+        });
+    </script>
+</body></html>

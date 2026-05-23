@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>MITCAN - Home</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #000000;
+            color: #e2e2e2;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .glass {
+            background: rgba(31, 31, 31, 0.7);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .orange-glow {
+            box-shadow: 0 0 25px rgba(255, 140, 0, 0.2);
+        }
+        .qr-gradient {
+            background: linear-gradient(135deg, #1A1A1A 0%, #0e0e0e 100%);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .active-glow {
+            filter: drop-shadow(0 0 8px rgba(255, 183, 125, 0.6));
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-surface-variant": "#ddc1ae",
+                        "on-surface": "#e2e2e2",
+                        "surface": "#131313",
+                        "primary-fixed-dim": "#ffb77d",
+                        "tertiary-container": "#aba9ab",
+                        "primary-fixed": "#ffdcc3",
+                        "outline-variant": "#564334",
+                        "on-tertiary-container": "#3e3e40",
+                        "on-secondary": "#313030",
+                        "on-secondary-fixed-variant": "#474746",
+                        "primary-container": "#ff8c00",
+                        "on-primary-fixed": "#2f1500",
+                        "error": "#ffb4ab",
+                        "secondary-fixed": "#e5e2e1",
+                        "surface-bright": "#393939",
+                        "surface-container": "#1f1f1f",
+                        "secondary": "#c8c6c5",
+                        "on-tertiary-fixed": "#1b1b1d",
+                        "outline": "#a48c7a",
+                        "on-secondary-container": "#b7b5b4",
+                        "surface-container-high": "#2a2a2a",
+                        "tertiary-fixed-dim": "#c8c6c8",
+                        "on-secondary-fixed": "#1c1b1b",
+                        "on-primary-fixed-variant": "#6e3900",
+                        "surface-container-lowest": "#0e0e0e",
+                        "on-error": "#690005",
+                        "error-container": "#93000a",
+                        "inverse-surface": "#e2e2e2",
+                        "on-primary": "#4d2600",
+                        "surface-variant": "#353535",
+                        "on-tertiary": "#303032",
+                        "inverse-primary": "#904d00",
+                        "on-background": "#e2e2e2",
+                        "surface-container-low": "#1b1b1b",
+                        "on-primary-container": "#623200",
+                        "on-tertiary-fixed-variant": "#474649",
+                        "background": "#131313",
+                        "secondary-fixed-dim": "#c8c6c5",
+                        "tertiary": "#c8c6c8",
+                        "on-error-container": "#ffdad6",
+                        "secondary-container": "#474746",
+                        "surface-tint": "#ffb77d",
+                        "primary": "#ffb77d",
+                        "surface-container-highest": "#353535",
+                        "tertiary-fixed": "#e4e2e4",
+                        "inverse-on-surface": "#303030",
+                        "surface-dim": "#131313"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "stack-md": "16px",
+                        "gutter": "12px",
+                        "stack-lg": "24px",
+                        "unit": "4px",
+                        "stack-sm": "8px",
+                        "margin-main": "20px"
+                    },
+                    "fontFamily": {
+                        "headline-lg-mobile": ["Inter"],
+                        "label-md": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "headline-xl": ["Inter"],
+                        "body-md": ["Inter"],
+                        "body-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-lg-mobile": ["22px", {"lineHeight": "28px", "fontWeight": "700"}],
+                        "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                        "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                        "headline-lg": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "headline-xl": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background min-h-screen flex flex-col items-center overflow-x-hidden pb-32">
+<!-- Top App Bar -->
+<header class="flex justify-between items-center px-margin-main h-16 w-full max-w-md mx-auto sticky top-0 z-50 bg-background/80 backdrop-blur-md">
+<div class="flex items-center gap-3">
+<button class="text-on-surface-variant hover:text-primary transition-colors scale-95 active:opacity-80">
+<span class="material-symbols-outlined" data-icon="menu">menu</span>
+</button>
+<h1 class="text-headline-lg font-headline-lg font-extrabold text-on-surface tracking-widest uppercase">MITCAN</h1>
+</div>
+<button class="relative text-on-surface-variant hover:text-primary transition-colors scale-95 active:opacity-80">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+<span class="absolute top-0 right-0 w-2 h-2 bg-primary-container rounded-full ring-2 ring-background"></span>
+</button>
+</header>
+<main class="w-full max-w-md px-margin-main flex flex-col gap-6 mt-2">
+<!-- Welcome Header -->
+<div class="flex justify-between items-end">
+<div>
+<p class="text-on-surface-variant font-body-md text-body-md mb-1">Hola, Luis 👋</p>
+<h2 class="text-headline-xl font-headline-xl text-on-surface">Mi Perfil</h2>
+</div>
+<div class="bg-primary-container/20 px-3 py-1.5 rounded-full border border-primary-container/30">
+<p class="text-primary font-label-md text-label-md">Nivel Oro Parrillero</p>
+</div>
+</div>
+<!-- Rewards Card -->
+<div class="relative overflow-hidden rounded-2xl p-6 orange-glow bg-gradient-to-br from-[#2a1700] to-[#131313] border border-white/5">
+<div class="absolute -top-10 -right-10 w-40 h-40 bg-primary-container/10 blur-[60px] rounded-full"></div>
+<p class="text-on-surface-variant font-label-md text-label-md uppercase tracking-widest mb-1">Tus puntos</p>
+<div class="flex items-baseline gap-2 mb-4">
+<span class="text-5xl font-bold text-primary tracking-tight">2,450</span>
+<span class="text-lg font-medium text-on-surface/60">pts</span>
+</div>
+<p class="text-primary-fixed-dim font-headline-md text-headline-md mb-6">¡Vas muy bien!</p>
+<!-- Progress Bar -->
+<div class="space-y-3">
+<div class="h-3 w-full bg-surface-container-high rounded-full overflow-hidden">
+<div class="h-full bg-primary-container rounded-full relative" style="width: 82%;">
+<div class="absolute top-0 right-0 h-full w-4 bg-white/20 blur-sm"></div>
+</div>
+</div>
+<div class="flex justify-between items-center text-label-md font-label-md">
+<p class="text-on-surface-variant">Te faltan 550 pts para subir a <span class="text-on-surface font-bold">Nivel Diamante</span></p>
+<span class="material-symbols-outlined text-primary-container text-base" data-icon="diamond" style="font-variation-settings: 'FILL' 1;">diamond</span>
+</div>
+</div>
+</div>
+<!-- ENORMOUS QR Container -->
+<div class="glass rounded-[2rem] p-8 flex flex-col items-center gap-6 shadow-2xl relative">
+<div class="qr-gradient p-6 rounded-3xl border border-white/10 relative">
+<!-- Decorative Corner Accents -->
+<div class="absolute top-2 left-2 w-4 h-4 border-t-2 border-l-2 border-primary-container/50"></div>
+<div class="absolute top-2 right-2 w-4 h-4 border-t-2 border-right-2 border-primary-container/50"></div>
+<div class="absolute bottom-2 left-2 w-4 h-4 border-b-2 border-l-2 border-primary-container/50"></div>
+<div class="absolute bottom-2 right-2 w-4 h-4 border-b-2 border-right-2 border-primary-container/50"></div>
+<img alt="Membership QR" class="w-56 h-56 opacity-90 rounded-lg filter drop-shadow-lg" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBe0CWpVUuNnY07NTeXnMXTziqbvz-x9d1uo9y5QjfTgI-58N-Pmg_QwQL1CliYrMNe2IZZ90eFmkl8-kRljgcfAC8rRiCk_L7k5ueCqfvMPBJ2fH_o7vUyTpCPY6_OR4EtIWMuClUNtFrmnOwOPBEDlfZPN8j5cBYRiaVqfNaNAq6AeJoNACcMe4B3RqbrEgCkCGZbHhzYKxbMBJbJJ1m-H2mgzEbuIQzXzRwaoPzVRnq5McT_5Ywd4RB74GJiHPtA84VH8dud0yxk"/>
+<div class="absolute inset-0 flex items-center justify-center">
+<div class="bg-background w-12 h-12 rounded-xl flex items-center justify-center border border-primary-container shadow-lg">
+<span class="text-primary font-black text-xl">M</span>
+</div>
+</div>
+</div>
+<div class="text-center space-y-2">
+<p class="text-headline-md font-headline-md text-on-surface">Escanea en caja</p>
+<p class="text-body-md font-body-md text-on-surface-variant max-w-[240px]">Acumula puntos y disfruta beneficios exclusivos de club.</p>
+</div>
+<div class="w-full h-px bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
+<button class="flex items-center gap-2 text-primary font-label-md text-label-md group">
+                VER CÓDIGO NUMÉRICO
+                <span class="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+<!-- Promociones section -->
+<section class="flex flex-col gap-4">
+<div class="flex justify-between items-center">
+<h3 class="text-headline-md font-headline-md text-on-surface">Promociones para ti</h3>
+<button class="text-primary font-label-md text-label-md">Ver todas</button>
+</div>
+<div class="flex gap-4 overflow-x-auto pb-4 -mx-margin-main px-margin-main snap-x no-scrollbar">
+<!-- Promo Card 1 -->
+<div class="snap-start min-w-[280px] bg-surface-container-high rounded-2xl overflow-hidden flex border border-white/5 relative h-32">
+<div class="flex-1 p-4 flex flex-col justify-between">
+<div>
+<h4 class="text-headline-md font-bold text-on-surface leading-tight">Doble puntos</h4>
+<p class="text-body-md text-on-surface-variant">en cortes selectos</p>
+</div>
+<p class="text-label-md text-primary font-medium">Válido hoy</p>
+</div>
+<div class="w-32 relative">
+<img class="absolute inset-0 w-full h-full object-cover" data-alt="Close up of a premium raw ribeye steak with intense marbling on a dark slate background. The lighting is dramatic and moody, emphasizing the textures of the meat and fat. A warm orange glow illuminates the scene from the side, matching the cinematic noir aesthetic of a high-end steakhouse club." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCE00Hp20oNegJg4YS425yJuGsOulg0PJDgpn4S3j4SSD3CttSSJl1b9ApJMdmKljDKfovgnAzlICnJCndcyKa-4XCqJp64JxsfyNwPNGyCQpvKT7WJRno-bhc94zSr9ZP5l-CIzc5zsCXqiOgE9SXwlXr2LvXb1l2QLM-TZ71-1m6lrevYiVhw3gOYnTaNZc1lOvwkI6OkoKI-_BwsDM3korQLtwYUefbc--dwrG8F1LBL1ArK-4u7sm7QrHHhiKGYJMB7wHTs4bOG"/>
+<div class="absolute inset-0 bg-gradient-to-r from-surface-container-high via-surface-container-high/20 to-transparent"></div>
+<div class="absolute bottom-2 right-2 bg-primary-container text-on-primary font-bold px-2 py-1 rounded text-sm">2X</div>
+</div>
+</div>
+<!-- Promo Card 2 -->
+<div class="snap-start min-w-[280px] bg-surface-container-high rounded-2xl overflow-hidden flex border border-white/5 relative h-32">
+<div class="flex-1 p-4 flex flex-col justify-between">
+<div>
+<h4 class="text-headline-md font-bold text-on-surface leading-tight">Envío Gratis</h4>
+<p class="text-body-md text-on-surface-variant">en compras &gt; $500</p>
+</div>
+<p class="text-label-md text-primary font-medium">Fin de semana</p>
+</div>
+<div class="w-32 relative">
+<img class="absolute inset-0 w-full h-full object-cover" data-alt="A delivery van parked on a modern urban street at night with soft city lights in the background. The scene is captured in a cinematic noir style with deep shadows and warm amber light reflecting off the vehicle's surfaces. The overall atmosphere is premium and efficient, using a dark coffee and orange accent palette." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAdaFeFRVLVegudJnVwag_Ue89735ZuKCpG_5xbbvx1iUn8Djih8Cvn88WAS-sb-Q2fz_UXVcxzmwU3lwy14xQb7nZWJ8Vml_ZIynUl5WNJXkrRnDFaG0l6ORvM2vSxW9y4q3sdsSzlMzCkP0JebMt6x6baHqepIo-e1SOkzK5yW-1q1qb-PBiXtemFeIUWZ9EF9AizrN-eOIwAlINzqFbJnID9qXdJDF70eLXgnAg6_SuVA0OWFoy3ZeD_7UGlh9PNqsw8I1h5Akhe"/>
+<div class="absolute inset-0 bg-gradient-to-r from-surface-container-high via-surface-container-high/20 to-transparent"></div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Bottom Nav Bar -->
+<nav class="fixed bottom-0 left-0 right-0 flex justify-around items-center px-4 pt-3 pb-6 max-w-md mx-auto z-50 rounded-t-xl bg-surface-container/80 backdrop-blur-xl border-t border-white/5 shadow-[0_-4px_20px_rgba(255,140,0,0.15)]">
+<button class="flex flex-col items-center justify-center text-primary active-glow active:scale-110 duration-300 ease-out">
+<span class="material-symbols-outlined" data-icon="home" style="font-variation-settings: 'FILL' 1;">home</span>
+<span class="text-label-md font-label-md mt-1">Inicio</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-secondary-fixed-variant hover:text-primary-fixed-dim transition-all">
+<span class="material-symbols-outlined" data-icon="grid_view">grid_view</span>
+<span class="text-label-md font-label-md mt-1">Catálogo</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-secondary-fixed-variant hover:text-primary-fixed-dim transition-all">
+<span class="material-symbols-outlined" data-icon="shopping_bag">shopping_bag</span>
+<span class="text-label-md font-label-md mt-1">Pedidos</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-secondary-fixed-variant hover:text-primary-fixed-dim transition-all">
+<span class="material-symbols-outlined" data-icon="location_on">location_on</span>
+<span class="text-label-md font-label-md mt-1">Sucursales</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-secondary-fixed-variant hover:text-primary-fixed-dim transition-all">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+<span class="text-label-md font-label-md mt-1">Perfil</span>
+</button>
+</nav>
+<!-- Interaction Script -->
+<script>
+        document.querySelectorAll('button').forEach(btn => {
+            btn.addEventListener('click', () => {
+                // Haptic feedback simulation
+                if ('vibrate' in navigator) {
+                    navigator.vibrate(5);
+                }
+            });
+        });
+    </script>
+</body></html>
