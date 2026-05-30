@@ -4,10 +4,41 @@
   'use strict';
 
   // ---------- Service Worker ----------
+  // When a new shell version is detected we activate it immediately and
+  // reload, so design/copy updates appear on the next paint instead of
+  // after every tab is closed.
   if ('serviceWorker' in navigator) {
+    var reloadingForUpdate = false;
+    navigator.serviceWorker.addEventListener('controllerchange', function () {
+      if (reloadingForUpdate) return;
+      reloadingForUpdate = true;
+      window.location.reload();
+    });
+
     window.addEventListener('load', function () {
       navigator.serviceWorker
-        .register('/sw.js', { scope: '/' })
+        .register('/sw.js', { scope: '/', updateViaCache: 'none' })
+        .then(function (reg) {
+          function promote(worker) {
+            if (!worker) return;
+            worker.addEventListener('statechange', function () {
+              if (worker.state === 'installed' && navigator.serviceWorker.controller) {
+                worker.postMessage('SKIP_WAITING');
+              }
+            });
+          }
+          if (reg.waiting && navigator.serviceWorker.controller) {
+            reg.waiting.postMessage('SKIP_WAITING');
+          }
+          promote(reg.installing);
+          reg.addEventListener('updatefound', function () { promote(reg.installing); });
+
+          document.addEventListener('visibilitychange', function () {
+            if (document.visibilityState === 'visible') {
+              reg.update().catch(function () { /* noop */ });
+            }
+          });
+        })
         .catch(function (err) {
           console.warn('[CSN] SW registration failed:', err);
         });

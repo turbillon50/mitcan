@@ -283,7 +283,7 @@
 
     // Reflect in theme-color so the browser chrome / iOS status bar match.
     const meta = document.querySelector('meta[name="theme-color"]');
-    if (meta) meta.setAttribute('content', t === 'dark' ? '#000000' : '#f5f5f7');
+    if (meta) meta.setAttribute('content', t === 'dark' ? '#14100b' : '#faf4ec');
 
     document.querySelectorAll('[data-theme-toggle-icon]').forEach((el) => {
       el.textContent = t === 'dark' ? 'light_mode' : 'dark_mode';
