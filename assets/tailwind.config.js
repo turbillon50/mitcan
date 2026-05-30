@@ -1,4 +1,4 @@
-/* Tailwind CDN config shared by every page in the MITCAN PWA. */
+/* Tailwind CDN config shared by every page in the CSN PWA. */
 window.tailwind = window.tailwind || {};
 tailwind.config = {
   darkMode: 'class',

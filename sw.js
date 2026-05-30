@@ -1,5 +1,5 @@
-/* MITCAN PWA service worker — app shell + runtime caching. */
-const VERSION = 'mitcan-v1.1.0';
+/* CSN PWA service worker — app shell + runtime caching. */
+const VERSION = 'csn-v2.0.0';
 const SHELL_CACHE = `${VERSION}-shell`;
 const RUNTIME_CACHE = `${VERSION}-runtime`;
 const IMAGE_CACHE = `${VERSION}-images`;
@@ -13,11 +13,14 @@ const SHELL_ASSETS = [
   '/recompensas.html',
   '/pedido',
   '/pedido.html',
+  '/sucursales',
+  '/sucursales.html',
   '/offline.html',
   '/manifest.webmanifest',
   '/assets/theme.css',
   '/assets/app.js',
   '/assets/tailwind.config.js',
+  '/assets/sucursales.js',
   '/assets/qr-membership.png',
   '/assets/qr-membership-sm.png',
   '/icons/favicon.svg',

@@ -12,7 +12,7 @@ from pathlib import Path
 OUT = Path(__file__).resolve().parent.parent / "assets"
 OUT.mkdir(parents=True, exist_ok=True)
 
-PAYLOAD = "MITCAN-CLUB-LUIS-2450"
+PAYLOAD = "CSN-CLUB-LUIS-2450"
 ORANGE = (255, 183, 125)
 BG = (14, 14, 14)
 BLACK = (0, 0, 0)
@@ -54,8 +54,15 @@ def make_qr(size_px: int, with_logo: bool = True) -> Image.Image:
             outline=(255, 140, 0),
             width=max(1, size_px // 256),
         )
-        font = find_font(int(box * 0.7))
-        text = "M"
+        text = "CSN"
+        target_w = int(box * 0.78)
+        fs = int(box * 0.55)
+        while fs > 8:
+            font = find_font(fs)
+            bbox = draw.textbbox((0, 0), text, font=font)
+            if (bbox[2] - bbox[0]) <= target_w:
+                break
+            fs -= 2
         bbox = draw.textbbox((0, 0), text, font=font)
         tw, th = bbox[2] - bbox[0], bbox[3] - bbox[1]
         tx = x + (box - tw) // 2 - bbox[0]
