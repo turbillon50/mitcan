@@ -3,11 +3,11 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#ff8c1a" />
-  <meta name="color-scheme" content="dark" />
+  <meta name="theme-color" content="#f5f5f7" />
+  <meta name="color-scheme" content="light dark" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="apple-mobile-web-app-title" content="CSN" />
   <meta name="description" content="Cortes premium y combos de Carnes Selectas Nayarit." />
   <title>CSN — Catálogo</title>
@@ -25,33 +25,37 @@
   <script src="/assets/tailwind.config.js"></script>
   <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
   <link rel="stylesheet" href="/assets/theme.css" />
+  <script src="/assets/i18n.js"></script>
 </head>
 <body class="selection:bg-primary-container selection:text-on-primary-container">
   <header class="app-header">
     <div class="app-header-inner">
-      <div class="flex items-center gap-4">
-        <button class="text-primary" aria-label="Menú">
-          <span class="material-symbols-outlined">menu</span>
+      <a href="/" aria-label="CSN" style="display: inline-flex; align-items: center; gap: 8px;">
+        <img src="/assets/logo-badge-sm.png" alt="CSN — Carnes Selectas Nayarit" width="34" height="29" />
+      </a>
+      <div style="display: inline-flex; gap: 8px;">
+        <button class="toolbar-toggle" data-action="toggle-lang" data-i18n-attr="aria-label:a11y.lang">
+          <span data-lang-toggle-label>EN</span>
         </button>
-        <a href="/" class="flex items-center gap-2" aria-label="CSN Carnes Selectas Nayarit — Inicio">
-          <img src="/assets/logo-badge-sm.png" alt="" width="40" height="34" class="h-9 w-auto drop-shadow-[0_0_8px_rgba(255,140,0,0.35)]" decoding="async" />
-          <span class="sr-only">CSN — Carnes Selectas Nayarit</span>
-        </a>
+        <button class="icon-btn" data-action="toggle-theme" data-i18n-attr="aria-label:a11y.theme">
+          <span class="material-symbols-outlined" style="font-size: 20px;" data-theme-toggle-icon>dark_mode</span>
+        </button>
+        <button class="icon-btn" data-i18n-attr="aria-label:a11y.notifications">
+          <span class="material-symbols-outlined" style="font-size: 20px;">notifications</span>
+        </button>
       </div>
-      <button class="text-primary" aria-label="Notificaciones">
-        <span class="material-symbols-outlined">notifications</span>
-      </button>
     </div>
   </header>
 
   <main class="pt-2 px-margin-main max-w-md mx-auto">
     <section class="mb-stack-lg">
-      <h2 class="text-headline-lg-mobile mb-stack-md text-on-surface">Catálogo</h2>
+      <h2 class="text-headline-lg-mobile mb-stack-md text-on-surface" data-i18n="catalog.title">Catálogo</h2>
       <div class="relative group">
         <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant group-focus-within:text-primary transition-colors">search</span>
-        <label for="catalog-search" class="sr-only">Buscar productos</label>
+        <label for="catalog-search" class="sr-only" data-i18n="catalog.search">Buscar productos</label>
         <input id="catalog-search" type="search" autocomplete="off"
                class="w-full bg-surface-container border-none rounded-xl py-3 pl-12 pr-4 text-body-md focus:ring-1 focus:ring-primary transition-all placeholder:text-on-surface-variant/50"
+               data-i18n-attr="placeholder:catalog.search"
                placeholder="Buscar productos" />
       </div>
     </section>
@@ -178,11 +182,11 @@
   </main>
 
   <nav class="bottom-nav" aria-label="Navegación principal">
-    <a href="/"><span class="material-symbols-outlined">home</span><span>Inicio</span></a>
-    <a href="/catalogo" aria-current="page"><span class="material-symbols-outlined">grid_view</span><span>Catálogo</span></a>
-    <a href="/pedido"><span class="material-symbols-outlined">shopping_bag</span><span>Pedidos</span></a>
-    <a href="/sucursales"><span class="material-symbols-outlined">location_on</span><span>Sucursales</span></a>
-    <a href="/recompensas"><span class="material-symbols-outlined">redeem</span><span>Premios</span></a>
+    <a href="/"><span class="material-symbols-outlined">home</span><span data-i18n="nav.home">Inicio</span></a>
+    <a href="/catalogo" aria-current="page"><span class="material-symbols-outlined">grid_view</span><span data-i18n="nav.catalog">Catálogo</span></a>
+    <a href="/pedido"><span class="material-symbols-outlined">shopping_bag</span><span data-i18n="nav.orders">Pedidos</span></a>
+    <a href="/sucursales"><span class="material-symbols-outlined">location_on</span><span data-i18n="nav.locations">Sucursales</span></a>
+    <a href="/recompensas"><span class="material-symbols-outlined">redeem</span><span data-i18n="nav.rewards">Premios</span></a>
   </nav>
 
   <script src="/assets/app.js" defer></script>

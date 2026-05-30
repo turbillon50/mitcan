@@ -30,11 +30,11 @@
       '<span class="material-symbols-outlined">install_mobile</span>' +
       '</div>' +
       '<div class="install-banner__body">' +
-      '<strong>Instala CSN</strong>' +
-      '<span>Acceso rápido y modo sin conexión.</span>' +
+      '<strong>' + tr('install.title', 'Instala CSN') + '</strong>' +
+      '<span>' + tr('install.body', 'Acceso rápido y modo sin conexión.') + '</span>' +
       '</div>' +
-      '<button class="install-banner__cta" type="button">Instalar</button>' +
-      '<button class="install-banner__close" type="button" aria-label="Cerrar">' +
+      '<button class="install-banner__cta" type="button">' + tr('install.cta', 'Instalar') + '</button>' +
+      '<button class="install-banner__close" type="button" aria-label="' + tr('install.dismiss', 'Cerrar') + '">' +
       '<span class="material-symbols-outlined">close</span>' +
       '</button>';
     document.body.appendChild(el);
@@ -82,9 +82,13 @@
     t = document.createElement('div');
     t.className = 'net-toast';
     t.innerHTML =
-      '<span class="dot"></span><span class="net-toast__text">Sin conexión</span>';
+      '<span class="dot"></span><span class="net-toast__text"></span>';
     document.body.appendChild(t);
     return t;
+  }
+
+  function tr(key, fallback) {
+    return (window.CSN && window.CSN.tr) ? window.CSN.tr(key) : fallback;
   }
 
   function updateNetState(initial) {
@@ -93,12 +97,12 @@
     if (navigator.onLine) {
       if (initial) return;
       t.classList.add('is-online');
-      label.textContent = 'Conectado de nuevo';
+      label.textContent = tr('net.online', 'Conectado de nuevo');
       t.classList.add('is-visible');
       setTimeout(function () { t.classList.remove('is-visible'); }, 2200);
     } else {
       t.classList.remove('is-online');
-      label.textContent = 'Sin conexión — modo offline';
+      label.textContent = tr('net.offline', 'Sin conexión — modo offline');
       t.classList.add('is-visible');
     }
   }
