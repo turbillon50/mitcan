@@ -50,8 +50,13 @@
 html, body {
   margin: 0;
   padding: 0;
-  background-color: var(--background);
-  color: var(--on-surface);
+  background-color: #ff8c1a;
+  background-image:
+    radial-gradient(140% 95% at 18% 0%, #ffb066 0%, transparent 55%),
+    radial-gradient(140% 100% at 95% 100%, #c8480a 0%, transparent 60%),
+    linear-gradient(170deg, #ff8c1a 0%, #d35a0c 100%);
+  background-attachment: fixed;
+  color: #ffffff;
   font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
   -webkit-font-smoothing: antialiased;
   -webkit-tap-highlight-color: transparent;
@@ -59,29 +64,57 @@ html, body {
 }
 
 body {
+  position: relative;
   min-height: 100dvh;
   padding-bottom: calc(96px + var(--safe-bottom));
 }
+
+/* Brand watermark: gigantic CSN badge pinned in the background. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: -8% -25% auto auto;
+  width: 130%;
+  height: 90%;
+  background: url("/assets/logo-watermark.png") no-repeat center / contain;
+  pointer-events: none;
+  opacity: 0.18;
+  mix-blend-mode: multiply;
+  z-index: 0;
+}
+
+main, header, nav, section { position: relative; z-index: 1; }
 
 a { color: inherit; text-decoration: none; }
 button { font-family: inherit; cursor: pointer; }
 img { display: block; max-width: 100%; }
 
+/* Cards on orange — light translucent panels with a warm tint. */
 .glass {
-  background: rgba(31, 31, 31, 0.7);
+  background: rgba(255, 255, 255, 0.16);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  color: #ffffff;
 }
 .glass-card {
-  background: rgba(26, 26, 26, 0.6);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.14);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  color: #ffffff;
 }
-.orange-glow { box-shadow: 0 0 25px rgba(255, 140, 0, 0.2); }
-.inner-glow { box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.2); }
-.active-glow { filter: drop-shadow(0 0 8px rgba(255, 183, 125, 0.6)); }
+/* Dark glass variant for product list cards where image contrast matters. */
+.glass-dark {
+  background: rgba(44, 26, 16, 0.55);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+}
+.orange-glow { box-shadow: 0 12px 28px -10px rgba(120, 50, 0, 0.5); }
+.inner-glow { box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.35); }
+.active-glow { filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.5)); }
 .qr-gradient { background: linear-gradient(135deg, #1A1A1A 0%, #0e0e0e 100%); }
 
 .material-symbols-outlined {
@@ -101,9 +134,9 @@ img { display: block; max-width: 100%; }
   max-width: 28rem;
   margin: 0 auto;
   padding-top: var(--safe-top);
-  background: rgba(0, 0, 0, 0.7);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  background: linear-gradient(180deg, rgba(255, 140, 26, 0.95) 0%, rgba(255, 140, 26, 0.6) 100%);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
 }
 .app-header-inner {
   display: flex;
@@ -113,7 +146,7 @@ img { display: block; max-width: 100%; }
   padding: 0 var(--margin-main);
 }
 
-/* Bottom nav with safe-area padding */
+/* Bottom nav — warm dark brown for contrast against the orange page. */
 .bottom-nav {
   position: fixed;
   bottom: 0;
@@ -125,13 +158,13 @@ img { display: block; max-width: 100%; }
   justify-content: space-around;
   align-items: center;
   padding: 12px 16px calc(20px + var(--safe-bottom));
-  background: rgba(31, 31, 31, 0.8);
+  background: rgba(44, 26, 16, 0.92);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
-  border-top-left-radius: 16px;
-  border-top-right-radius: 16px;
-  box-shadow: 0 -4px 20px rgba(255, 140, 0, 0.15);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-top-left-radius: 18px;
+  border-top-right-radius: 18px;
+  box-shadow: 0 -8px 24px -8px rgba(0, 0, 0, 0.35);
   z-index: 50;
 }
 .bottom-nav a {
@@ -140,15 +173,15 @@ img { display: block; max-width: 100%; }
   align-items: center;
   gap: 4px;
   font-size: 12px;
-  font-weight: 500;
+  font-weight: 600;
   letter-spacing: 0.05em;
-  color: var(--on-secondary-fixed-variant);
+  color: rgba(255, 220, 184, 0.7);
   transition: color 200ms ease, transform 200ms ease;
 }
-.bottom-nav a:hover { color: var(--primary-fixed-dim); }
+.bottom-nav a:hover { color: #ffffff; }
 .bottom-nav a[aria-current="page"] {
-  color: var(--primary);
-  filter: drop-shadow(0 0 8px rgba(255, 183, 125, 0.6));
+  color: #ffffff;
+  filter: drop-shadow(0 0 6px rgba(255, 200, 130, 0.55));
   transform: scale(1.08);
 }
 .bottom-nav a[aria-current="page"] .material-symbols-outlined {
@@ -246,27 +279,8 @@ img { display: block; max-width: 100%; }
   position: relative;
   margin: 0 calc(-1 * var(--margin-main)) var(--stack-lg);
   padding: calc(56px + var(--safe-top)) var(--margin-main) 28px;
-  background:
-    radial-gradient(120% 95% at 18% 8%, #ffb066 0%, transparent 55%),
-    radial-gradient(140% 100% at 95% 100%, #c8480a 0%, transparent 60%),
-    linear-gradient(160deg, #ff8c1a 0%, #e36510 100%);
   color: #ffffff;
   overflow: hidden;
-  border-bottom-left-radius: 32px;
-  border-bottom-right-radius: 32px;
-  box-shadow: 0 18px 40px -18px rgba(255, 140, 26, 0.55);
-}
-.brand-hero::before {
-  content: "";
-  position: absolute;
-  inset: -12% -18% auto auto;
-  width: 130%;
-  height: 130%;
-  background: url("/assets/logo-watermark.png") no-repeat center / contain;
-  pointer-events: none;
-  filter: saturate(0.95) brightness(0.95);
-  mix-blend-mode: multiply;
-  opacity: 0.35;
 }
 .brand-hero > * { position: relative; z-index: 1; }
 .brand-hero__topline {
@@ -311,10 +325,11 @@ img { display: block; max-width: 100%; }
 }
 .brand-hero__card {
   margin-top: 22px; padding: 16px 18px;
-  background: rgba(255, 255, 255, 0.16);
-  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.28);
   border-radius: 18px;
-  backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+  box-shadow: 0 10px 24px -12px rgba(120, 50, 0, 0.4);
 }
 .brand-hero__card-label {
   font-size: 12px; font-weight: 700; letter-spacing: 0.08em;
@@ -327,11 +342,12 @@ img { display: block; max-width: 100%; }
 /* Friendly section heading used in the new home below the hero */
 .section-title {
   font-size: 22px; font-weight: 800; letter-spacing: -0.01em;
-  color: var(--on-surface); margin: 0 0 12px;
+  color: #ffffff; margin: 0 0 12px;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
 }
 .section-link {
   font-size: 13px; font-weight: 700; letter-spacing: 0.06em;
-  text-transform: uppercase; color: var(--brand-orange);
+  text-transform: uppercase; color: #ffffff; opacity: 0.9;
 }
 
 /* Compact level chip used in card footers */
