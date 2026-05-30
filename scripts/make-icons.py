@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate MITCAN PWA icons (M monogram on premium black, orange glow)."""
+"""Generate CSN PWA icons (CSN monogram on premium black, orange glow)."""
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
 from pathlib import Path
 
@@ -34,7 +34,6 @@ def make_icon(size: int, maskable: bool = False) -> Image.Image:
     img = Image.blend(img, glow, 0.9)
 
     draw = ImageDraw.Draw(img)
-    # Subtle rounded edge for non-maskable icons (visual only — manifest declares purpose)
     if not maskable:
         margin = int(size * 0.08)
         draw.rounded_rectangle(
@@ -44,15 +43,26 @@ def make_icon(size: int, maskable: bool = False) -> Image.Image:
             width=max(1, size // 128),
         )
 
-    font_size = int(size * (0.62 if not maskable else 0.5))
+    # At tiny sizes use a dot; otherwise fit "CSN" to the safe area.
+    if size < 32:
+        text = "C"
+    else:
+        text = "CSN"
+    safe = size * (0.78 if not maskable else 0.62)
+    font_size = max(8, int(size * 0.5))
     font = find_font(font_size)
-    text = "M"
+    while font_size > 6:
+        font = find_font(font_size)
+        bbox = draw.textbbox((0, 0), text, font=font)
+        if (bbox[2] - bbox[0]) <= safe:
+            break
+        font_size -= 2
     bbox = draw.textbbox((0, 0), text, font=font)
     tw, th = bbox[2] - bbox[0], bbox[3] - bbox[1]
     tx = (size - tw) // 2 - bbox[0]
     ty = (size - th) // 2 - bbox[1] - int(size * 0.02)
 
-    # Glow under the letter
+    # Glow under the wordmark
     layer = Image.new("RGBA", (size, size), (0, 0, 0, 0))
     ld = ImageDraw.Draw(layer)
     ld.text((tx, ty), text, font=font, fill=(255, 140, 0, 200))
@@ -76,13 +86,13 @@ for name, (size, maskable) in sizes.items():
     make_icon(size, maskable).save(OUT / name, "PNG", optimize=True)
     print(f"wrote {name}")
 
-# Minimal SVG favicon to keep crisp at any size
 svg = """<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'>
   <rect width='64' height='64' rx='14' fill='#0a0a0a'/>
   <circle cx='32' cy='32' r='22' fill='#3a1c00' opacity='0.7'/>
   <text x='50%' y='54%' text-anchor='middle' dominant-baseline='middle'
-        font-family='Inter, Arial, sans-serif' font-weight='800' font-size='36'
-        fill='#ffb77d'>M</text>
+        font-family='Inter, Arial, sans-serif' font-weight='800' font-size='22'
+        fill='#ffb77d'>CSN</text>
 </svg>"""
 (OUT / "favicon.svg").write_text(svg)
 print("wrote favicon.svg")
+

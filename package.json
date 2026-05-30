@@ -1,8 +1,8 @@
 {
-  "name": "mitcan-pwa",
-  "version": "1.0.0",
+  "name": "csn-pwa",
+  "version": "2.0.0",
   "private": true,
-  "description": "MITCAN — Club de Recompensas. Progressive Web App.",
+  "description": "CSN — Carnes Selectas Nayarit. Progressive Web App.",
   "scripts": {
     "icons": "python3 scripts/make-icons.py",
     "dev": "npx --yes serve -l 3000 .",

@@ -1,4 +1,4 @@
-/* MITCAN PWA shell — service worker bootstrap, install prompt, network state,
+/* CSN PWA shell — service worker bootstrap, install prompt, network state,
    light haptic & ripple feedback. Shared by every page. */
 (function () {
   'use strict';
@@ -9,7 +9,7 @@
       navigator.serviceWorker
         .register('/sw.js', { scope: '/' })
         .catch(function (err) {
-          console.warn('[MITCAN] SW registration failed:', err);
+          console.warn('[CSN] SW registration failed:', err);
         });
     });
   }
@@ -24,13 +24,13 @@
     var el = document.createElement('div');
     el.className = 'install-banner';
     el.setAttribute('role', 'dialog');
-    el.setAttribute('aria-label', 'Instalar MITCAN');
+    el.setAttribute('aria-label', 'Instalar CSN');
     el.innerHTML =
       '<div class="install-banner__icon" aria-hidden="true">' +
       '<span class="material-symbols-outlined">install_mobile</span>' +
       '</div>' +
       '<div class="install-banner__body">' +
-      '<strong>Instala MITCAN</strong>' +
+      '<strong>Instala CSN</strong>' +
       '<span>Acceso rápido y modo sin conexión.</span>' +
       '</div>' +
       '<button class="install-banner__cta" type="button">Instalar</button>' +
