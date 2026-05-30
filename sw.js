@@ -1,5 +1,5 @@
 /* CSN PWA service worker — app shell + runtime caching. */
-const VERSION = 'csn-v4.0.0';
+const VERSION = 'csn-v5.0.0';
 const SHELL_CACHE = `${VERSION}-shell`;
 const RUNTIME_CACHE = `${VERSION}-runtime`;
 const IMAGE_CACHE = `${VERSION}-images`;
@@ -19,6 +19,7 @@ const SHELL_ASSETS = [
   '/manifest.webmanifest',
   '/assets/theme.css',
   '/assets/app.js',
+  '/assets/i18n.js',
   '/assets/tailwind.config.js',
   '/assets/sucursales.js',
   '/assets/qr-membership.png',
