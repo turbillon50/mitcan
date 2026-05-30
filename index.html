@@ -36,53 +36,27 @@
   <link rel="stylesheet" href="/assets/theme.css" />
 </head>
 <body>
-  <header class="app-header">
-    <div class="app-header-inner">
-      <div class="flex items-center gap-3">
-        <button class="text-on-surface-variant hover:text-primary transition-colors" aria-label="Menú">
-          <span class="material-symbols-outlined">menu</span>
-        </button>
-        <a href="/" class="flex items-center gap-2" aria-label="CSN Carnes Selectas Nayarit — Inicio">
-          <img src="/assets/logo-badge-sm.png" alt="" width="40" height="34" class="h-9 w-auto drop-shadow-[0_0_8px_rgba(255,140,0,0.35)]" decoding="async" />
-          <span class="sr-only">CSN — Carnes Selectas Nayarit</span>
+  <main class="w-full max-w-md mx-auto px-margin-main flex flex-col gap-6">
+    <section class="brand-hero" aria-label="Saludo y nivel">
+      <div class="brand-hero__topline">
+        <a href="/" aria-label="CSN Carnes Selectas Nayarit — Inicio">
+          <img src="/assets/logo-badge-sm.png" alt="CSN Carnes Selectas Nayarit" class="brand-hero__logo" decoding="async" />
         </a>
+        <button class="brand-hero__icon-btn" aria-label="Notificaciones">
+          <span class="material-symbols-outlined">notifications</span>
+        </button>
       </div>
-      <button class="relative text-on-surface-variant hover:text-primary transition-colors" aria-label="Notificaciones">
-        <span class="material-symbols-outlined">notifications</span>
-        <span class="absolute top-0 right-0 w-2 h-2 bg-primary-container rounded-full ring-2 ring-background"></span>
-      </button>
-    </div>
-  </header>
 
-  <main class="w-full max-w-md mx-auto px-margin-main flex flex-col gap-6 mt-2">
-    <section class="flex justify-between items-end">
-      <div>
-        <p class="text-on-surface-variant text-body-md mb-1">Hola, Luis 👋</p>
-        <h2 class="text-headline-xl text-on-surface">Mi Perfil</h2>
+      <h1 class="brand-hero__hello">Hola, Miguel 👋</h1>
+      <p class="brand-hero__points">Tus puntos: <span>300</span></p>
+      <p class="brand-hero__tofor">Te faltan 100 puntos para llegar a <strong>Maestro del Carbón 🔥</strong></p>
+      <div class="brand-hero__bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="75">
+        <span style="width: 75%;"></span>
       </div>
-      <div class="bg-primary-container/20 px-3 py-1.5 rounded-full border border-primary-container/30">
-        <p class="text-primary text-label-md">Nivel Oro Parrillero</p>
-      </div>
-    </section>
 
-    <section class="relative overflow-hidden rounded-2xl p-6 orange-glow bg-gradient-to-br from-[#2a1700] to-[#131313] border border-white/5">
-      <div class="absolute -top-10 -right-10 w-40 h-40 bg-primary-container/10 blur-[60px] rounded-full"></div>
-      <p class="text-on-surface-variant text-label-md uppercase tracking-widest mb-1">Tus puntos</p>
-      <div class="flex items-baseline gap-2 mb-4">
-        <span class="text-5xl font-bold text-primary tracking-tight">2,450</span>
-        <span class="text-lg font-medium text-on-surface/60">pts</span>
-      </div>
-      <p class="text-primary-fixed-dim text-headline-md mb-6">¡Vas muy bien!</p>
-      <div class="space-y-3">
-        <div class="h-3 w-full bg-surface-container-high rounded-full overflow-hidden" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="82">
-          <div class="h-full bg-primary-container rounded-full relative" style="width: 82%;">
-            <div class="absolute top-0 right-0 h-full w-4 bg-white/20 blur-sm"></div>
-          </div>
-        </div>
-        <div class="flex justify-between items-center text-label-md">
-          <p class="text-on-surface-variant">Te faltan 550 pts para subir a <span class="text-on-surface font-bold">Nivel Diamante</span></p>
-          <span class="material-symbols-outlined text-primary-container text-base" style="font-variation-settings: 'FILL' 1;">diamond</span>
-        </div>
+      <div class="brand-hero__card">
+        <p class="brand-hero__card-label">Nivel Actual</p>
+        <p class="brand-hero__card-value">Taquero Oficial 🥩</p>
       </div>
     </section>
 
@@ -97,11 +71,11 @@
              src="/assets/qr-membership.png" />
       </div>
       <div class="text-center space-y-2">
-        <p class="text-headline-md text-on-surface">Escanea en caja</p>
-        <p class="text-body-md text-on-surface-variant max-w-[240px]">Acumula puntos y disfruta beneficios exclusivos de club.</p>
+        <p class="text-headline-md text-on-surface">Escanea en caja 🥩</p>
+        <p class="text-body-md text-on-surface-variant max-w-[260px]">Súmate puntos en cada compra y desbloquea recompensas en tu carnicería favorita.</p>
       </div>
       <div class="w-full h-px bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
-      <button class="flex items-center gap-2 text-primary text-label-md group">
+      <button class="flex items-center gap-2 text-label-md group" style="color: var(--brand-orange-bright);">
         VER CÓDIGO NUMÉRICO
         <span class="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">arrow_forward</span>
       </button>
@@ -109,8 +83,8 @@
 
     <section class="flex flex-col gap-4">
       <div class="flex justify-between items-center">
-        <h3 class="text-headline-md text-on-surface">Promociones para ti</h3>
-        <a href="/recompensas" class="text-primary text-label-md">Ver todas</a>
+        <h3 class="section-title">Promos para ti 🔥</h3>
+        <a href="/recompensas" class="section-link">Ver todas</a>
       </div>
       <div class="flex gap-4 overflow-x-auto pb-4 -mx-margin-main px-margin-main snap-x no-scrollbar">
         <article class="snap-start min-w-[280px] bg-surface-container-high rounded-2xl overflow-hidden flex border border-white/5 relative h-32">

@@ -1,8 +1,8 @@
-/* CSN — Obsidian & Ember design tokens + shared component styles */
+/* CSN — Brand tokens (Brasa & Marca) + shared component styles. */
 
 :root {
   color-scheme: dark;
-  /* surfaces */
+  /* base surfaces (used by inner content) */
   --surface: #131313;
   --surface-dim: #131313;
   --surface-bright: #393939;
@@ -11,29 +11,36 @@
   --surface-container: #1f1f1f;
   --surface-container-high: #2a2a2a;
   --surface-container-highest: #353535;
-  --background: #000000;
-  --on-background: #e2e2e2;
-  --on-surface: #e2e2e2;
-  --on-surface-variant: #ddc1ae;
-  /* accents */
-  --primary: #ffb77d;
-  --primary-container: #ff8c00;
-  --on-primary: #4d2600;
-  --on-primary-container: #623200;
-  --on-secondary-fixed-variant: #474746;
+  --background: #150a04;
+  --on-background: #fff3e6;
+  --on-surface: #fff3e6;
+  --on-surface-variant: #ffdcb8;
+
+  /* CSN corporate */
+  --brand-orange: #ff8c1a;
+  --brand-orange-bright: #ff9f3a;
+  --brand-orange-deep: #d35a0c;
+  --brand-brown: #4a2e1f;
+  --brand-brown-deep: #2c1a10;
+  --brand-cream: #fff3e6;
+
+  /* legacy accent variables (kept for back-compat with existing classes) */
+  --primary: #ff9f3a;
+  --primary-container: #ff8c1a;
+  --on-primary: #2c1a10;
+  --on-primary-container: #ffffff;
+  --on-secondary-fixed-variant: #6b4a35;
   --primary-fixed-dim: #ffb77d;
-  /* radii */
+
   --radius-sm: 0.25rem;
   --radius-md: 0.75rem;
   --radius-lg: 1rem;
   --radius-xl: 1.5rem;
-  /* spacing */
   --margin-main: 20px;
   --gutter: 12px;
   --stack-sm: 8px;
   --stack-md: 16px;
   --stack-lg: 24px;
-  /* safe areas */
   --safe-top: env(safe-area-inset-top, 0px);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
 }
@@ -233,6 +240,109 @@ img { display: block; max-width: 100%; }
   width: 8px; height: 8px; border-radius: 999px; background: #ffb4ab;
 }
 .net-toast.is-online .dot { background: #b6e5b0; }
+
+/* ===== Brand hero (orange backdrop + big logo watermark) ===== */
+.brand-hero {
+  position: relative;
+  margin: 0 calc(-1 * var(--margin-main)) var(--stack-lg);
+  padding: calc(56px + var(--safe-top)) var(--margin-main) 28px;
+  background:
+    radial-gradient(120% 95% at 18% 8%, #ffb066 0%, transparent 55%),
+    radial-gradient(140% 100% at 95% 100%, #c8480a 0%, transparent 60%),
+    linear-gradient(160deg, #ff8c1a 0%, #e36510 100%);
+  color: #ffffff;
+  overflow: hidden;
+  border-bottom-left-radius: 32px;
+  border-bottom-right-radius: 32px;
+  box-shadow: 0 18px 40px -18px rgba(255, 140, 26, 0.55);
+}
+.brand-hero::before {
+  content: "";
+  position: absolute;
+  inset: -12% -18% auto auto;
+  width: 130%;
+  height: 130%;
+  background: url("/assets/logo-watermark.png") no-repeat center / contain;
+  pointer-events: none;
+  filter: saturate(0.95) brightness(0.95);
+  mix-blend-mode: multiply;
+  opacity: 0.35;
+}
+.brand-hero > * { position: relative; z-index: 1; }
+.brand-hero__topline {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 18px;
+}
+.brand-hero__logo { height: 36px; width: auto; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.25)); }
+.brand-hero__icon-btn {
+  width: 40px; height: 40px; border-radius: 999px;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: rgba(255, 255, 255, 0.18);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+.brand-hero__hello {
+  font-size: 44px; line-height: 1.05; font-weight: 800;
+  letter-spacing: -0.025em; margin: 4px 0 14px;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.18);
+}
+.brand-hero__points {
+  font-size: 28px; font-weight: 800; letter-spacing: -0.01em;
+  margin: 0 0 10px;
+}
+.brand-hero__points span { font-weight: 800; }
+.brand-hero__tofor {
+  font-size: 18px; line-height: 1.35; font-weight: 500; margin: 0 0 14px;
+  max-width: 320px;
+}
+.brand-hero__tofor strong { font-weight: 800; }
+.brand-hero__bar {
+  width: 100%; height: 14px; border-radius: 999px;
+  background: rgba(255, 255, 255, 0.25);
+  overflow: hidden; box-shadow: inset 0 1px 2px rgba(0,0,0,0.18);
+}
+.brand-hero__bar > span {
+  display: block; height: 100%;
+  background: linear-gradient(90deg, #ffffff 0%, #ffe6c8 100%);
+  border-radius: 999px;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.55);
+}
+.brand-hero__card {
+  margin-top: 22px; padding: 16px 18px;
+  background: rgba(255, 255, 255, 0.16);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 18px;
+  backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+}
+.brand-hero__card-label {
+  font-size: 12px; font-weight: 700; letter-spacing: 0.08em;
+  text-transform: uppercase; opacity: 0.85; margin-bottom: 4px;
+}
+.brand-hero__card-value {
+  font-size: 22px; font-weight: 800; letter-spacing: -0.01em;
+}
+
+/* Friendly section heading used in the new home below the hero */
+.section-title {
+  font-size: 22px; font-weight: 800; letter-spacing: -0.01em;
+  color: var(--on-surface); margin: 0 0 12px;
+}
+.section-link {
+  font-size: 13px; font-weight: 700; letter-spacing: 0.06em;
+  text-transform: uppercase; color: var(--brand-orange);
+}
+
+/* Compact level chip used in card footers */
+.level-chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 6px 10px; border-radius: 999px;
+  background: rgba(255, 140, 26, 0.18);
+  border: 1px solid rgba(255, 140, 26, 0.35);
+  color: var(--brand-orange-bright);
+  font-size: 12px; font-weight: 700; letter-spacing: 0.04em;
+}
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
