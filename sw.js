@@ -1,5 +1,5 @@
 /* CSN PWA service worker — app shell + runtime caching. */
-const VERSION = 'csn-v2.0.0';
+const VERSION = 'csn-v2.1.0';
 const SHELL_CACHE = `${VERSION}-shell`;
 const RUNTIME_CACHE = `${VERSION}-runtime`;
 const IMAGE_CACHE = `${VERSION}-images`;
@@ -23,6 +23,8 @@ const SHELL_ASSETS = [
   '/assets/sucursales.js',
   '/assets/qr-membership.png',
   '/assets/qr-membership-sm.png',
+  '/assets/logo-badge.png',
+  '/assets/logo-badge-sm.png',
   '/icons/favicon.svg',
   '/icons/favicon-32.png',
   '/icons/icon-192.png',
