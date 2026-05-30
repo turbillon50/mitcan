@@ -1,38 +1,35 @@
 #!/usr/bin/env python3
-"""Generate CSN PWA icons (CSN monogram on premium black, orange glow)."""
-from PIL import Image, ImageDraw, ImageFont, ImageFilter
+"""Generate CSN PWA icons using the real CSN badge logo.
+
+Composites assets/logo-badge.png onto a premium dark canvas with a soft
+orange ambient glow. Produces icons at all sizes the manifest needs,
+including a maskable variant with a generous safe area.
+"""
+from PIL import Image, ImageDraw, ImageFilter
 from pathlib import Path
 
-OUT = Path(__file__).resolve().parent.parent / "icons"
+ROOT = Path(__file__).resolve().parent.parent
+OUT = ROOT / "icons"
+BADGE_SRC = ROOT / "assets" / "logo-badge.png"
 OUT.mkdir(parents=True, exist_ok=True)
 
 BG = (10, 10, 10)
-ORANGE = (255, 140, 0)
-ORANGE_BRIGHT = (255, 183, 125)
-
-
-def find_font(size: int) -> ImageFont.FreeTypeFont:
-    candidates = [
-        "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
-        "/usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf",
-        "/usr/share/fonts/truetype/freefont/FreeSansBold.ttf",
-    ]
-    for path in candidates:
-        if Path(path).exists():
-            return ImageFont.truetype(path, size)
-    return ImageFont.load_default()
+GLOW = (60, 28, 0)
 
 
 def make_icon(size: int, maskable: bool = False) -> Image.Image:
     img = Image.new("RGB", (size, size), BG)
+
+    # Soft orange ambient glow centered.
     glow = Image.new("RGB", (size, size), BG)
     gd = ImageDraw.Draw(glow)
     cx, cy = size // 2, size // 2
-    r = int(size * 0.45)
-    gd.ellipse((cx - r, cy - r, cx + r, cy + r), fill=(60, 28, 0))
+    r = int(size * 0.46)
+    gd.ellipse((cx - r, cy - r, cx + r, cy + r), fill=GLOW)
     glow = glow.filter(ImageFilter.GaussianBlur(radius=size * 0.08))
-    img = Image.blend(img, glow, 0.9)
+    img = Image.blend(img, glow, 0.95)
 
+    # Subtle rounded border for non-maskable icons (UI-only hint).
     draw = ImageDraw.Draw(img)
     if not maskable:
         margin = int(size * 0.08)
@@ -43,37 +40,28 @@ def make_icon(size: int, maskable: bool = False) -> Image.Image:
             width=max(1, size // 128),
         )
 
-    # At tiny sizes use a dot; otherwise fit "CSN" to the safe area.
-    if size < 32:
-        text = "C"
-    else:
-        text = "CSN"
-    safe = size * (0.78 if not maskable else 0.62)
-    font_size = max(8, int(size * 0.5))
-    font = find_font(font_size)
-    while font_size > 6:
-        font = find_font(font_size)
-        bbox = draw.textbbox((0, 0), text, font=font)
-        if (bbox[2] - bbox[0]) <= safe:
-            break
-        font_size -= 2
-    bbox = draw.textbbox((0, 0), text, font=font)
-    tw, th = bbox[2] - bbox[0], bbox[3] - bbox[1]
-    tx = (size - tw) // 2 - bbox[0]
-    ty = (size - th) // 2 - bbox[1] - int(size * 0.02)
+    # Place the badge centered. Maskable icons need a tighter safe area
+    # so that platform crops don't clip the badge.
+    safe = 0.78 if not maskable else 0.62
+    badge_max = int(size * safe)
+    badge = Image.open(BADGE_SRC).convert("RGBA")
+    bw, bh = badge.size
+    scale = badge_max / max(bw, bh)
+    new_size = (max(1, int(bw * scale)), max(1, int(bh * scale)))
+    badge = badge.resize(new_size, Image.LANCZOS)
 
-    # Glow under the wordmark
-    layer = Image.new("RGBA", (size, size), (0, 0, 0, 0))
-    ld = ImageDraw.Draw(layer)
-    ld.text((tx, ty), text, font=font, fill=(255, 140, 0, 200))
-    layer = layer.filter(ImageFilter.GaussianBlur(radius=size * 0.025))
-    img.paste(layer, (0, 0), layer)
+    # Cast a warm shadow underneath the badge so it lifts off the canvas.
+    shadow = Image.new("RGBA", img.size, (0, 0, 0, 0))
+    shadow.paste(badge, ((size - badge.width) // 2, (size - badge.height) // 2 + int(size * 0.012)))
+    shadow = shadow.filter(ImageFilter.GaussianBlur(radius=size * 0.018))
+    rgba = img.convert("RGBA")
+    rgba.alpha_composite(shadow)
+    rgba.paste(badge, ((size - badge.width) // 2, (size - badge.height) // 2), badge)
 
-    draw.text((tx, ty), text, font=font, fill=ORANGE_BRIGHT)
-    return img
+    return rgba.convert("RGB")
 
 
-sizes = {
+SIZES = {
     "icon-192.png": (192, False),
     "icon-512.png": (512, False),
     "icon-maskable-512.png": (512, True),
@@ -82,17 +70,15 @@ sizes = {
     "favicon-16.png": (16, False),
 }
 
-for name, (size, maskable) in sizes.items():
+for name, (size, maskable) in SIZES.items():
     make_icon(size, maskable).save(OUT / name, "PNG", optimize=True)
     print(f"wrote {name}")
 
+# SVG favicon references the badge PNG so any future logo swap propagates.
 svg = """<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'>
   <rect width='64' height='64' rx='14' fill='#0a0a0a'/>
   <circle cx='32' cy='32' r='22' fill='#3a1c00' opacity='0.7'/>
-  <text x='50%' y='54%' text-anchor='middle' dominant-baseline='middle'
-        font-family='Inter, Arial, sans-serif' font-weight='800' font-size='22'
-        fill='#ffb77d'>CSN</text>
+  <image href='/assets/logo-badge-sm.png' x='8' y='12' width='48' height='40' preserveAspectRatio='xMidYMid meet'/>
 </svg>"""
 (OUT / "favicon.svg").write_text(svg)
 print("wrote favicon.svg")
-

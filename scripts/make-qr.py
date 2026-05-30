@@ -1,32 +1,22 @@
 #!/usr/bin/env python3
-"""Generate brand-tinted QR assets for the MITCAN PWA.
+"""Generate brand-tinted QR assets for the CSN PWA.
 
-QR-Code uses MITCAN orange on a deep coffee background with a centered
-"M" knockout so the membership code is unmistakable.
+QR code uses CSN orange on a deep coffee background with the real CSN
+badge composited at the center as a knockout. ERROR_CORRECT_H gives
+~30% redundancy so the centered badge does not break readability.
 """
 import qrcode
 from qrcode.constants import ERROR_CORRECT_H
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw, ImageFilter
 from pathlib import Path
 
-OUT = Path(__file__).resolve().parent.parent / "assets"
-OUT.mkdir(parents=True, exist_ok=True)
+ROOT = Path(__file__).resolve().parent.parent
+OUT = ROOT / "assets"
+BADGE_SRC = ROOT / "assets" / "logo-badge.png"
 
 PAYLOAD = "CSN-CLUB-LUIS-2450"
 ORANGE = (255, 183, 125)
 BG = (14, 14, 14)
-BLACK = (0, 0, 0)
-
-
-def find_font(size: int) -> ImageFont.FreeTypeFont:
-    for p in [
-        "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
-        "/usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf",
-        "/usr/share/fonts/truetype/freefont/FreeSansBold.ttf",
-    ]:
-        if Path(p).exists():
-            return ImageFont.truetype(p, size)
-    return ImageFont.load_default()
 
 
 def make_qr(size_px: int, with_logo: bool = True) -> Image.Image:
@@ -38,37 +28,38 @@ def make_qr(size_px: int, with_logo: bool = True) -> Image.Image:
     )
     qr.add_data(PAYLOAD)
     qr.make(fit=True)
-    img = qr.make_image(fill_color=ORANGE, back_color=BG).convert("RGB")
+    img = qr.make_image(fill_color=ORANGE, back_color=BG).convert("RGBA")
     img = img.resize((size_px, size_px), Image.LANCZOS)
+
     if with_logo:
-        # Knockout box with "M"
-        box = int(size_px * 0.22)
+        # Black knockout panel for legibility.
+        box = int(size_px * 0.26)
         x = (size_px - box) // 2
         y = (size_px - box) // 2
         draw = ImageDraw.Draw(img)
-        draw.rounded_rectangle((x, y, x + box, y + box), radius=int(box * 0.22), fill=BLACK)
-        # 1px primary border
         draw.rounded_rectangle(
             (x, y, x + box, y + box),
-            radius=int(box * 0.22),
+            radius=int(box * 0.20),
+            fill=(0, 0, 0, 255),
+        )
+        draw.rounded_rectangle(
+            (x, y, x + box, y + box),
+            radius=int(box * 0.20),
             outline=(255, 140, 0),
             width=max(1, size_px // 256),
         )
-        text = "CSN"
-        target_w = int(box * 0.78)
-        fs = int(box * 0.55)
-        while fs > 8:
-            font = find_font(fs)
-            bbox = draw.textbbox((0, 0), text, font=font)
-            if (bbox[2] - bbox[0]) <= target_w:
-                break
-            fs -= 2
-        bbox = draw.textbbox((0, 0), text, font=font)
-        tw, th = bbox[2] - bbox[0], bbox[3] - bbox[1]
-        tx = x + (box - tw) // 2 - bbox[0]
-        ty = y + (box - th) // 2 - bbox[1] - int(box * 0.04)
-        draw.text((tx, ty), text, font=font, fill=ORANGE)
-    return img
+        # Place the real badge inside.
+        badge = Image.open(BADGE_SRC).convert("RGBA")
+        inner = int(box * 0.84)
+        bw, bh = badge.size
+        scale = inner / max(bw, bh)
+        new = (max(1, int(bw * scale)), max(1, int(bh * scale)))
+        badge = badge.resize(new, Image.LANCZOS)
+        bx = x + (box - badge.width) // 2
+        by = y + (box - badge.height) // 2
+        img.paste(badge, (bx, by), badge)
+
+    return img.convert("RGB")
 
 
 for name, size, logo in [
