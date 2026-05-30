@@ -1,33 +1,37 @@
-/* CSN — Apple-TV-inspired light/dark theme. Orange used as accent only. */
+/* CSN — Carnes Selectas Nayarit: brand-accurate red + orange, clean light mode. */
 
 :root {
   color-scheme: light dark;
 
-  /* ===== Light — "Carnicería Premium" (warm paper, leather accents) ===== */
-  --bg: #faf4ec;
+  /* ===== Light — "CSN Clean" (white surfaces, brand red/orange accents) ===== */
+  --bg: #F7F5F3;
   --bg-elevated: #ffffff;
-  --bg-glass: rgba(255, 250, 244, 0.82);
+  --bg-glass: rgba(255, 255, 255, 0.88);
   --surface: #ffffff;
-  --surface-soft: #f3ead9;
-  --surface-muted: #ece1cd;
-  --on-bg: #2a1a10;
-  --on-bg-soft: #5a3a26;
-  --on-bg-muted: #8a6e54;
-  --hairline: rgba(74, 46, 31, 0.10);
-  --hairline-strong: rgba(74, 46, 31, 0.20);
-  --shadow-card: 0 12px 28px -14px rgba(74, 46, 31, 0.22), 0 2px 6px -3px rgba(74, 46, 31, 0.10);
-  --shadow-hero: 0 26px 60px -28px rgba(74, 46, 31, 0.28);
+  --surface-soft: #FFF3EE;
+  --surface-muted: #F0EAE3;
+  --on-bg: #1A0A05;
+  --on-bg-soft: #5A3020;
+  --on-bg-muted: #8A6050;
+  --hairline: rgba(100, 30, 15, 0.10);
+  --hairline-strong: rgba(100, 30, 15, 0.22);
+  --shadow-card: 0 12px 28px -14px rgba(100, 30, 15, 0.18), 0 2px 6px -3px rgba(100, 30, 15, 0.08);
+  --shadow-hero: 0 26px 60px -28px rgba(180, 40, 20, 0.40);
 
-  --brand-orange: #f97316;
-  --brand-orange-soft: #ffd1a6;
-  --brand-orange-deep: #c2410c;
+  /* ===== CSN Brand Palette ===== */
+  --brand-red: #CC2B18;
+  --brand-red-deep: #A82210;
+  --brand-orange: #E87020;
+  --brand-orange-soft: #FFD4A8;
+  --brand-orange-deep: #C05010;
+  --brand-wood: #C48040;
   --brand-copper: #b97836;
   --brand-leather: #6b3e2a;
-  --brand-cream: #fff6e8;
-  --brand-brown: #4a2e1f;
+  --brand-cream: #FFF6EE;
+  --brand-brown: #2E140A;
 
-  --primary: #f97316;
-  --primary-pressed: #c2410c;
+  --primary: #CC2B18;
+  --primary-pressed: #A82210;
   --on-primary: #ffffff;
 
   --radius-sm: 10px;
@@ -50,48 +54,48 @@
   --font-body: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter', system-ui, sans-serif;
 
   --surface-container: #ffffff;
-  --surface-container-low: #fcf6ec;
-  --surface-container-high: #f3ead9;
-  --surface-container-highest: #ece1cd;
-  --surface-variant: #f3ead9;
-  --on-surface: #2a1a10;
-  --on-surface-variant: #8a6e54;
+  --surface-container-low: #FFF6F0;
+  --surface-container-high: #F0EAE3;
+  --surface-container-highest: #E8DFD5;
+  --surface-variant: #FFF3EE;
+  --on-surface: #1A0A05;
+  --on-surface-variant: #8A6050;
   --on-secondary-fixed-variant: #b3997b;
-  --primary-fixed-dim: #fb923c;
-  --primary-container: #f97316;
+  --primary-fixed-dim: #E87020;
+  --primary-container: #CC2B18;
   --on-primary-container: #ffffff;
-  --background: #faf4ec;
+  --background: #F7F5F3;
 }
 
 [data-theme="dark"] {
   color-scheme: dark;
-  --bg: #14100b;
-  --bg-elevated: #1f1812;
-  --bg-glass: rgba(31, 24, 18, 0.82);
-  --surface: #1f1812;
-  --surface-soft: #261d15;
-  --surface-muted: #2f241a;
-  --on-bg: #faf4ec;
-  --on-bg-soft: #e6d5be;
-  --on-bg-muted: #b3997b;
-  --hairline: rgba(255, 224, 188, 0.10);
-  --hairline-strong: rgba(255, 224, 188, 0.20);
-  --shadow-card: 0 20px 40px -18px rgba(0, 0, 0, 0.55);
-  --shadow-hero: 0 30px 80px -28px rgba(249, 115, 22, 0.22);
+  --bg: #120806;
+  --bg-elevated: #1E100C;
+  --bg-glass: rgba(30, 16, 12, 0.88);
+  --surface: #1E100C;
+  --surface-soft: #281610;
+  --surface-muted: #321E16;
+  --on-bg: #FFF6EE;
+  --on-bg-soft: #E8D0BE;
+  --on-bg-muted: #B39080;
+  --hairline: rgba(255, 210, 180, 0.10);
+  --hairline-strong: rgba(255, 210, 180, 0.20);
+  --shadow-card: 0 20px 40px -18px rgba(0, 0, 0, 0.60);
+  --shadow-hero: 0 30px 80px -28px rgba(200, 43, 24, 0.30);
 
-  --primary: #fb923c;
-  --primary-pressed: #fcad6c;
-  --on-primary: #1a0e02;
+  --primary: #E87020;
+  --primary-pressed: #CC2B18;
+  --on-primary: #ffffff;
 
-  --surface-container: #1f1812;
-  --surface-container-low: #261d15;
-  --surface-container-high: #2f241a;
-  --surface-container-highest: #3a2c20;
-  --surface-variant: #2f241a;
-  --on-surface: #faf4ec;
-  --on-surface-variant: #b3997b;
-  --on-secondary-fixed-variant: #8a6e54;
-  --background: #14100b;
+  --surface-container: #1E100C;
+  --surface-container-low: #281610;
+  --surface-container-high: #321E16;
+  --surface-container-highest: #3C2418;
+  --surface-variant: #321E16;
+  --on-surface: #FFF6EE;
+  --on-surface-variant: #B39080;
+  --on-secondary-fixed-variant: #8A6050;
+  --background: #120806;
 }
 
 * { box-sizing: border-box; }
@@ -111,17 +115,6 @@ body {
   position: relative;
   min-height: 100dvh;
   padding-bottom: calc(96px + var(--safe-bottom));
-  /* Subtle warm paper grain — barely-there texture for warmth. */
-  background-image:
-    radial-gradient(rgba(185, 120, 54, 0.05) 1px, transparent 1px),
-    radial-gradient(rgba(74, 46, 31, 0.04) 1px, transparent 1px);
-  background-size: 12px 12px, 18px 18px;
-  background-position: 0 0, 6px 9px;
-}
-[data-theme="dark"] body {
-  background-image:
-    radial-gradient(rgba(251, 146, 60, 0.04) 1px, transparent 1px),
-    radial-gradient(rgba(255, 224, 188, 0.025) 1px, transparent 1px);
 }
 
 h1, h2, h3, .display {
@@ -179,27 +172,27 @@ img { display: block; max-width: 100%; }
   border-radius: 999px; background: var(--brand-orange);
 }
 
-/* ===== Hero (Apple TV: light, big imagery, bold display) ===== */
+/* ===== Hero — CSN brand red/orange gradient ===== */
 .atv-hero {
   position: relative; overflow: hidden;
   margin: 12px var(--margin-main) 0;
   padding: 32px 28px 34px;
   border-radius: var(--radius-2xl);
   background:
-    radial-gradient(120% 130% at 0% 0%, #ffd6a8 0%, transparent 55%),
-    radial-gradient(120% 130% at 100% 100%, #f9d9b0 0%, transparent 60%),
-    linear-gradient(140deg, #fff6e8 0%, #f7e8cf 100%);
-  color: #2a1a10;
+    radial-gradient(120% 130% at 0% 0%, rgba(255,255,255,0.18) 0%, transparent 50%),
+    radial-gradient(90% 90% at 100% 100%, rgba(0,0,0,0.22) 0%, transparent 55%),
+    linear-gradient(140deg, #CC2B18 0%, #E87020 100%);
+  color: #ffffff;
   box-shadow: var(--shadow-hero);
-  border: 1px solid rgba(185, 120, 54, 0.16);
+  border: 1px solid rgba(255,255,255,0.15);
 }
 [data-theme="dark"] .atv-hero {
   background:
-    radial-gradient(120% 130% at 0% 0%, rgba(249, 115, 22, 0.32) 0%, transparent 55%),
-    radial-gradient(120% 130% at 100% 100%, rgba(185, 120, 54, 0.18) 0%, transparent 60%),
-    linear-gradient(140deg, #1f1812 0%, #2a1f17 100%);
+    radial-gradient(120% 130% at 0% 0%, rgba(204, 43, 24, 0.45) 0%, transparent 55%),
+    radial-gradient(120% 130% at 100% 100%, rgba(232, 112, 32, 0.22) 0%, transparent 60%),
+    linear-gradient(140deg, #1E100C 0%, #281610 100%);
   color: var(--on-bg);
-  border-color: rgba(255, 224, 188, 0.10);
+  border-color: rgba(255, 210, 180, 0.12);
 }
 .atv-hero::before {
   content: "";
@@ -225,36 +218,44 @@ img { display: block; max-width: 100%; }
   font-family: var(--font-display);
   font-size: 64px; line-height: 1; font-weight: 700;
   letter-spacing: -0.04em; margin: 0 0 16px;
-  color: var(--brand-orange-deep);
+  color: #ffffff;
 }
 [data-theme="dark"] .atv-hero__points-value { color: var(--brand-orange); }
 .atv-hero__tofor {
-  font-size: 15px; line-height: 1.4; font-weight: 500; opacity: 0.78;
+  font-size: 15px; line-height: 1.4; font-weight: 500; opacity: 0.88;
   margin: 0 0 14px; max-width: 320px;
 }
 .atv-hero__tofor strong { font-weight: 800; opacity: 1; }
 .atv-hero__bar {
   width: 100%; height: 8px; border-radius: 999px;
-  background: rgba(0, 0, 0, 0.08);
+  background: rgba(255, 255, 255, 0.28);
   overflow: hidden;
 }
 [data-theme="dark"] .atv-hero__bar { background: rgba(255, 255, 255, 0.15); }
 .atv-hero__bar > span {
   display: block; height: 100%;
-  background: linear-gradient(90deg, var(--brand-orange) 0%, var(--brand-orange-deep) 100%);
+  background: linear-gradient(90deg, rgba(255,255,255,0.85) 0%, #ffffff 100%);
   border-radius: 999px;
-  box-shadow: 0 0 14px rgba(255, 140, 26, 0.5);
+  box-shadow: 0 0 14px rgba(255, 255, 255, 0.45);
+}
+[data-theme="dark"] .atv-hero__bar > span {
+  background: linear-gradient(90deg, var(--brand-orange) 0%, var(--brand-red) 100%);
+  box-shadow: 0 0 14px rgba(232, 112, 32, 0.5);
 }
 .atv-hero__chip {
   display: inline-flex; align-items: center; gap: 8px;
   margin-top: 18px; padding: 8px 14px;
-  background: var(--bg-elevated); border: 1px solid var(--hairline);
+  background: rgba(255,255,255,0.20); border: 1px solid rgba(255,255,255,0.30);
   border-radius: 999px;
-  font-size: 13px; font-weight: 700;
-  box-shadow: var(--shadow-card);
+  font-size: 13px; font-weight: 700; color: #ffffff;
+  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
 }
-.atv-hero__chip-label { opacity: 0.6; font-weight: 600; letter-spacing: 0.02em; }
-.atv-hero__chip-value { color: var(--brand-orange); }
+[data-theme="dark"] .atv-hero__chip {
+  background: var(--bg-elevated); border-color: var(--hairline); color: var(--on-bg);
+}
+.atv-hero__chip-label { opacity: 0.75; font-weight: 600; letter-spacing: 0.02em; }
+.atv-hero__chip-value { color: #ffffff; font-weight: 800; }
+[data-theme="dark"] .atv-hero__chip-value { color: var(--brand-orange); }
 
 /* ===== Cards & lists ===== */
 .card {
@@ -293,10 +294,10 @@ img { display: block; max-width: 100%; }
 .btn-primary {
   display: inline-flex; align-items: center; justify-content: center; gap: 6px;
   padding: 10px 16px; border-radius: 999px;
-  background: var(--brand-orange);
+  background: var(--primary);
   color: #ffffff; border: none;
   font-weight: 700; font-size: 13px; letter-spacing: 0.02em;
-  box-shadow: 0 8px 18px -8px rgba(255, 140, 26, 0.65);
+  box-shadow: 0 8px 18px -8px rgba(200, 43, 24, 0.55);
   transition: transform 140ms ease, background-color 140ms ease;
 }
 .btn-primary:active { transform: scale(0.97); background: var(--primary-pressed); }
@@ -315,8 +316,8 @@ img { display: block; max-width: 100%; }
   white-space: nowrap;
 }
 .chip-filter.is-active {
-  background: var(--brand-orange); color: #ffffff;
-  box-shadow: 0 6px 14px -6px rgba(255, 140, 26, 0.6);
+  background: var(--primary); color: #ffffff;
+  box-shadow: 0 6px 14px -6px rgba(200, 43, 24, 0.50);
 }
 
 .section-title {
@@ -325,12 +326,12 @@ img { display: block; max-width: 100%; }
   color: var(--on-bg); margin: 0 0 12px;
 }
 .section-link {
-  font-size: 13px; font-weight: 700; color: var(--brand-orange);
+  font-size: 13px; font-weight: 700; color: var(--primary);
 }
 
-.orange-glow { box-shadow: 0 8px 22px -10px rgba(255, 140, 26, 0.5); }
+.orange-glow { box-shadow: 0 8px 22px -10px rgba(200, 43, 24, 0.45); }
 .inner-glow { box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.5); }
-.active-glow { filter: drop-shadow(0 0 8px rgba(255, 140, 26, 0.55)); }
+.active-glow { filter: drop-shadow(0 0 8px rgba(200, 43, 24, 0.50)); }
 .qr-gradient {
   background: linear-gradient(135deg, #ffffff 0%, #f5f5f7 100%);
   border: 1px solid var(--hairline);
@@ -361,7 +362,7 @@ img { display: block; max-width: 100%; }
 }
 .bottom-nav a:hover { color: var(--on-bg); }
 .bottom-nav a[aria-current="page"] {
-  color: var(--brand-orange-deep);
+  color: var(--primary);
   font-weight: 700;
 }
 [data-theme="dark"] .bottom-nav a[aria-current="page"] {
@@ -392,15 +393,15 @@ img { display: block; max-width: 100%; }
 }
 .install-banner__icon {
   width: 40px; height: 40px; border-radius: 12px;
-  background: rgba(255, 140, 26, 0.12);
-  color: var(--brand-orange);
+  background: rgba(204, 43, 24, 0.12);
+  color: var(--primary);
   display: flex; align-items: center; justify-content: center;
 }
 .install-banner__body { flex: 1; line-height: 1.2; }
 .install-banner__body strong { display: block; font-size: 14px; font-weight: 700; }
 .install-banner__body span { font-size: 12px; color: var(--on-bg-muted); }
 .install-banner__cta {
-  background: var(--brand-orange); color: #ffffff; border: none;
+  background: var(--primary); color: #ffffff; border: none;
   border-radius: 999px; padding: 8px 14px;
   font-size: 12px; font-weight: 700; letter-spacing: 0.04em;
 }
