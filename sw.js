@@ -1,5 +1,5 @@
 /* CSN PWA service worker — app shell + runtime caching. */
-const VERSION = 'csn-v5.1.0';
+const VERSION = 'csn-v5.2.0';
 const SHELL_CACHE = `${VERSION}-shell`;
 const RUNTIME_CACHE = `${VERSION}-runtime`;
 const IMAGE_CACHE = `${VERSION}-images`;
@@ -98,17 +98,22 @@ async function htmlStrategy(event) {
   }
 }
 
-// Stale-while-revalidate for CSS/JS/manifest.
+// Network-first (3s timeout) for CSS/JS/manifest so design changes ship
+// the moment a user reloads — fall back to cache only when truly offline.
 async function staticStrategy(event) {
   const cache = await caches.open(RUNTIME_CACHE);
-  const cached = await cache.match(event.request);
-  const network = fetch(event.request)
-    .then((res) => {
-      if (res && res.ok) cache.put(event.request, res.clone());
-      return res;
-    })
-    .catch(() => cached);
-  return cached || network;
+  try {
+    const fresh = await Promise.race([
+      fetch(event.request),
+      new Promise((_, reject) => setTimeout(() => reject(new Error('sw-timeout')), 3000)),
+    ]);
+    if (fresh && fresh.ok) cache.put(event.request, fresh.clone());
+    return fresh;
+  } catch (e) {
+    const cached = await cache.match(event.request);
+    if (cached) return cached;
+    throw e;
+  }
 }
 
 // Cache-first for images, with cap & graceful fallback.
