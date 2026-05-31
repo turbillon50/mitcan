@@ -197,4 +197,79 @@
     window.addEventListener('scroll', onScroll, { passive: true });
     onScroll();
   });
+
+
+  // ---------- Desktop sidebar injection ----------
+  function normPath(p) {
+    p = (p || '/').replace(/\/index(\.html)?$/, '/').replace(/\.html$/, '').replace(/\/$/, '');
+    return p || '/';
+  }
+
+  function buildSidebar() {
+    if (document.querySelector('.sidebar-nav')) return;
+    var path = normPath(location.pathname);
+    var links = [
+      { href: '/',            icon: 'home',         label: 'Inicio' },
+      { href: '/catalogo',    icon: 'grid_view',    label: 'Catálogo' },
+      { href: '/pedido',      icon: 'shopping_bag', label: 'Pedidos' },
+      { href: '/sucursales',  icon: 'location_on',  label: 'Sucursales' },
+      { href: '/recompensas', icon: 'redeem',       label: 'Premios' },
+    ];
+    var nav = document.createElement('nav');
+    nav.className = 'sidebar-nav';
+    nav.setAttribute('aria-label', 'Navegación principal');
+
+    var brand = document.createElement('div');
+    brand.className = 'sidebar-brand';
+    brand.innerHTML =
+      '<img src="/assets/logo-badge-sm.png" alt="CSN" width="34" height="29" />' +
+      '<span class="sidebar-brand-name">CSN</span>';
+    nav.appendChild(brand);
+
+    links.forEach(function (l) {
+      var a = document.createElement('a');
+      a.href = l.href;
+      a.innerHTML = '<span class="material-symbols-outlined">' + l.icon + '</span>' + l.label;
+      if (normPath(l.href) === path) a.setAttribute('aria-current', 'page');
+      nav.appendChild(a);
+    });
+
+    var footer = document.createElement('div');
+    footer.className = 'sidebar-footer';
+
+    var themeBtn = document.createElement('button');
+    themeBtn.type = 'button';
+    themeBtn.innerHTML = '<span class="material-symbols-outlined" id="sb-theme-icon">dark_mode</span><span>Tema</span>';
+    themeBtn.addEventListener('click', function () {
+      var isDark = document.body.dataset.theme === 'dark';
+      document.body.dataset.theme = isDark ? 'light' : 'dark';
+      localStorage.setItem('csn-theme', document.body.dataset.theme);
+      document.getElementById('sb-theme-icon').textContent = isDark ? 'dark_mode' : 'light_mode';
+    });
+
+    var langBtn = document.createElement('button');
+    langBtn.type = 'button';
+    langBtn.innerHTML = '<span class="material-symbols-outlined">translate</span><span>Idioma</span>';
+    langBtn.addEventListener('click', function () {
+      var btn = document.querySelector('[data-action="toggle-lang"]');
+      if (btn) btn.click();
+    });
+
+    footer.appendChild(themeBtn);
+    footer.appendChild(langBtn);
+    nav.appendChild(footer);
+
+    document.body.insertBefore(nav, document.body.firstChild);
+
+    var icon = document.getElementById('sb-theme-icon');
+    if (icon) icon.textContent = document.body.dataset.theme === 'dark' ? 'light_mode' : 'dark_mode';
+  }
+
+  document.addEventListener('DOMContentLoaded', function () {
+    if (window.matchMedia('(min-width: 768px)').matches) buildSidebar();
+  });
+  window.matchMedia('(min-width: 768px)').addEventListener('change', function (e) {
+    if (e.matches) buildSidebar();
+  });
+
 })();
