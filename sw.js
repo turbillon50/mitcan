@@ -1,5 +1,5 @@
 /* CSN PWA service worker — app shell + runtime caching. */
-const VERSION = 'csn-v5.2.0';
+const VERSION = 'csn-v5.3.0';
 const SHELL_CACHE = `${VERSION}-shell`;
 const RUNTIME_CACHE = `${VERSION}-runtime`;
 const IMAGE_CACHE = `${VERSION}-images`;
