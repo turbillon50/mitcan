@@ -12,8 +12,7 @@ export default async function LandingPage() {
     getProductosConCategoria({ soloActivos: true }),
     getSucursales({ soloActivas: true }),
   ]);
-  const destacados = productos.filter((p) => p.destacado).slice(0, 4);
-  const showcase = (destacados.length ? destacados : productos).slice(0, 4);
+  const showcase = productos.slice(0, 4);
 
   return (
     <div className="min-h-dvh">

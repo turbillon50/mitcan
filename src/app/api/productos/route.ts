@@ -8,7 +8,7 @@ export async function GET(req: Request) {
   const productos = await prisma.productos.findMany({
     where: all ? undefined : { activo: true },
     include: { categoria: true },
-    orderBy: [{ destacado: "desc" }, { nombre: "asc" }],
+    orderBy: { nombre: "asc" },
   });
   return NextResponse.json(productos);
 }
@@ -18,15 +18,20 @@ export async function POST(req: Request) {
   if (!staff) return NextResponse.json({ error: "No autorizado" }, { status: 403 });
 
   const b = await req.json();
+  const nombre: string = b.nombre ?? "Producto";
+  const slug =
+    (b.slug as string) ||
+    nombre.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "") ||
+    `producto-${Date.now()}`;
   const producto = await prisma.productos.create({
     data: {
-      nombre: b.nombre,
+      nombre,
+      slug,
       descripcion: b.descripcion ?? null,
       categoria_id: b.categoria_id ?? null,
       precio: b.precio ?? 0,
       unidad: b.unidad ?? "kg",
       imagen_url: b.imagen_url ?? null,
-      destacado: !!b.destacado,
       activo: b.activo ?? true,
     },
   });

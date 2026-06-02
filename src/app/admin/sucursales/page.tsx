@@ -17,7 +17,7 @@ type Suc = {
   direccion: string | null;
   telefono: string | null;
   horario: string | null;
-  activa: boolean;
+  activa: boolean | null;
 };
 
 function Fields({ s }: { s?: Suc }) {

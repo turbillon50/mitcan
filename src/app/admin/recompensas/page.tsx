@@ -1,6 +1,6 @@
 import { Plus, Pencil } from "lucide-react";
 import { prisma } from "@/lib/prisma";
-import { formatDate } from "@/lib/format";
+import { formatMXN } from "@/lib/format";
 import FormDialog from "@/components/admin/FormDialog";
 import DeleteButton from "@/components/admin/DeleteButton";
 import { saveRecompensa, deleteRecompensa } from "../actions";
@@ -21,8 +21,8 @@ type Rec = {
   tipo: string | null;
   puntos_requeridos: number;
   imagen_url: string | null;
-  valido_hasta: Date | null;
-  activa: boolean;
+  valor: unknown;
+  activa: boolean | null;
 };
 
 function Fields({ r }: { r?: Rec }) {
@@ -65,16 +65,15 @@ function Fields({ r }: { r?: Rec }) {
         <input name="imagen_url" defaultValue={r?.imagen_url ?? ""} className="input" placeholder="https://…" />
       </div>
       <div>
-        <label className="label">Válido hasta</label>
+        <label className="label">Valor (descuento $ / %)</label>
         <input
-          name="valido_hasta"
-          type="date"
-          defaultValue={
-            r?.valido_hasta
-              ? new Date(r.valido_hasta).toISOString().slice(0, 10)
-              : ""
-          }
+          name="valor"
+          type="number"
+          step="0.01"
+          min="0"
+          defaultValue={r ? Number(r.valor ?? 0) || "" : ""}
           className="input"
+          placeholder="Opcional"
         />
       </div>
       <label className="flex items-center gap-2 text-sm">
@@ -117,7 +116,7 @@ export default async function AdminRecompensas() {
               <th className="px-4 py-3">Recompensa</th>
               <th className="px-4 py-3">Tipo</th>
               <th className="px-4 py-3">Puntos</th>
-              <th className="px-4 py-3">Vence</th>
+              <th className="px-4 py-3">Valor</th>
               <th className="px-4 py-3">Estado</th>
               <th className="px-4 py-3 text-right">Acciones</th>
             </tr>
@@ -140,7 +139,7 @@ export default async function AdminRecompensas() {
                   {r.puntos_requeridos}
                 </td>
                 <td className="px-4 py-3 text-on-bg-muted">
-                  {r.valido_hasta ? formatDate(r.valido_hasta) : "—"}
+                  {r.valor != null ? formatMXN(Number(r.valor)) : "—"}
                 </td>
                 <td className="px-4 py-3">
                   <span className={`chip text-xs ${r.activa ? "chip-active" : ""}`}>

@@ -132,7 +132,7 @@ export default async function AdminPedidos({
                 </td>
                 <td className="px-4 py-3">
                   <InlineSelect
-                    value={p.estado}
+                    value={p.estado ?? "nuevo"}
                     options={ESTADO_OPTS}
                     action={async (next) => {
                       "use server";

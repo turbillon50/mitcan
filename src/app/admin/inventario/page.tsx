@@ -80,7 +80,7 @@ export default async function AdminInventario({
                         productoId={p.id}
                         sucursalId={sucursalId}
                         stock={Number(inv?.stock ?? 0)}
-                        disponible={inv?.disponible ?? true}
+                        minStock={Number(inv?.min_stock ?? 5)}
                       />
                     ) : (
                       <span className="text-on-bg-muted">

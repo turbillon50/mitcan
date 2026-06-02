@@ -23,10 +23,11 @@ export async function getCurrentDbUser() {
   const seededRole = (cu?.publicMetadata?.role as user_role | undefined) ?? "cliente";
 
   try {
+    // users.id is a (non-defaulted) text PK; we key it to the Clerk user id.
     dbUser = await prisma.users.upsert({
       where: { clerk_id: userId },
       update: {},
-      create: { clerk_id: userId, email, nombre, rol: seededRole },
+      create: { id: userId, clerk_id: userId, email, nombre, rol: seededRole },
     });
   } catch {
     // If email collides with an existing row, link it instead.

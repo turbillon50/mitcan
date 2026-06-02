@@ -32,7 +32,7 @@ export function getProductosConCategoria(opts?: { soloActivos?: boolean }) {
       prisma.productos.findMany({
         where: opts?.soloActivos ? { activo: true } : undefined,
         include: { categoria: true },
-        orderBy: [{ destacado: "desc" }, { nombre: "asc" }],
+        orderBy: { nombre: "asc" },
       }),
     []
   );
@@ -80,7 +80,7 @@ export async function getAdminKpis() {
           _sum: { total: true },
           where: { estado: { not: "cancelado" } },
         }),
-        prisma.pedidos.count({ where: { estado: "pendiente" } }),
+        prisma.pedidos.count({ where: { estado: "nuevo" } }),
       ]);
       return {
         totalPedidos,
@@ -111,7 +111,7 @@ export async function getVentasPorEstado() {
         _sum: { total: true },
       });
       return rows.map((r) => ({
-        estado: r.estado,
+        estado: r.estado ?? "nuevo",
         pedidos: r._count._all,
         total: Number(r._sum.total ?? 0),
       }));
@@ -160,6 +160,7 @@ export async function getVentasUltimosDias(dias = 14) {
         buckets.set(d.toISOString().slice(0, 10), { ventas: 0, pedidos: 0 });
       }
       for (const p of pedidos) {
+        if (!p.created_at) continue;
         const key = p.created_at.toISOString().slice(0, 10);
         const b = buckets.get(key);
         if (b) {

@@ -16,8 +16,7 @@ type Prod = {
   precio: unknown;
   unidad: string | null;
   imagen_url: string | null;
-  destacado: boolean;
-  activo: boolean;
+  activo: boolean | null;
 };
 type Cat = { id: number; nombre: string };
 
@@ -66,16 +65,10 @@ function Fields({ p, cats }: { p?: Prod; cats: Cat[] }) {
         <label className="label">URL de imagen</label>
         <input name="imagen_url" defaultValue={p?.imagen_url ?? ""} className="input" placeholder="https://…" />
       </div>
-      <div className="flex gap-5">
-        <label className="flex items-center gap-2 text-sm">
-          <input type="checkbox" name="destacado" defaultChecked={p?.destacado ?? false} />
-          Destacado
-        </label>
-        <label className="flex items-center gap-2 text-sm">
-          <input type="checkbox" name="activo" defaultChecked={p?.activo ?? true} />
-          Activo
-        </label>
-      </div>
+      <label className="flex items-center gap-2 text-sm">
+        <input type="checkbox" name="activo" defaultChecked={p?.activo ?? true} />
+        Disponible
+      </label>
     </>
   );
 }
@@ -139,11 +132,6 @@ export default async function AdminProductos() {
                     </div>
                     <div>
                       <p className="font-medium">{p.nombre}</p>
-                      {p.destacado && (
-                        <span className="text-[10px] uppercase tracking-wide text-primary">
-                          Destacado
-                        </span>
-                      )}
                     </div>
                   </div>
                 </td>

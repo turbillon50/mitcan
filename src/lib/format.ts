@@ -50,7 +50,7 @@ export function serialize<T>(value: T): T {
 }
 
 export const ESTADOS_PEDIDO = [
-  "pendiente",
+  "nuevo",
   "confirmado",
   "en_camino",
   "entregado",
@@ -58,6 +58,7 @@ export const ESTADOS_PEDIDO = [
 ] as const;
 
 export const ESTADO_LABEL: Record<string, string> = {
+  nuevo: "Nuevo",
   pendiente: "Pendiente",
   confirmado: "Confirmado",
   en_camino: "En camino",
@@ -66,6 +67,7 @@ export const ESTADO_LABEL: Record<string, string> = {
 };
 
 export const ESTADO_COLOR: Record<string, string> = {
+  nuevo: "bg-amber-500/15 text-amber-400 border-amber-500/25",
   pendiente: "bg-amber-500/15 text-amber-400 border-amber-500/25",
   confirmado: "bg-sky-500/15 text-sky-400 border-sky-500/25",
   en_camino: "bg-primary/15 text-primary border-primary/25",

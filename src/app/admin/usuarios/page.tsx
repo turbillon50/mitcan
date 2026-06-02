@@ -94,7 +94,7 @@ export default async function AdminUsuarios({
                 <td className="px-4 py-3">
                   {canEdit ? (
                     <InlineSelect
-                      value={u.rol}
+                      value={u.rol ?? "cliente"}
                       options={ROL_OPTS}
                       action={async (next) => {
                         "use server";
@@ -102,8 +102,8 @@ export default async function AdminUsuarios({
                       }}
                     />
                   ) : (
-                    <span className={`chip text-xs ${ROL_COLOR[u.rol] ?? ""}`}>
-                      {ROL_OPTS.find((r) => r.value === u.rol)?.label ?? u.rol}
+                    <span className={`chip text-xs ${ROL_COLOR[u.rol ?? "cliente"] ?? ""}`}>
+                      {ROL_OPTS.find((r) => r.value === u.rol)?.label ?? u.rol ?? "Cliente"}
                     </span>
                   )}
                 </td>

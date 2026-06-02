@@ -1,17 +1,16 @@
 // CSN — Carnes Selectas Nayarit
-// Schema hand-authored to match the EXISTING Neon database (11 tables, real data).
-// IMPORTANT: do NOT run `prisma migrate` against this DB — the tables already exist.
-// To reconcile exact columns with the live database run:  npx prisma db pull
-// (with DATABASE_URL pointing at the Neon instance), then `prisma generate`.
+// Schema reconciled with the LIVE Neon database via runtime introspection
+// (information_schema). The existing tables already hold real data — do NOT run
+// `prisma migrate`. Prisma field names are kept app-friendly and @map'd to the
+// real columns where they differ.
 
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 enum user_role {
@@ -22,170 +21,164 @@ enum user_role {
 }
 
 model sucursales {
-  id            Int       @id @default(autoincrement())
-  nombre        String
-  area          String?
-  direccion     String?
-  telefono      String?
-  lat           Float?
-  lng           Float?
-  horario       String?
-  activa        Boolean   @default(true)
-  created_at    DateTime  @default(now())
+  id         Int       @id @default(autoincrement())
+  nombre     String    @map("name")
+  area       String
+  direccion  String?   @map("address")
+  telefono   String?   @map("phone")
+  lat        Decimal?  @db.Decimal
+  lng        Decimal?  @db.Decimal
+  horario    String?   @default("8:00-20:00")
+  activa     Boolean?  @default(true) @map("active")
+  created_at DateTime? @default(now()) @db.Timestamptz(6)
 
-  inventario    inventario[]
-  pedidos       pedidos[]
-  users         users[]
+  inventario inventario[]
+  pedidos    pedidos[]
+  users      users[]
 
   @@map("sucursales")
 }
 
 model users {
-  id            Int       @id @default(autoincrement())
-  clerk_id      String?   @unique
-  email         String?   @unique
-  nombre        String?
-  telefono      String?
-  rol           user_role @default(cliente)
-  puntos        Int       @default(0)
-  nivel         String?
-  sucursal_id   Int?
-  activo        Boolean   @default(true)
-  created_at    DateTime  @default(now())
+  id          String     @id
+  clerk_id    String     @unique
+  email       String?    @unique
+  nombre      String?    @map("name")
+  telefono    String?    @map("phone")
+  rol         user_role? @default(cliente) @map("role")
+  sucursal_id Int?
+  puntos      Int?       @default(0)
+  nivel       String?    @default("bronce")
+  created_at  DateTime?  @default(now()) @db.Timestamptz(6)
 
-  sucursal      sucursales?     @relation(fields: [sucursal_id], references: [id])
-  pedidos       pedidos[]
-  redenciones   redenciones[]
+  sucursal       sucursales?      @relation(fields: [sucursal_id], references: [id])
+  pedidos        pedidos[]
+  redenciones    redenciones[]
   notificaciones notificaciones[]
 
   @@map("users")
 }
 
 model categorias {
-  id          Int        @id @default(autoincrement())
-  nombre      String
-  slug        String?
-  icono       String?
-  orden       Int        @default(0)
-  activa      Boolean    @default(true)
+  id     Int      @id @default(autoincrement())
+  nombre String   @map("name")
+  slug   String
+  icono  String?  @map("icon")
+  orden  Int?     @default(0)
+  activa Boolean? @default(true) @map("active")
 
-  productos   productos[]
+  productos productos[]
 
   @@map("categorias")
 }
 
 model productos {
-  id            Int       @id @default(autoincrement())
-  nombre        String
-  descripcion   String?
-  categoria_id  Int?
-  precio        Decimal   @default(0) @db.Decimal(10, 2)
-  unidad        String?   @default("kg")
-  imagen_url    String?
-  destacado     Boolean   @default(false)
-  activo        Boolean   @default(true)
-  created_at    DateTime  @default(now())
+  id           Int       @id @default(autoincrement())
+  nombre       String    @map("name")
+  slug         String
+  descripcion  String?
+  categoria_id Int?
+  precio       Decimal   @db.Decimal
+  unidad       String?   @default("kg")
+  imagen_url   String?
+  activo       Boolean?  @default(true) @map("disponible")
+  created_at   DateTime? @default(now()) @db.Timestamptz(6)
 
-  categoria     categorias?    @relation(fields: [categoria_id], references: [id])
-  inventario    inventario[]
-  pedido_items  pedido_items[]
+  categoria    categorias?    @relation(fields: [categoria_id], references: [id])
+  inventario   inventario[]
+  pedido_items pedido_items[]
 
   @@map("productos")
 }
 
 model inventario {
-  id            Int       @id @default(autoincrement())
-  producto_id   Int
-  sucursal_id   Int
-  stock         Decimal   @default(0) @db.Decimal(10, 2)
-  precio        Decimal?  @db.Decimal(10, 2)
-  disponible    Boolean   @default(true)
-  updated_at    DateTime  @default(now()) @updatedAt
+  id          Int       @id @default(autoincrement())
+  producto_id Int?
+  sucursal_id Int?
+  stock       Decimal?  @default(0) @db.Decimal
+  min_stock   Decimal?  @default(5) @db.Decimal
+  updated_at  DateTime? @default(now()) @db.Timestamptz(6)
 
-  producto      productos  @relation(fields: [producto_id], references: [id])
-  sucursal      sucursales @relation(fields: [sucursal_id], references: [id])
+  producto productos?  @relation(fields: [producto_id], references: [id])
+  sucursal sucursales? @relation(fields: [sucursal_id], references: [id])
 
-  @@unique([producto_id, sucursal_id])
   @@map("inventario")
 }
 
 model pedidos {
-  id            Int       @id @default(autoincrement())
-  folio         String?   @unique
-  user_id       Int?
-  sucursal_id   Int?
-  estado        String    @default("pendiente") // pendiente|confirmado|en_camino|entregado|cancelado
-  tipo_entrega  String?   @default("recoger")   // recoger|domicilio
-  direccion     String?
-  subtotal      Decimal   @default(0) @db.Decimal(10, 2)
-  total         Decimal   @default(0) @db.Decimal(10, 2)
-  puntos_ganados Int      @default(0)
-  notas         String?
-  created_at    DateTime  @default(now())
+  id             Int       @id @default(autoincrement())
+  folio          String    @map("numero")
+  user_id        String?   @map("cliente_id")
+  sucursal_id    Int?
+  estado         String?   @default("nuevo") @map("status")
+  subtotal       Decimal?  @db.Decimal
+  descuento      Decimal?  @default(0) @db.Decimal
+  total          Decimal?  @db.Decimal
+  puntos_ganados Int?      @default(0)
+  notas          String?
+  created_at     DateTime? @default(now()) @db.Timestamptz(6)
+  updated_at     DateTime? @default(now()) @db.Timestamptz(6)
 
-  user          users?         @relation(fields: [user_id], references: [id])
-  sucursal      sucursales?    @relation(fields: [sucursal_id], references: [id])
-  items         pedido_items[]
-  redenciones   redenciones[]
+  user     users?         @relation(fields: [user_id], references: [id])
+  sucursal sucursales?    @relation(fields: [sucursal_id], references: [id])
+  items    pedido_items[]
 
   @@map("pedidos")
 }
 
 model pedido_items {
-  id              Int      @id @default(autoincrement())
-  pedido_id       Int
+  id              Int     @id @default(autoincrement())
+  pedido_id       Int?
   producto_id     Int?
-  cantidad        Decimal  @default(1) @db.Decimal(10, 2)
-  precio_unitario Decimal  @default(0) @db.Decimal(10, 2)
-  subtotal        Decimal  @default(0) @db.Decimal(10, 2)
+  cantidad        Decimal @db.Decimal
+  precio_unitario Decimal @db.Decimal
+  subtotal        Decimal @db.Decimal
 
-  pedido          pedidos    @relation(fields: [pedido_id], references: [id], onDelete: Cascade)
-  producto        productos? @relation(fields: [producto_id], references: [id])
+  pedido   pedidos?   @relation(fields: [pedido_id], references: [id], onDelete: Cascade)
+  producto productos? @relation(fields: [producto_id], references: [id])
 
   @@map("pedido_items")
 }
 
 model recompensas {
-  id                Int       @id @default(autoincrement())
-  nombre            String
+  id                Int      @id @default(autoincrement())
+  nombre            String   @map("name")
   descripcion       String?
-  tipo              String?   @default("descuento") // cupon|descuento|envio|producto
-  puntos_requeridos Int       @default(0)
+  puntos_requeridos Int
+  tipo              String?  @default("descuento")
+  valor             Decimal? @db.Decimal
+  activa            Boolean? @default(true) @map("active")
   imagen_url        String?
-  valido_hasta      DateTime?
-  activa            Boolean   @default(true)
-  created_at        DateTime  @default(now())
 
-  redenciones       redenciones[]
+  redenciones redenciones[]
 
   @@map("recompensas")
 }
 
 model redenciones {
   id            Int       @id @default(autoincrement())
-  user_id       Int
-  recompensa_id Int
-  pedido_id     Int?
-  estado        String    @default("activa") // activa|usada|expirada
-  created_at    DateTime  @default(now())
+  user_id       String?
+  recompensa_id Int?
+  puntos_usados Int
+  estado        String?   @default("activa") @map("status")
+  created_at    DateTime? @default(now()) @db.Timestamptz(6)
 
-  user          users       @relation(fields: [user_id], references: [id])
-  recompensa    recompensas @relation(fields: [recompensa_id], references: [id])
-  pedido        pedidos?    @relation(fields: [pedido_id], references: [id])
+  user       users?       @relation(fields: [user_id], references: [id])
+  recompensa recompensas? @relation(fields: [recompensa_id], references: [id])
 
   @@map("redenciones")
 }
 
 model notificaciones {
-  id          Int       @id @default(autoincrement())
-  user_id     Int
-  titulo      String
-  mensaje     String?
-  tipo        String?   @default("info")
-  leida       Boolean   @default(false)
-  created_at  DateTime  @default(now())
+  id         Int       @id @default(autoincrement())
+  user_id    String?
+  titulo     String
+  mensaje    String
+  tipo       String?   @default("general")
+  leida      Boolean?  @default(false)
+  created_at DateTime? @default(now()) @db.Timestamptz(6)
 
-  user        users     @relation(fields: [user_id], references: [id])
+  user users? @relation(fields: [user_id], references: [id])
 
   @@map("notificaciones")
 }

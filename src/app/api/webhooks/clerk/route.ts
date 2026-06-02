@@ -72,8 +72,9 @@ export async function POST(req: Request) {
           data: { email, nombre },
         });
       } else {
+        // users.id is a non-defaulted text PK keyed to the Clerk user id.
         await prisma.users.create({
-          data: { clerk_id: data.id, email, nombre, rol },
+          data: { id: data.id, clerk_id: data.id, email, nombre, rol },
         });
         if (email) {
           await sendEmail({
@@ -85,7 +86,7 @@ export async function POST(req: Request) {
       }
     } else if (type === "user.deleted") {
       await prisma.users
-        .update({ where: { clerk_id: data.id }, data: { activo: false } })
+        .delete({ where: { clerk_id: data.id } })
         .catch(() => null);
     }
   } catch (err) {

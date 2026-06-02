@@ -29,8 +29,7 @@ export async function PATCH(req: Request, { params }: Ctx) {
 
   const data: Record<string, unknown> = {};
   if (typeof b.estado === "string") data.estado = b.estado;
-  if (typeof b.tipo_entrega === "string") data.tipo_entrega = b.tipo_entrega;
-  if (typeof b.direccion === "string") data.direccion = b.direccion;
+  if (typeof b.notas === "string") data.notas = b.notas;
 
   const pedido = await prisma.pedidos.update({
     where: { id: parseInt(id) },
@@ -38,11 +37,12 @@ export async function PATCH(req: Request, { params }: Ctx) {
   });
 
   // When an order is delivered, credit the earned points to the customer.
-  if (b.estado === "entregado" && pedido.user_id && pedido.puntos_ganados > 0) {
+  const ganados = pedido.puntos_ganados ?? 0;
+  if (b.estado === "entregado" && pedido.user_id && ganados > 0) {
     await prisma.users
       .update({
         where: { id: pedido.user_id },
-        data: { puntos: { increment: pedido.puntos_ganados } },
+        data: { puntos: { increment: ganados } },
       })
       .catch(() => null);
   }

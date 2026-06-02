@@ -90,9 +90,6 @@ export default async function RecompensasPage() {
                 <p className="text-sm text-on-bg-muted">{r.descripcion}</p>
                 <p className="mt-1 text-[11px] uppercase tracking-wide text-primary">
                   {r.puntos_requeridos} pts
-                  {r.valido_hasta
-                    ? ` · vence ${formatDate(r.valido_hasta)}`
-                    : ""}
                 </p>
               </div>
               <RedeemButton recompensaId={r.id} disabled={bloqueada} />
@@ -143,7 +140,7 @@ export default async function RecompensasPage() {
               key={r.id}
               className="flex items-center justify-between rounded-xl border border-hairline bg-surface-2 px-4 py-3 text-sm"
             >
-              <span>{r.recompensa.nombre}</span>
+              <span>{r.recompensa?.nombre ?? "Recompensa"}</span>
               <span className="text-on-bg-muted">{formatDate(r.created_at)}</span>
             </div>
           ))}

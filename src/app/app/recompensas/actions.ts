@@ -22,6 +22,7 @@ export async function canjearRecompensa(recompensaId: number) {
       data: {
         user_id: user.id,
         recompensa_id: recompensa.id,
+        puntos_usados: recompensa.puntos_requeridos,
         estado: "activa",
       },
     }),

@@ -8,22 +8,27 @@ export default function InventarioCell({
   productoId,
   sucursalId,
   stock,
-  disponible,
+  minStock,
 }: {
   productoId: number;
   sucursalId: number;
   stock: number;
-  disponible: boolean;
+  minStock: number;
 }) {
   const [s, setS] = useState(String(stock));
-  const [disp, setDisp] = useState(disponible);
+  const [min, setMin] = useState(String(minStock));
   const [dirty, setDirty] = useState(false);
   const [pending, start] = useTransition();
   const [saved, setSaved] = useState(false);
 
   const save = () =>
     start(async () => {
-      await upsertInventario(productoId, sucursalId, parseFloat(s) || 0, disp);
+      await upsertInventario(
+        productoId,
+        sucursalId,
+        parseFloat(s) || 0,
+        parseFloat(min) || 0
+      );
       setDirty(false);
       setSaved(true);
       setTimeout(() => setSaved(false), 1500);
@@ -36,6 +41,7 @@ export default function InventarioCell({
         step="0.01"
         min="0"
         value={s}
+        aria-label="Stock"
         onChange={(e) => {
           setS(e.target.value);
           setDirty(true);
@@ -43,15 +49,19 @@ export default function InventarioCell({
         className="w-20 rounded-lg border border-hairline bg-surface-2 px-2 py-1.5 text-sm outline-none focus:border-primary/50"
       />
       <label className="flex items-center gap-1 text-xs text-on-bg-muted">
+        mín
         <input
-          type="checkbox"
-          checked={disp}
+          type="number"
+          step="0.01"
+          min="0"
+          value={min}
+          aria-label="Stock mínimo"
           onChange={(e) => {
-            setDisp(e.target.checked);
+            setMin(e.target.value);
             setDirty(true);
           }}
+          className="w-16 rounded-lg border border-hairline bg-surface-2 px-2 py-1.5 text-sm outline-none focus:border-primary/50"
         />
-        Disp.
       </label>
       {dirty ? (
         <button

@@ -26,7 +26,7 @@ export default async function PedidoPage() {
     : [];
 
   const activo = pedidos.find((p) =>
-    ["pendiente", "confirmado", "en_camino"].includes(p.estado)
+    ["nuevo", "pendiente", "confirmado", "en_camino"].includes(p.estado ?? "")
   );
 
   return (
@@ -54,9 +54,10 @@ export default async function PedidoPage() {
           </div>
           <div className="relative flex items-center justify-between px-2">
             <div className="absolute left-6 right-6 top-1/2 h-1 -translate-y-1/2 rounded-full bg-surface-3" />
-            {[{ estado: "pendiente", icon: ChefHat }, ...STEPS].map((s, i) => {
-              const order = ["pendiente", "confirmado", "en_camino", "entregado"];
-              const done = order.indexOf(activo.estado) >= order.indexOf(s.estado);
+            {[{ estado: "nuevo", icon: ChefHat }, ...STEPS].map((s) => {
+              const order = ["nuevo", "confirmado", "en_camino", "entregado"];
+              const done =
+                order.indexOf(activo.estado ?? "") >= order.indexOf(s.estado);
               const Icon = s.icon;
               return (
                 <div key={s.estado} className="relative z-10 flex flex-col items-center gap-1">
