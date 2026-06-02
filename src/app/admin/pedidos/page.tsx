@@ -117,7 +117,11 @@ export default async function AdminPedidos({
           <tbody className="divide-y divide-hairline">
             {pedidos.map((p) => (
               <tr key={p.id}>
-                <td className="px-4 py-3 font-medium">{p.folio ?? `#${p.id}`}</td>
+                <td className="px-4 py-3 font-medium">
+                  <Link href={`/admin/pedidos/${p.id}`} className="text-primary hover:underline">
+                    {p.folio ?? `#${p.id}`}
+                  </Link>
+                </td>
                 <td className="px-4 py-3 text-on-bg-muted">
                   {p.user?.nombre ?? p.user?.email ?? "—"}
                 </td>

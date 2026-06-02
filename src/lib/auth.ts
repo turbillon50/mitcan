@@ -1,6 +1,7 @@
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { prisma } from "./prisma";
+import { sendEmail, welcomeEmail } from "./resend";
 import type { user_role } from "@prisma/client";
 
 // Owner emails that are always promoted to admin on sign-in.
@@ -54,6 +55,14 @@ export async function getCurrentDbUser() {
         update: {},
         create: { id: userId, clerk_id: userId, email, nombre, rol },
       });
+      // Welcome email on first provision (works even without the Clerk webhook).
+      if (email) {
+        await sendEmail({
+          to: email,
+          subject: "¡Bienvenido al Club CSN! 🥩",
+          html: welcomeEmail(nombre),
+        }).catch(() => null);
+      }
     } catch {
       // If email collides with an existing row, link it instead.
       if (email) {
