@@ -1,10 +1,10 @@
-import { prisma } from "./prisma";
+import { prisma, withRetry } from "./prisma";
 
-/** Run a Prisma query, returning a fallback if the DB is unreachable
- *  (e.g. during build-time prerender or a transient outage). */
+/** Run a Prisma query (with transient-error retry), returning a fallback if the
+ *  DB is unreachable (e.g. during build-time prerender or a transient outage). */
 async function safe<T>(fn: () => Promise<T>, fallback: T): Promise<T> {
   try {
-    return await fn();
+    return await withRetry(fn);
   } catch (err) {
     console.error("[CSN] DB query failed:", (err as Error)?.message);
     return fallback;
@@ -46,6 +46,47 @@ export function getSucursales(opts?: { soloActivas?: boolean }) {
         orderBy: { id: "asc" },
       }),
     []
+  );
+}
+
+export function getPromocionesActivas(limit = 6) {
+  const now = new Date();
+  return safe(
+    () =>
+      prisma.promociones.findMany({
+        where: {
+          activa: true,
+          OR: [{ fecha_fin: null }, { fecha_fin: { gte: now } }],
+        },
+        orderBy: { id: "desc" },
+        take: limit,
+        include: { sucursal: true, producto: true },
+      }),
+    []
+  );
+}
+
+export async function getVentasPorSucursal() {
+  return safe(
+    async () => {
+      const rows = await prisma.pedidos.groupBy({
+        by: ["sucursal_id"],
+        _count: { _all: true },
+        _sum: { total: true },
+        where: { estado: { not: "cancelado" } },
+      });
+      const ids = rows.map((r) => r.sucursal_id).filter(Boolean) as number[];
+      const sucs = await prisma.sucursales.findMany({ where: { id: { in: ids } } });
+      const byId = new Map(sucs.map((s) => [s.id, s.nombre]));
+      return rows
+        .map((r) => ({
+          sucursal: byId.get(r.sucursal_id ?? -1) ?? "Sin sucursal",
+          pedidos: r._count._all,
+          total: Number(r._sum.total ?? 0),
+        }))
+        .sort((a, b) => b.total - a.total);
+    },
+    [] as { sucursal: string; pedidos: number; total: number }[]
   );
 }
 

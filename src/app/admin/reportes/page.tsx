@@ -6,17 +6,19 @@ import {
   getVentasUltimosDias,
   getVentasPorEstado,
   getTopProductos,
+  getVentasPorSucursal,
 } from "@/lib/data";
 import { formatMXN, formatNumber, serialize } from "@/lib/format";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminReportes() {
-  const [kpis, ventas, porEstado, top] = await Promise.all([
+  const [kpis, ventas, porEstado, top, porSucursal] = await Promise.all([
     getAdminKpis(),
     getVentasUltimosDias(30),
     getVentasPorEstado(),
     getTopProductos(6),
+    getVentasPorSucursal(),
   ]);
 
   const ticketPromedio =
@@ -68,6 +70,21 @@ export default async function AdminReportes() {
             </p>
           )}
         </div>
+      </div>
+
+      <div className="card p-5">
+        <h2 className="mb-4 font-bold">Ventas por sucursal</h2>
+        {porSucursal.length ? (
+          <TopProductosBar
+            data={serialize(
+              porSucursal.map((s) => ({ nombre: s.sucursal, ingresos: s.total }))
+            )}
+          />
+        ) : (
+          <p className="py-16 text-center text-sm text-on-bg-muted">
+            Sin ventas por sucursal aún
+          </p>
+        )}
       </div>
     </div>
   );

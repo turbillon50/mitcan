@@ -2,15 +2,20 @@ import Link from "next/link";
 import Image from "next/image";
 import { Beef, MapPin, Gift, QrCode, ArrowRight, Flame } from "lucide-react";
 import PublicHeader from "@/components/PublicHeader";
-import { getProductosConCategoria, getSucursales } from "@/lib/data";
+import {
+  getProductosConCategoria,
+  getSucursales,
+  getPromocionesActivas,
+} from "@/lib/data";
 import { formatMXN } from "@/lib/format";
 
 export const dynamic = "force-dynamic";
 
 export default async function LandingPage() {
-  const [productos, sucursales] = await Promise.all([
+  const [productos, sucursales, promos] = await Promise.all([
     getProductosConCategoria({ soloActivos: true }),
     getSucursales({ soloActivas: true }),
+    getPromocionesActivas(6),
   ]);
   const showcase = productos.slice(0, 4);
 
@@ -77,6 +82,37 @@ export default async function LandingPage() {
           ))}
         </div>
       </section>
+
+      {/* Promotions */}
+      {promos.length > 0 && (
+        <section className="mx-auto max-w-6xl px-5 pb-4">
+          <h2 className="section-title mb-6 flex items-center gap-2">
+            <Flame className="text-primary" size={22} /> Promociones activas
+          </h2>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {promos.map((p) => (
+              <div key={p.id} className="card overflow-hidden">
+                <div className="csn-gradient flex items-center justify-between p-5">
+                  <div>
+                    <h3 className="text-lg font-bold">{p.titulo}</h3>
+                    {p.descripcion && (
+                      <p className="mt-1 text-sm text-on-bg-muted">{p.descripcion}</p>
+                    )}
+                    {p.sucursal?.nombre && (
+                      <p className="mt-2 text-xs text-on-bg-muted">
+                        📍 {p.sucursal.nombre}
+                      </p>
+                    )}
+                  </div>
+                  <span className="chip chip-active shrink-0 text-xs uppercase">
+                    {p.tipo ?? "promo"}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* Featured products */}
       {showcase.length > 0 && (
