@@ -1,11 +1,12 @@
 import Link from "next/link";
-import Image from "next/image";
 import { ChevronRight, Flame, QrCode } from "lucide-react";
 import { getCurrentDbUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getRecompensas } from "@/lib/data";
 import { formatNumber, formatMXN, serialize } from "@/lib/format";
+import { membershipUrl } from "@/lib/membership";
 import StatusBadge from "@/components/StatusBadge";
+import MembershipQR from "@/components/MembershipQR";
 
 export const dynamic = "force-dynamic";
 
@@ -86,15 +87,8 @@ export default async function DashboardPage() {
 
       {/* Membership QR */}
       <section className="card flex flex-col items-center gap-4 p-7 text-center">
-        <div className="rounded-2xl bg-gradient-to-br from-[#2a1705] to-[#0e0e0e] p-4">
-          <Image
-            src="/assets/qr-membership.png"
-            alt="QR de membresía CSN"
-            width={200}
-            height={200}
-            className="rounded-xl"
-            priority
-          />
+        <div className="rounded-2xl bg-gradient-to-br from-[#2a1705] to-[#0e0e0e] p-3">
+          {user ? <MembershipQR value={membershipUrl(user.id)} size={196} /> : null}
         </div>
         <div>
           <h2 className="flex items-center justify-center gap-2 text-xl font-bold">

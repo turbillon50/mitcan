@@ -4,6 +4,8 @@ import { getCurrentDbUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getRecompensas } from "@/lib/data";
 import { formatNumber, formatDate } from "@/lib/format";
+import { membershipUrl } from "@/lib/membership";
+import MembershipQR from "@/components/MembershipQR";
 import RedeemButton from "./RedeemButton";
 
 export const dynamic = "force-dynamic";
@@ -120,14 +122,7 @@ export default async function RecompensasPage() {
               {formatNumber(puntos)} <small className="text-sm">pts</small>
             </p>
           </div>
-          <div className="rounded-lg border border-primary/30 bg-[#0e0e0e] p-1.5">
-            <Image
-              src="/assets/qr-membership-sm.png"
-              alt="QR personal CSN"
-              width={56}
-              height={56}
-            />
-          </div>
+          {user ? <MembershipQR value={membershipUrl(user.id)} size={64} /> : null}
         </div>
       </section>
 
