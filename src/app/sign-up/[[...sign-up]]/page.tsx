@@ -8,7 +8,7 @@ export default function SignUpPage() {
       <Link href="/" className="flex items-center gap-2">
         <Image src="/assets/logo-badge.png" alt="CSN" width={56} height={48} />
       </Link>
-      <SignUp />
+      <SignUp fallbackRedirectUrl="/app/dashboard" signInUrl="/sign-in" />
     </div>
   );
 }
