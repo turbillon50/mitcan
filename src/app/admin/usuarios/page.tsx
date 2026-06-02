@@ -3,6 +3,7 @@ import { formatNumber, formatDate } from "@/lib/format";
 import InlineSelect from "@/components/admin/InlineSelect";
 import { requireAdmin, isAdmin } from "@/lib/auth";
 import { updateUserRol } from "../actions";
+import InviteStaff from "./InviteStaff";
 import type { user_role } from "@prisma/client";
 
 export const dynamic = "force-dynamic";
@@ -48,12 +49,15 @@ export default async function AdminUsuarios({
 
   return (
     <div className="flex flex-col gap-6">
-      <div>
-        <h1 className="section-title text-2xl">Usuarios</h1>
-        <p className="text-sm text-on-bg-muted">
-          {usuarios.length} usuarios
-          {!canEdit && " · solo administradores pueden cambiar roles"}
-        </p>
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h1 className="section-title text-2xl">Usuarios</h1>
+          <p className="text-sm text-on-bg-muted">
+            {usuarios.length} usuarios
+            {!canEdit && " · solo administradores pueden cambiar roles"}
+          </p>
+        </div>
+        {canEdit && <InviteStaff />}
       </div>
 
       <form className="flex gap-2" action="/admin/usuarios">

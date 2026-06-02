@@ -11,8 +11,8 @@ const isPublicRoute = createRouteMatcher([
   "/api/webhooks(.*)",
 ]);
 
-// Protected: /app/* (usuario) and /admin/* (staff).
-const isProtectedRoute = createRouteMatcher(["/app(.*)", "/admin(.*)"]);
+// Protected: /app/* (usuario), /admin/* (staff) and /m/* (member scan, staff).
+const isProtectedRoute = createRouteMatcher(["/app(.*)", "/admin(.*)", "/m/(.*)"]);
 
 export default clerkMiddleware(async (auth, req) => {
   if (isProtectedRoute(req) && !isPublicRoute(req)) {
