@@ -11,10 +11,50 @@ const isPublicRoute = createRouteMatcher([
   "/api/webhooks(.*)",
 ]);
 
-// Protected: /app/* (usuario), /admin/* (staff) and /m/* (member scan, staff).
-const isProtectedRoute = createRouteMatcher(["/app(.*)", "/admin(.*)", "/m/(.*)"]);
+// Protected (need a Clerk session): /app/* (usuario) and /m/* (member scan).
+const isProtectedRoute = createRouteMatcher(["/app(.*)", "/m/(.*)"]);
+
+// Admin lives behind its own independent secret link + key, on top of the
+// Clerk role check done in the /admin layout.
+const isAdminRoute = createRouteMatcher(["/admin(.*)"]);
+const ADMIN_KEY = process.env.CSN_ADMIN_KEY ?? "mitcan";
+const ADMIN_COOKIE = "csn_ak";
 
 export default clerkMiddleware(async (auth, req) => {
+  if (isAdminRoute(req)) {
+    const url = req.nextUrl;
+    const provided = url.searchParams.get("k");
+    const cookie = req.cookies.get(ADMIN_COOKIE)?.value;
+    const hasKey = provided === ADMIN_KEY || cookie === ADMIN_KEY;
+
+    // Without the key the admin area is invisible (looks like the public site).
+    if (!hasKey) {
+      return NextResponse.redirect(new URL("/", req.url));
+    }
+
+    const { userId } = await auth();
+    if (!userId) {
+      const signIn = new URL("/sign-in", req.url);
+      const target = url.pathname + (provided ? `?k=${provided}` : "");
+      signIn.searchParams.set("redirect_url", target);
+      const res = NextResponse.redirect(signIn);
+      if (provided === ADMIN_KEY) {
+        res.cookies.set(ADMIN_COOKIE, ADMIN_KEY, cookieOpts());
+      }
+      return res;
+    }
+
+    // Persist the key as a cookie and drop it from the URL bar.
+    if (provided === ADMIN_KEY) {
+      const clean = new URL(url);
+      clean.searchParams.delete("k");
+      const res = NextResponse.redirect(clean);
+      res.cookies.set(ADMIN_COOKIE, ADMIN_KEY, cookieOpts());
+      return res;
+    }
+    return;
+  }
+
   if (isProtectedRoute(req) && !isPublicRoute(req)) {
     const { userId } = await auth();
     if (!userId) {
@@ -24,6 +64,16 @@ export default clerkMiddleware(async (auth, req) => {
     }
   }
 });
+
+function cookieOpts() {
+  return {
+    httpOnly: true,
+    sameSite: "lax" as const,
+    secure: true,
+    path: "/",
+    maxAge: 60 * 60 * 24 * 365,
+  };
+}
 
 export const config = {
   matcher: [

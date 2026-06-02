@@ -140,3 +140,67 @@ export async function updateUserRol(id: string, rol: user_role) {
   await prisma.users.update({ where: { id }, data: { rol } });
   revalidatePath("/admin/usuarios");
 }
+
+/* ---------------- Categorías ---------------- */
+export async function saveCategoria(formData: FormData) {
+  await requireAdmin();
+  const id = num(formData.get("id"), 0);
+  const nombre = str(formData.get("nombre")) ?? "Categoría";
+  const slug = str(formData.get("slug")) ?? slugify(nombre) ?? `cat-${Date.now()}`;
+  const data = {
+    nombre,
+    slug,
+    icono: str(formData.get("icono")),
+    orden: Math.round(num(formData.get("orden"))),
+    activa: bool(formData.get("activa")),
+  };
+  if (id) await prisma.categorias.update({ where: { id }, data });
+  else await prisma.categorias.create({ data });
+  revalidatePath("/admin/categorias");
+  revalidatePath("/catalogo");
+}
+
+export async function deleteCategoria(id: number) {
+  await requireAdmin();
+  await prisma.categorias.delete({ where: { id } });
+  revalidatePath("/admin/categorias");
+  revalidatePath("/catalogo");
+}
+
+/* ---------------- Redenciones ---------------- */
+export async function updateRedencionEstado(id: number, estado: string) {
+  await requireAdmin();
+  await prisma.redenciones.update({ where: { id }, data: { estado } });
+  revalidatePath("/admin/redenciones");
+}
+
+/* ---------------- Notificaciones ---------------- */
+export async function enviarNotificacion(formData: FormData) {
+  await requireAdmin();
+  const titulo = str(formData.get("titulo")) ?? "Aviso CSN";
+  const mensaje = str(formData.get("mensaje")) ?? "";
+  const tipo = str(formData.get("tipo")) ?? "general";
+  const destino = str(formData.get("destino")); // email específico o null = todos
+
+  let userIds: string[] = [];
+  if (destino) {
+    const u = await prisma.users.findFirst({ where: { email: destino } });
+    if (u) userIds = [u.id];
+  } else {
+    const all = await prisma.users.findMany({ select: { id: true } });
+    userIds = all.map((u) => u.id);
+  }
+
+  if (userIds.length) {
+    await prisma.notificaciones.createMany({
+      data: userIds.map((uid) => ({ user_id: uid, titulo, mensaje, tipo })),
+    });
+  }
+  revalidatePath("/admin/notificaciones");
+}
+
+export async function deleteNotificacion(id: number) {
+  await requireAdmin();
+  await prisma.notificaciones.delete({ where: { id } });
+  revalidatePath("/admin/notificaciones");
+}
