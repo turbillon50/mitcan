@@ -17,6 +17,8 @@ type Suc = {
   direccion: string | null;
   telefono: string | null;
   horario: string | null;
+  lat: unknown;
+  lng: unknown;
   activa: boolean | null;
 };
 
@@ -51,6 +53,16 @@ function Fields({ s }: { s?: Suc }) {
         <div>
           <label className="label">Horario</label>
           <input name="horario" defaultValue={s?.horario ?? ""} className="input" />
+        </div>
+      </div>
+      <div className="grid grid-cols-2 gap-3">
+        <div>
+          <label className="label">Latitud (opcional)</label>
+          <input name="lat" defaultValue={s?.lat != null ? String(s.lat) : ""} className="input" placeholder="se geocodifica sola" />
+        </div>
+        <div>
+          <label className="label">Longitud (opcional)</label>
+          <input name="lng" defaultValue={s?.lng != null ? String(s.lng) : ""} className="input" placeholder="se geocodifica sola" />
         </div>
       </div>
       <label className="flex items-center gap-2 text-sm">
