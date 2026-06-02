@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { requireAdmin, isAdmin } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { getMapboxToken, geocode } from "@/lib/mapbox";
 import type { user_role } from "@prisma/client";
 
 function num(v: FormDataEntryValue | null, def = 0) {
@@ -29,12 +30,34 @@ function slugify(s: string) {
 export async function saveSucursal(formData: FormData) {
   await requireAdmin();
   const id = num(formData.get("id"), 0);
+  const direccion = str(formData.get("direccion"));
+  const area = str(formData.get("area")) ?? "tepic"; // area is NOT NULL in the DB
+  const nombre = str(formData.get("nombre")) ?? "Sucursal";
+
+  let lat: number | null = formData.get("lat") ? num(formData.get("lat")) : null;
+  let lng: number | null = formData.get("lng") ? num(formData.get("lng")) : null;
+
+  // Auto-geocode when coordinates aren't provided but we have something to locate.
+  if ((lat == null || lng == null)) {
+    const token = getMapboxToken();
+    const query = direccion ?? `${nombre}, ${area}, Nayarit, México`;
+    if (token && query) {
+      const geo = await geocode(query, token);
+      if (geo) {
+        lat = geo.lat;
+        lng = geo.lng;
+      }
+    }
+  }
+
   const data = {
-    nombre: str(formData.get("nombre")) ?? "Sucursal",
-    area: str(formData.get("area")) ?? "tepic", // area is NOT NULL in the DB
-    direccion: str(formData.get("direccion")),
+    nombre,
+    area,
+    direccion,
     telefono: str(formData.get("telefono")),
     horario: str(formData.get("horario")) ?? undefined,
+    lat,
+    lng,
     activa: bool(formData.get("activa")),
   };
   if (id) await prisma.sucursales.update({ where: { id }, data });
