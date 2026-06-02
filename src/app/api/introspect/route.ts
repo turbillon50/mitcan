@@ -50,9 +50,11 @@ export async function GET(req: Request) {
       ORDER BY relname
     `);
 
-    return NextResponse.json(
-      { columns, constraints, enums, counts },
-      { headers: { "cache-control": "no-store" } }
+    return new NextResponse(
+      JSON.stringify({ columns, constraints, enums, counts }, (_k, v) =>
+        typeof v === "bigint" ? Number(v) : v
+      ),
+      { headers: { "content-type": "application/json", "cache-control": "no-store" } }
     );
   } catch (err) {
     return NextResponse.json(
