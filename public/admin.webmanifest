@@ -1,0 +1,21 @@
+{
+  "name": "CSN Admin — Carnes Selectas Nayarit",
+  "short_name": "CSN Admin",
+  "description": "Panel de administración ERP de CSN Carnes Selectas Nayarit.",
+  "lang": "es-MX",
+  "dir": "ltr",
+  "id": "/admin?source=pwa",
+  "start_url": "/admin?k=mitcan&source=pwa",
+  "scope": "/admin",
+  "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
+  "orientation": "any",
+  "theme_color": "#131313",
+  "background_color": "#131313",
+  "categories": ["business", "productivity"],
+  "icons": [
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

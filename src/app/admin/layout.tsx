@@ -1,8 +1,25 @@
+import type { Metadata, Viewport } from "next";
 import { UserButton } from "@clerk/nextjs";
 import AdminSidebar from "@/components/admin/AdminSidebar";
 import { requireAdmin } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
+
+// Independent installable PWA for the admin (its own manifest/icon/scope),
+// separate from the customer app.
+export const metadata: Metadata = {
+  title: "CSN Admin",
+  manifest: "/admin.webmanifest",
+  appleWebApp: {
+    capable: true,
+    title: "CSN Admin",
+    statusBarStyle: "black-translucent",
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#131313",
+};
 
 export default async function AdminLayout({
   children,
