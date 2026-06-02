@@ -1,0 +1,22 @@
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  reactStrictMode: true,
+  images: {
+    remotePatterns: [
+      { protocol: "https", hostname: "lh3.googleusercontent.com" },
+      { protocol: "https", hostname: "images.unsplash.com" },
+      { protocol: "https", hostname: "**.public.blob.vercel-storage.com" },
+    ],
+  },
+  eslint: { ignoreDuringBuilds: true },
+  // Legacy routes from the old static PWA → keep installed apps / bookmarks alive.
+  async redirects() {
+    return [
+      { source: "/inicio", destination: "/", permanent: false },
+      { source: "/recompensas", destination: "/app/recompensas", permanent: false },
+      { source: "/pedido", destination: "/app/pedido", permanent: false },
+    ];
+  },
+};
+
+export default nextConfig;

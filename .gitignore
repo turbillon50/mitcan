@@ -4,5 +4,11 @@ node_modules
 *.log
 .env
 .env.local
+.env*.local
 __pycache__/
 *.pyc
+.next/
+next-env.d.ts
+/out/
+/build
+*.tsbuildinfo
