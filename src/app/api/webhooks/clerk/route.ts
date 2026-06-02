@@ -1,7 +1,7 @@
 import { Webhook } from "svix";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+import { prisma, withRetry } from "@/lib/prisma";
 import { sendEmail, welcomeEmail } from "@/lib/resend";
 import type { user_role } from "@prisma/client";
 
@@ -62,20 +62,24 @@ export async function POST(req: Request) {
         null;
       const rol = data.public_metadata?.role ?? "cliente";
 
-      const existing = await prisma.users.findUnique({
-        where: { clerk_id: data.id },
-      });
+      const existing = await withRetry(() =>
+        prisma.users.findUnique({ where: { clerk_id: data.id } })
+      );
 
       if (existing) {
-        await prisma.users.update({
-          where: { clerk_id: data.id },
-          data: { email, nombre },
-        });
+        await withRetry(() =>
+          prisma.users.update({
+            where: { clerk_id: data.id },
+            data: { email, nombre },
+          })
+        );
       } else {
         // users.id is a non-defaulted text PK keyed to the Clerk user id.
-        await prisma.users.create({
-          data: { id: data.id, clerk_id: data.id, email, nombre, rol },
-        });
+        await withRetry(() =>
+          prisma.users.create({
+            data: { id: data.id, clerk_id: data.id, email, nombre, rol },
+          })
+        );
         if (email) {
           await sendEmail({
             to: email,

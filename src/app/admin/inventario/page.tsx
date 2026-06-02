@@ -62,7 +62,7 @@ export default async function AdminInventario({
             <tr>
               <th className="px-4 py-3">Producto</th>
               <th className="px-4 py-3">Precio base</th>
-              <th className="px-4 py-3">Stock en sucursal</th>
+              <th className="px-4 py-3">Stock / mín / precio en sucursal</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-hairline">
@@ -81,6 +81,8 @@ export default async function AdminInventario({
                         sucursalId={sucursalId}
                         stock={Number(inv?.stock ?? 0)}
                         minStock={Number(inv?.min_stock ?? 5)}
+                        precio={inv?.precio != null ? Number(inv.precio) : null}
+                        precioBase={Number(p.precio)}
                       />
                     ) : (
                       <span className="text-on-bg-muted">
