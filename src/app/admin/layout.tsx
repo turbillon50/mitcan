@@ -10,6 +10,10 @@ export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "CSN Admin",
   manifest: "/admin.webmanifest",
+  icons: {
+    icon: "/icons/icon-admin-192.png",
+    apple: "/icons/apple-touch-icon-admin-180.png",
+  },
   appleWebApp: {
     capable: true,
     title: "CSN Admin",
