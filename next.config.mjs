@@ -9,6 +9,14 @@ const nextConfig = {
     ],
   },
   eslint: { ignoreDuringBuilds: true },
+  // Legacy routes from the old static PWA → keep installed apps / bookmarks alive.
+  async redirects() {
+    return [
+      { source: "/inicio", destination: "/", permanent: false },
+      { source: "/recompensas", destination: "/app/recompensas", permanent: false },
+      { source: "/pedido", destination: "/app/pedido", permanent: false },
+    ];
+  },
 };
 
 export default nextConfig;
