@@ -4,6 +4,8 @@ import { AREA_LABELS } from "@/lib/data";
 import { formatPhone } from "@/lib/format";
 import FormDialog from "@/components/admin/FormDialog";
 import DeleteButton from "@/components/admin/DeleteButton";
+import LocationPicker from "@/components/admin/LocationPicker";
+import { getMapboxToken } from "@/lib/mapbox";
 import { saveSucursal, deleteSucursal } from "../actions";
 
 export const dynamic = "force-dynamic";
@@ -22,7 +24,7 @@ type Suc = {
   activa: boolean | null;
 };
 
-function Fields({ s }: { s?: Suc }) {
+function Fields({ s, token }: { s?: Suc; token: string | null }) {
   return (
     <>
       {s && <input type="hidden" name="id" value={s.id} />}
@@ -55,16 +57,11 @@ function Fields({ s }: { s?: Suc }) {
           <input name="horario" defaultValue={s?.horario ?? ""} className="input" />
         </div>
       </div>
-      <div className="grid grid-cols-2 gap-3">
-        <div>
-          <label className="label">Latitud (opcional)</label>
-          <input name="lat" defaultValue={s?.lat != null ? String(s.lat) : ""} className="input" placeholder="se geocodifica sola" />
-        </div>
-        <div>
-          <label className="label">Longitud (opcional)</label>
-          <input name="lng" defaultValue={s?.lng != null ? String(s.lng) : ""} className="input" placeholder="se geocodifica sola" />
-        </div>
-      </div>
+      <LocationPicker
+        token={token}
+        defaultLat={s?.lat != null ? Number(s.lat) : null}
+        defaultLng={s?.lng != null ? Number(s.lng) : null}
+      />
       <label className="flex items-center gap-2 text-sm">
         <input type="checkbox" name="activa" defaultChecked={s?.activa ?? true} />
         Activa
@@ -74,6 +71,7 @@ function Fields({ s }: { s?: Suc }) {
 }
 
 export default async function AdminSucursales() {
+  const token = getMapboxToken();
   const sucursales = await prisma.sucursales
     .findMany({ orderBy: { id: "asc" } })
     .catch(() => [] as Suc[]);
@@ -94,7 +92,7 @@ export default async function AdminSucursales() {
           }
           action={saveSucursal}
         >
-          <Fields />
+          <Fields token={token} />
         </FormDialog>
       </div>
 
@@ -143,7 +141,7 @@ export default async function AdminSucursales() {
                       triggerClass="flex h-8 w-8 items-center justify-center rounded-lg text-on-bg-muted hover:bg-surface-2 hover:text-primary"
                       action={saveSucursal}
                     >
-                      <Fields s={s} />
+                      <Fields s={s} token={token} />
                     </FormDialog>
                     <DeleteButton action={deleteSucursal.bind(null, s.id)} />
                   </div>

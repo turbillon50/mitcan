@@ -7,6 +7,7 @@ import {
   ESTADO_LABEL,
 } from "@/lib/format";
 import InlineSelect from "@/components/admin/InlineSelect";
+import ExportCsv from "@/components/admin/ExportCsv";
 import { updatePedidoEstado } from "../actions";
 
 export const dynamic = "force-dynamic";
@@ -66,9 +67,22 @@ export default async function AdminPedidos({
 
   return (
     <div className="flex flex-col gap-6">
-      <div>
-        <h1 className="section-title text-2xl">Pedidos</h1>
-        <p className="text-sm text-on-bg-muted">{pedidos.length} resultados</p>
+      <div className="flex items-center justify-between gap-3">
+        <div>
+          <h1 className="section-title text-2xl">Pedidos</h1>
+          <p className="text-sm text-on-bg-muted">{pedidos.length} resultados</p>
+        </div>
+        <ExportCsv
+          filename="pedidos"
+          rows={pedidos.map((p) => ({
+            folio: p.folio ?? `#${p.id}`,
+            cliente: p.user?.nombre ?? p.user?.email ?? "",
+            sucursal: p.sucursal?.nombre ?? "",
+            fecha: p.created_at ? new Date(p.created_at).toISOString() : "",
+            total: Number(p.total),
+            estado: p.estado ?? "",
+          }))}
+        />
       </div>
 
       {/* Filters */}
