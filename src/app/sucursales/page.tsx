@@ -1,6 +1,5 @@
 import PublicHeader from "@/components/PublicHeader";
-import SucursalesClient from "./SucursalesClient";
-import SucursalesMap from "@/components/SucursalesMap";
+import SucursalesExplorer from "@/components/SucursalesExplorer";
 import { getSucursales, AREA_LABELS } from "@/lib/data";
 import { getMapboxToken } from "@/lib/mapbox";
 
@@ -18,28 +17,15 @@ export default async function SucursalesPage() {
     telefono: s.telefono,
     whatsapp: s.whatsapp,
     horario: s.horario,
+    lat: s.lat != null ? Number(s.lat) : null,
+    lng: s.lng != null ? Number(s.lng) : null,
   }));
 
-  // Branches that already have coordinates → map markers.
-  const puntos = sucursales
-    .filter((s) => s.lat != null && s.lng != null)
-    .map((s) => ({
-      id: s.id,
-      nombre: s.nombre,
-      area: s.area,
-      direccion: s.direccion,
-      telefono: s.telefono,
-      lat: Number(s.lat),
-      lng: Number(s.lng),
-    }));
-
+  // Area chips from areas actually present, in canonical order.
   const present = new Set(data.map((s) => s.area).filter(Boolean) as string[]);
   const ordered = Object.keys(AREA_LABELS).filter((k) => present.has(k));
   const extras = [...present].filter((k) => !(k in AREA_LABELS));
-  const areas = [...ordered, ...extras].map((key) => ({
-    key,
-    label: AREA_LABELS[key] ?? key,
-  }));
+  const areas = [...ordered, ...extras].map((key) => ({ key, label: AREA_LABELS[key] ?? key }));
 
   return (
     <div className="min-h-dvh pb-20">
@@ -49,14 +35,7 @@ export default async function SucursalesPage() {
         <p className="mb-6 text-on-bg-muted">
           {sucursales.length} sucursales · Nayarit · Sinaloa · Jalisco
         </p>
-
-        {token && puntos.length > 0 && (
-          <div className="mb-8">
-            <SucursalesMap token={token} puntos={puntos} />
-          </div>
-        )}
-
-        <SucursalesClient sucursales={data} areas={areas} />
+        <SucursalesExplorer token={token} sucursales={data} areas={areas} />
       </main>
     </div>
   );
