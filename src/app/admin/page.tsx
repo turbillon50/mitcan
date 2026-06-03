@@ -36,9 +36,20 @@ export default async function AdminDashboard() {
 
   return (
     <div className="flex flex-col gap-7">
-      <div>
-        <h1 className="section-title text-2xl">Dashboard</h1>
-        <p className="text-sm text-on-bg-muted">Resumen del negocio en tiempo real</p>
+      <div className="csn-gradient flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-hairline p-6">
+        <div>
+          <h1 className="section-title text-2xl">Centro de control CSN</h1>
+          <p className="text-sm text-on-bg-muted">
+            Resumen del negocio en tiempo real
+          </p>
+        </div>
+        <span className="chip chip-active">
+          {new Date().toLocaleDateString("es-MX", {
+            weekday: "long",
+            day: "numeric",
+            month: "long",
+          })}
+        </span>
       </div>
 
       {/* KPIs */}

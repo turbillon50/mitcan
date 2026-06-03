@@ -12,15 +12,20 @@ export default function KpiCard({
   hint?: string;
 }) {
   return (
-    <div className="card p-5">
-      <div className="flex items-center justify-between">
-        <p className="text-sm text-on-bg-muted">{label}</p>
-        <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/15 text-primary">
-          <Icon size={18} />
+    <div className="card relative overflow-hidden p-5">
+      <span className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-accent to-primary" />
+      <div className="flex items-start justify-between">
+        <div>
+          <p className="text-sm text-on-bg-muted">{label}</p>
+          <p className="mt-2 font-display text-3xl font-extrabold tracking-tight">
+            {value}
+          </p>
+          {hint && <p className="mt-1 text-xs text-on-bg-muted">{hint}</p>}
+        </div>
+        <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 text-primary">
+          <Icon size={20} />
         </span>
       </div>
-      <p className="mt-3 font-display text-3xl font-extrabold">{value}</p>
-      {hint && <p className="mt-1 text-xs text-on-bg-muted">{hint}</p>}
     </div>
   );
 }

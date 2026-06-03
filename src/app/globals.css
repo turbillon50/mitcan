@@ -69,6 +69,22 @@ body {
   .section-title {
     @apply font-display text-2xl font-bold tracking-tight text-on-bg;
   }
+  /* Admin tables: consistent, professional look across every page */
+  .card thead th {
+    @apply bg-surface-2/70 font-semibold text-on-bg-muted;
+  }
+  .card thead th:first-child {
+    @apply rounded-tl-xl;
+  }
+  .card thead th:last-child {
+    @apply rounded-tr-xl;
+  }
+  .card tbody tr {
+    @apply transition-colors;
+  }
+  .card tbody tr:hover {
+    @apply bg-surface-2/50;
+  }
 }
 
 .no-scrollbar::-webkit-scrollbar {
