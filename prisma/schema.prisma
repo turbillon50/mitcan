@@ -130,6 +130,7 @@ model inventario {
   stock       Decimal?  @default(0) @db.Decimal
   min_stock   Decimal?  @default(5) @db.Decimal
   precio      Decimal?  @db.Decimal // precio específico por sucursal (override)
+  fuente      String?   @default("manual") // manual | sync_externo
   updated_at  DateTime? @default(now()) @db.Timestamptz(6)
 
   producto productos?  @relation(fields: [producto_id], references: [id])

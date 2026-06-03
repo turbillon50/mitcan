@@ -16,6 +16,8 @@ export default async function SucursalesPage() {
     area: s.area,
     direccion: s.direccion,
     telefono: s.telefono,
+    whatsapp: s.whatsapp,
+    horario: s.horario,
   }));
 
   // Branches that already have coordinates → map markers.

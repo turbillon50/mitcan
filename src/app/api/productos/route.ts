@@ -5,12 +5,41 @@ import { getStaffOrNull } from "@/lib/auth";
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
   const all = searchParams.get("all") === "1";
+  const sucursal = searchParams.get("sucursal");
+  const sucursalId = sucursal ? parseInt(sucursal) : null;
+
   const productos = await prisma.productos.findMany({
     where: all ? undefined : { activo: true },
     include: { categoria: true },
     orderBy: { nombre: "asc" },
   });
-  return NextResponse.json(productos);
+
+  // Apply per-branch price overrides when a sucursal is provided.
+  let overrides: Record<number, number> = {};
+  if (sucursalId) {
+    const precios = await prisma.precios_sucursal.findMany({
+      where: { sucursal_id: sucursalId, activo: true },
+    });
+    overrides = Object.fromEntries(
+      precios.filter((p) => p.precio != null).map((p) => [p.producto_id, Number(p.precio)])
+    );
+  }
+
+  const data = productos.map((p) => ({
+    id: p.id,
+    sku: p.sku,
+    nombre: p.nombre,
+    descripcion: p.descripcion,
+    categoria: p.categoria?.nombre ?? null,
+    precio_base: Number(p.precio),
+    precio: overrides[p.id] ?? Number(p.precio),
+    unidad: p.unidad,
+    es_nuevo: p.es_nuevo,
+    imagen_url: p.imagen_url,
+    activo: p.activo,
+  }));
+
+  return NextResponse.json(data);
 }
 
 export async function POST(req: Request) {

@@ -268,22 +268,40 @@ export async function savePromocion(formData: FormData) {
   const id = num(formData.get("id"), 0);
   const inicio = str(formData.get("fecha_inicio"));
   const fin = str(formData.get("fecha_fin"));
+  // "todas" or a list of sucursal IDs (checkbox name="suc")
+  const sucSel = formData.getAll("suc").map(String).filter(Boolean);
+  const todas = formData.get("todas") === "on" || sucSel.length === 0;
   const data = {
     titulo: str(formData.get("titulo")) ?? "Promoción",
     descripcion: str(formData.get("descripcion")),
     tipo: str(formData.get("tipo")) ?? "descuento",
     valor: formData.get("valor") ? num(formData.get("valor")) : null,
+    precio_promo: formData.get("precio_promo") ? num(formData.get("precio_promo")) : null,
+    unidad: str(formData.get("unidad")),
     producto_id: num(formData.get("producto_id"), 0) || null,
-    sucursal_id: num(formData.get("sucursal_id"), 0) || null,
+    sucursales: todas ? ["todas"] : sucSel,
     fecha_inicio: inicio ? new Date(inicio) : null,
     fecha_fin: fin ? new Date(fin) : null,
     imagen_url: str(formData.get("imagen_url")),
     activa: bool(formData.get("activa")),
   };
   if (id) await prisma.promociones.update({ where: { id }, data });
-  else await prisma.promociones.create({ data });
+  else
+    await prisma.promociones.create({
+      data: { ...data, orden: (await prisma.promociones.count()) },
+    });
   revalidatePath("/admin/promociones");
   revalidatePath("/");
+}
+
+export async function reordenarPromos(ids: number[]) {
+  await requireAdmin();
+  await prisma.$transaction(
+    ids.map((id, i) => prisma.promociones.update({ where: { id }, data: { orden: i } }))
+  );
+  revalidatePath("/admin/promociones");
+  revalidatePath("/");
+  return { ok: true };
 }
 
 export async function deletePromocion(id: number) {

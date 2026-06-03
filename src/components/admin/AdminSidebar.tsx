@@ -17,6 +17,7 @@ import {
   Megaphone,
   Bell,
   BarChart3,
+  BookOpen,
   Menu,
   X,
   ExternalLink,
@@ -56,6 +57,8 @@ const SECTIONS: { title: string; items: Item[] }[] = [
     items: [
       { href: "/admin/reportes", label: "Reportes", icon: BarChart3 },
       { href: "/admin/usuarios", label: "Usuarios", icon: Users },
+      { href: "/admin/contenido", label: "Contenido", icon: LayoutDashboard },
+      { href: "/admin/docs", label: "API / Docs", icon: BookOpen },
     ],
   },
 ];

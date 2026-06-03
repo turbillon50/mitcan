@@ -1,23 +1,68 @@
 import Link from "next/link";
-import Image from "next/image";
-import { Beef, MapPin, Gift, QrCode, ArrowRight, Flame } from "lucide-react";
+import { MapPin, Gift, QrCode, ArrowRight, Flame, Beef } from "lucide-react";
 import PublicHeader from "@/components/PublicHeader";
+import PromoCarousel from "@/components/PromoCarousel";
+import ProductGrid from "@/components/ProductGrid";
+import SucursalesMap from "@/components/SucursalesMap";
+import { FadeInOnScroll, SlideIn } from "@/components/motion";
 import {
   getProductosConCategoria,
   getSucursales,
   getPromocionesActivas,
+  getContent,
 } from "@/lib/data";
-import { formatMXN } from "@/lib/format";
+import { getMapboxToken } from "@/lib/mapbox";
+import { serialize } from "@/lib/format";
 
 export const dynamic = "force-dynamic";
 
+type Hero = { titulo?: string; subtitulo?: string; cta_text?: string; cta_href?: string };
+
 export default async function LandingPage() {
-  const [productos, sucursales, promos] = await Promise.all([
+  const [productos, sucursales, promos, hero] = await Promise.all([
     getProductosConCategoria({ soloActivos: true }),
     getSucursales({ soloActivas: true }),
-    getPromocionesActivas(6),
+    getPromocionesActivas(12),
+    getContent<Hero>("hero"),
   ]);
-  const showcase = productos.slice(0, 4);
+  const token = getMapboxToken();
+
+  const showcase = serialize(
+    productos.slice(0, 8).map((p) => ({
+      id: p.id,
+      nombre: p.nombre,
+      descripcion: p.descripcion,
+      precio: Number(p.precio),
+      unidad: p.unidad,
+      imagen_url: p.imagen_url,
+      categoria: p.categoria?.nombre ?? null,
+      es_nuevo: p.es_nuevo ?? false,
+    }))
+  );
+
+  const promosData = serialize(
+    promos.map((p) => ({
+      id: p.id,
+      titulo: p.titulo,
+      descripcion: p.descripcion,
+      imagen_url: p.imagen_url,
+      precio_promo: p.precio_promo != null ? Number(p.precio_promo) : null,
+      unidad: p.unidad,
+      todas: (p.sucursales ?? []).includes("todas"),
+    }))
+  );
+
+  const puntos = sucursales
+    .filter((s) => s.lat != null && s.lng != null)
+    .map((s) => ({
+      id: s.id,
+      nombre: s.nombre,
+      area: s.area,
+      direccion: s.direccion,
+      telefono: s.telefono,
+      lat: Number(s.lat),
+      lng: Number(s.lng),
+    }));
 
   return (
     <div className="min-h-dvh">
@@ -26,155 +71,102 @@ export default async function LandingPage() {
       {/* Hero */}
       <section className="csn-gradient relative overflow-hidden border-b border-hairline">
         <div className="mx-auto max-w-6xl px-5 py-16 md:py-24">
-          <div className="max-w-2xl animate-fade-in">
+          <SlideIn from="left" className="max-w-2xl">
             <span className="chip chip-active mb-5">
               <Flame size={14} /> Club de recompensas CSN
             </span>
             <h1 className="font-display text-4xl font-extrabold leading-[1.05] tracking-tight md:text-6xl">
-              La carne más selecta de{" "}
-              <span className="text-primary">Nayarit</span>, con premios en
-              cada compra.
+              {hero?.titulo ?? (
+                <>
+                  La carne más selecta de <span className="text-primary">Nayarit</span>, con premios en cada compra.
+                </>
+              )}
             </h1>
             <p className="mt-5 max-w-xl text-lg text-on-bg-muted">
-              Cortes premium, {sucursales.length || "varias"} sucursales en
-              Nayarit, Sinaloa y Jalisco, y un club que te regresa puntos por
-              cada kilo.
+              {hero?.subtitulo ??
+                `Cortes premium, ${sucursales.length} sucursales en Nayarit, Sinaloa y Jalisco, y un club que te regresa puntos por cada kilo.`}
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
-              <Link href="/sign-up" className="btn-primary px-5 py-3 text-base">
-                Únete gratis <ArrowRight size={18} />
+              <Link href={hero?.cta_href || "/sign-up"} className="btn-primary px-5 py-3 text-base">
+                {hero?.cta_text || "Únete gratis"} <ArrowRight size={18} />
               </Link>
               <Link href="/catalogo" className="btn-ghost px-5 py-3 text-base">
                 Ver catálogo
               </Link>
             </div>
-          </div>
+          </SlideIn>
         </div>
       </section>
 
+      {/* Promos */}
+      {promosData.length > 0 && (
+        <section className="mx-auto max-w-6xl px-5 py-12">
+          <FadeInOnScroll>
+            <h2 className="section-title mb-6 flex items-center gap-2">
+              <Flame className="text-primary" size={22} /> Promociones de temporada
+            </h2>
+          </FadeInOnScroll>
+          <PromoCarousel promos={promosData} />
+        </section>
+      )}
+
       {/* Value props */}
-      <section className="mx-auto max-w-6xl px-5 py-14">
+      <section className="mx-auto max-w-6xl px-5 py-8">
         <div className="grid gap-4 sm:grid-cols-3">
           {[
-            {
-              icon: QrCode,
-              title: "Escanea en caja",
-              body: "Suma puntos en cada compra con tu QR de membresía.",
-            },
-            {
-              icon: Gift,
-              title: "Canjea recompensas",
-              body: "Cupones, descuentos y envíos gratis con tus puntos.",
-            },
-            {
-              icon: Beef,
-              title: "Cortes selectos",
-              body: "Ribeye, New York, arrachera y combos parrilleros.",
-            },
-          ].map(({ icon: Icon, title, body }) => (
-            <div key={title} className="card p-6">
-              <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl bg-primary/15 text-primary">
-                <Icon size={22} />
+            { icon: QrCode, title: "Escanea en caja", body: "Suma puntos en cada compra con tu QR de membresía." },
+            { icon: Gift, title: "Canjea recompensas", body: "Cupones, descuentos y envíos gratis con tus puntos." },
+            { icon: Beef, title: "Cortes selectos", body: "Ribeye, arrachera, picaña y combos parrilleros." },
+          ].map(({ icon: Icon, title, body }, i) => (
+            <FadeInOnScroll key={title} delay={i * 0.08}>
+              <div className="card h-full p-6">
+                <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                  <Icon size={22} />
+                </div>
+                <h3 className="text-lg font-bold">{title}</h3>
+                <p className="mt-1 text-sm text-on-bg-muted">{body}</p>
               </div>
-              <h3 className="text-lg font-bold">{title}</h3>
-              <p className="mt-1 text-sm text-on-bg-muted">{body}</p>
-            </div>
+            </FadeInOnScroll>
           ))}
         </div>
       </section>
 
-      {/* Promotions */}
-      {promos.length > 0 && (
-        <section className="mx-auto max-w-6xl px-5 pb-4">
-          <h2 className="section-title mb-6 flex items-center gap-2">
-            <Flame className="text-primary" size={22} /> Promociones activas
-          </h2>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {promos.map((p) => (
-              <div key={p.id} className="card overflow-hidden">
-                <div className="csn-gradient flex items-center justify-between p-5">
-                  <div>
-                    <h3 className="text-lg font-bold">{p.titulo}</h3>
-                    {p.descripcion && (
-                      <p className="mt-1 text-sm text-on-bg-muted">{p.descripcion}</p>
-                    )}
-                    {p.sucursal?.nombre && (
-                      <p className="mt-2 text-xs text-on-bg-muted">
-                        📍 {p.sucursal.nombre}
-                      </p>
-                    )}
-                  </div>
-                  <span className="chip chip-active shrink-0 text-xs uppercase">
-                    {p.tipo ?? "promo"}
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
+      {/* Products */}
+      {showcase.length > 0 && (
+        <section className="mx-auto max-w-6xl px-5 py-8">
+          <FadeInOnScroll>
+            <div className="mb-6 flex items-end justify-between">
+              <h2 className="section-title">Cortes destacados 🔥</h2>
+              <Link href="/catalogo" className="text-sm font-semibold text-primary">Ver todo</Link>
+            </div>
+          </FadeInOnScroll>
+          <ProductGrid productos={showcase} />
         </section>
       )}
 
-      {/* Featured products */}
-      {showcase.length > 0 && (
-        <section className="mx-auto max-w-6xl px-5 pb-14">
+      {/* Sucursales + mapa */}
+      <section className="mx-auto max-w-6xl px-5 py-12">
+        <FadeInOnScroll>
           <div className="mb-6 flex items-end justify-between">
-            <h2 className="section-title">Cortes destacados 🔥</h2>
-            <Link href="/catalogo" className="text-sm font-semibold text-primary">
-              Ver todo
+            <h2 className="section-title flex items-center gap-2">
+              <MapPin className="text-primary" size={22} /> {sucursales.length} sucursales
+            </h2>
+            <Link href="/sucursales" className="text-sm font-semibold text-primary">Ver todas</Link>
+          </div>
+        </FadeInOnScroll>
+        {token && puntos.length > 0 ? (
+          <SucursalesMap token={token} puntos={puntos} />
+        ) : (
+          <div className="csn-gradient flex flex-col items-center gap-4 rounded-3xl border border-hairline p-10 text-center">
+            <MapPin className="text-primary" size={28} />
+            <p className="max-w-md text-on-bg-muted">
+              Tepic, Mazatlán, Vallarta, Bahía de Banderas y foráneas de Nayarit.
+            </p>
+            <Link href="/sucursales" className="btn-primary px-5 py-3">
+              Ver sucursales <ArrowRight size={18} />
             </Link>
           </div>
-          <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-            {showcase.map((p) => (
-              <article
-                key={p.id}
-                className="card overflow-hidden transition hover:border-primary/30"
-              >
-                <div className="relative h-36 bg-surface-2">
-                  {p.imagen_url ? (
-                    <Image
-                      src={p.imagen_url}
-                      alt={p.nombre}
-                      fill
-                      sizes="(max-width:768px) 50vw, 25vw"
-                      className="object-cover"
-                    />
-                  ) : (
-                    <div className="flex h-full items-center justify-center text-primary/40">
-                      <Beef size={40} />
-                    </div>
-                  )}
-                </div>
-                <div className="p-3.5">
-                  <p className="text-xs text-on-bg-muted">
-                    {p.categoria?.nombre ?? "Producto"}
-                  </p>
-                  <h3 className="font-bold leading-tight">{p.nombre}</h3>
-                  <p className="mt-1 text-sm font-semibold text-primary">
-                    {formatMXN(Number(p.precio))}
-                    <span className="text-on-bg-muted"> / {p.unidad ?? "kg"}</span>
-                  </p>
-                </div>
-              </article>
-            ))}
-          </div>
-        </section>
-      )}
-
-      {/* CTA */}
-      <section className="mx-auto max-w-6xl px-5 pb-20">
-        <div className="csn-gradient flex flex-col items-center gap-5 rounded-3xl border border-hairline p-10 text-center">
-          <MapPin className="text-primary" size={28} />
-          <h2 className="font-display text-3xl font-bold">
-            Encuentra tu carnicería CSN
-          </h2>
-          <p className="max-w-md text-on-bg-muted">
-            {sucursales.length || "Múltiples"} sucursales en Tepic, Mazatlán,
-            Vallarta, Bahía de Banderas y foráneas de Nayarit.
-          </p>
-          <Link href="/sucursales" className="btn-primary px-5 py-3">
-            Ver sucursales <ArrowRight size={18} />
-          </Link>
-        </div>
+        )}
       </section>
 
       <footer className="border-t border-hairline py-8 text-center text-sm text-on-bg-muted">

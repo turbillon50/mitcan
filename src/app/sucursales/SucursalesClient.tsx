@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Search, Phone, Navigation, Clock } from "lucide-react";
+import { Search, Phone, Navigation, Clock, MessageCircle } from "lucide-react";
 import { formatPhone } from "@/lib/format";
 
 type Sucursal = {
@@ -10,6 +10,8 @@ type Sucursal = {
   area: string | null;
   direccion: string | null;
   telefono: string | null;
+  whatsapp?: string | null;
+  horario?: string | null;
 };
 
 const norm = (s: string) =>
@@ -108,11 +110,26 @@ export default function SucursalesClient({
                             {s.direccion}
                           </p>
                         ) : null}
+                        {s.horario ? (
+                          <p className="mt-1 flex items-center gap-1 text-xs text-on-bg-muted">
+                            <Clock size={12} /> {s.horario}
+                          </p>
+                        ) : null}
                       </div>
                     </div>
 
-                    {s.telefono || s.direccion ? (
-                      <div className="mt-3 flex gap-2">
+                    {s.telefono || s.direccion || s.whatsapp ? (
+                      <div className="mt-3 flex flex-wrap gap-2">
+                        {s.whatsapp && (
+                          <a
+                            href={`https://wa.me/${s.whatsapp.replace(/\D/g, "")}`}
+                            target="_blank"
+                            rel="noopener"
+                            className="btn-primary flex-1 px-2 py-2 text-xs"
+                          >
+                            <MessageCircle size={14} /> WhatsApp
+                          </a>
+                        )}
                         {s.telefono && (
                           <a
                             href={`tel:+52${s.telefono.replace(/\D/g, "")}`}
