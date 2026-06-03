@@ -19,6 +19,13 @@ export const AREA_LABELS: Record<string, string> = {
   foraneas: "Área Foráneas Nayarit",
 };
 
+export async function getContent<T = unknown>(key: string): Promise<T | null> {
+  return safe(async () => {
+    const row = await prisma.content_blocks.findUnique({ where: { key } });
+    return (row?.content as T) ?? null;
+  }, null);
+}
+
 export function getCategorias() {
   return safe(
     () => prisma.categorias.findMany({ orderBy: { orden: "asc" } }),
@@ -49,18 +56,21 @@ export function getSucursales(opts?: { soloActivas?: boolean }) {
   );
 }
 
-export function getPromocionesActivas(limit = 6) {
+export function getPromocionesActivas(limit = 12) {
   const now = new Date();
   return safe(
     () =>
       prisma.promociones.findMany({
         where: {
           activa: true,
-          OR: [{ fecha_fin: null }, { fecha_fin: { gte: now } }],
+          AND: [
+            { OR: [{ fecha_inicio: null }, { fecha_inicio: { lte: now } }] },
+            { OR: [{ fecha_fin: null }, { fecha_fin: { gte: now } }] },
+          ],
         },
-        orderBy: { id: "desc" },
+        orderBy: [{ orden: "asc" }, { id: "desc" }],
         take: limit,
-        include: { sucursal: true, producto: true },
+        include: { producto: true },
       }),
     []
   );

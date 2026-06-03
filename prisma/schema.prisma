@@ -29,13 +29,15 @@ model sucursales {
   lat        Decimal?  @db.Decimal
   lng        Decimal?  @db.Decimal
   horario    String?   @default("8:00-20:00")
+  whatsapp   String?
   activa     Boolean?  @default(true) @map("active")
   created_at DateTime? @default(now()) @db.Timestamptz(6)
 
-  inventario  inventario[]
-  pedidos     pedidos[]
-  users       users[]
-  promociones promociones[]
+  inventario      inventario[]
+  pedidos         pedidos[]
+  users           users[]
+  promociones     promociones[]
+  precios_sucursal precios_sucursal[]
 
   @@map("sucursales")
 }
@@ -77,20 +79,48 @@ model productos {
   id           Int       @id @default(autoincrement())
   nombre       String    @map("name")
   slug         String
+  sku          String?   @unique
   descripcion  String?
   categoria_id Int?
   precio       Decimal   @db.Decimal
   unidad       String?   @default("kg")
   imagen_url   String?
+  es_nuevo     Boolean?  @default(false)
   activo       Boolean?  @default(true) @map("disponible")
   created_at   DateTime? @default(now()) @db.Timestamptz(6)
 
-  categoria    categorias?    @relation(fields: [categoria_id], references: [id])
-  inventario   inventario[]
-  pedido_items pedido_items[]
-  promociones  promociones[]
+  categoria        categorias?        @relation(fields: [categoria_id], references: [id])
+  inventario       inventario[]
+  pedido_items     pedido_items[]
+  promociones      promociones[]
+  precios_sucursal precios_sucursal[]
 
   @@map("productos")
+}
+
+model precios_sucursal {
+  id          Int       @id @default(autoincrement())
+  producto_id Int
+  sucursal_id Int
+  precio      Decimal?  @db.Decimal // null = usa precio base del producto
+  activo      Boolean?  @default(true)
+  created_at  DateTime? @default(now()) @db.Timestamptz(6)
+  updated_at  DateTime? @default(now()) @db.Timestamptz(6)
+
+  producto productos  @relation(fields: [producto_id], references: [id], onDelete: Cascade)
+  sucursal sucursales @relation(fields: [sucursal_id], references: [id], onDelete: Cascade)
+
+  @@unique([producto_id, sucursal_id])
+  @@map("precios_sucursal")
+}
+
+model content_blocks {
+  id         Int       @id @default(autoincrement())
+  key        String    @unique
+  content    Json?     @db.JsonB
+  updated_at DateTime? @default(now()) @updatedAt @db.Timestamptz(6)
+
+  @@map("content_blocks")
 }
 
 model inventario {
@@ -100,6 +130,7 @@ model inventario {
   stock       Decimal?  @default(0) @db.Decimal
   min_stock   Decimal?  @default(5) @db.Decimal
   precio      Decimal?  @db.Decimal // precio específico por sucursal (override)
+  fuente      String?   @default("manual") // manual | sync_externo
   updated_at  DateTime? @default(now()) @db.Timestamptz(6)
 
   producto productos?  @relation(fields: [producto_id], references: [id])
@@ -114,8 +145,12 @@ model promociones {
   descripcion  String?
   tipo         String?   @default("descuento") // descuento|monto|2x1|envio|combo
   valor        Decimal?  @db.Decimal
+  precio_promo Decimal?  @db.Decimal
+  unidad       String?
   producto_id  Int?
   sucursal_id  Int?
+  sucursales   String[]  @default([]) // IDs de sucursal o ['todas']
+  orden        Int?      @default(0)
   fecha_inicio DateTime? @db.Timestamptz(6)
   fecha_fin    DateTime? @db.Timestamptz(6)
   imagen_url   String?

@@ -5,18 +5,18 @@
 :root {
   color-scheme: light;
 
-  /* CSN — modo día. RGB triplets so Tailwind opacity modifiers work. */
-  --bg: 247 245 243; /* #F7F5F3 */
+  /* CSN — modo día, paleta de marca. RGB triplets para opacidad. */
+  --bg: 245 240 232; /* #F5F0E8 crema */
   --surface: 255 255 255; /* #ffffff */
-  --surface-2: 246 241 235; /* #F6F1EB */
-  --surface-3: 233 224 214; /* #E9E0D6 */
+  --surface-2: 240 233 222; /* #F0E9DE */
+  --surface-3: 229 220 205; /* #E5DCCD */
 
-  --primary: 204 43 24; /* #CC2B18 brand red — legible sobre blanco */
-  --accent: 232 112 32; /* #E87020 brand orange */
+  --primary: 196 30 58; /* #C41E3A rojo CSN */
+  --accent: 212 168 83; /* #D4A853 dorado */
   --on-primary: 255 255 255;
 
-  --on-bg: 26 10 5; /* #1A0A05 */
-  --on-bg-muted: 122 80 64; /* #7A5040 */
+  --on-bg: 26 26 26; /* #1a1a1a negro */
+  --on-bg-muted: 107 94 84; /* #6B5E54 */
 
   --font-display: "Fraunces", Georgia, serif;
   --font-body: "Inter", system-ui, -apple-system, sans-serif;
@@ -46,7 +46,7 @@ body {
     @apply bg-surface border border-hairline rounded-2xl shadow-card;
   }
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-accent px-4 py-2.5 text-sm font-semibold text-white transition active:scale-[0.98] hover:brightness-110 disabled:opacity-50;
+    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-white transition active:scale-[0.98] hover:brightness-110 disabled:opacity-50;
   }
   .btn-ghost {
     @apply inline-flex items-center justify-center gap-2 rounded-xl border border-hairline bg-surface-2 px-4 py-2.5 text-sm font-semibold text-on-bg transition hover:border-primary/40 active:scale-[0.98];
@@ -95,8 +95,9 @@ body {
   scrollbar-width: none;
 }
 
-/* gradient utility used by hero / membership — warm light */
+/* gradient utility used by hero / membership — crema + dorado cálido */
 .csn-gradient {
-  background: radial-gradient(circle at 25% 0%, rgba(232, 112, 32, 0.12), transparent 55%),
-    linear-gradient(160deg, #fff6ee 0%, #ffffff 60%);
+  background: radial-gradient(circle at 22% 0%, rgba(212, 168, 83, 0.18), transparent 55%),
+    radial-gradient(circle at 90% 10%, rgba(196, 30, 58, 0.08), transparent 45%),
+    linear-gradient(160deg, #faf6ee 0%, #ffffff 65%);
 }

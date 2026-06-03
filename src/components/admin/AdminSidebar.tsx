@@ -17,6 +17,7 @@ import {
   Megaphone,
   Bell,
   BarChart3,
+  BookOpen,
   Menu,
   X,
   ExternalLink,
@@ -38,7 +39,8 @@ const SECTIONS: { title: string; items: Item[] }[] = [
     items: [
       { href: "/admin/productos", label: "Productos", icon: Beef },
       { href: "/admin/categorias", label: "Categorías", icon: Tags },
-      { href: "/admin/inventario", label: "Inventario y precios", icon: Boxes },
+      { href: "/admin/inventario", label: "Inventario", icon: Boxes },
+      { href: "/admin/precios", label: "Precios por sucursal", icon: Tags },
       { href: "/admin/sucursales", label: "Sucursales", icon: Store },
     ],
   },
@@ -55,6 +57,8 @@ const SECTIONS: { title: string; items: Item[] }[] = [
     items: [
       { href: "/admin/reportes", label: "Reportes", icon: BarChart3 },
       { href: "/admin/usuarios", label: "Usuarios", icon: Users },
+      { href: "/admin/contenido", label: "Contenido", icon: LayoutDashboard },
+      { href: "/admin/docs", label: "API / Docs", icon: BookOpen },
     ],
   },
 ];
