@@ -33,7 +33,7 @@ export default async function AdminLayout({
   const admin = await requireAdmin();
 
   return (
-    <div className="flex min-h-dvh bg-bg">
+    <div className="min-h-dvh bg-bg lg:flex">
       <AdminSidebar />
       <div className="flex min-w-0 flex-1 flex-col">
         <header className="sticky top-0 z-30 hidden items-center justify-between border-b border-hairline bg-surface/80 px-6 py-3 backdrop-blur-xl lg:flex">
