@@ -3,20 +3,20 @@
 @tailwind utilities;
 
 :root {
-  color-scheme: dark;
+  color-scheme: light;
 
-  /* RGB channel triplets so Tailwind opacity modifiers (bg-surface/80) work */
-  --bg: 14 14 14; /* #0e0e0e */
-  --surface: 19 19 19; /* #131313 */
-  --surface-2: 27 27 27; /* #1b1b1b */
-  --surface-3: 36 36 36; /* #242424 */
+  /* CSN — modo día. RGB triplets so Tailwind opacity modifiers work. */
+  --bg: 247 245 243; /* #F7F5F3 */
+  --surface: 255 255 255; /* #ffffff */
+  --surface-2: 246 241 235; /* #F6F1EB */
+  --surface-3: 233 224 214; /* #E9E0D6 */
 
-  --primary: 255 183 125; /* #ffb77d */
-  --accent: 255 140 0; /* #ff8c00 */
-  --on-primary: 26 15 6;
+  --primary: 204 43 24; /* #CC2B18 brand red — legible sobre blanco */
+  --accent: 232 112 32; /* #E87020 brand orange */
+  --on-primary: 255 255 255;
 
-  --on-bg: 255 246 238; /* #fff6ee */
-  --on-bg-muted: 179 144 128; /* #b39080 */
+  --on-bg: 26 10 5; /* #1A0A05 */
+  --on-bg-muted: 122 80 64; /* #7A5040 */
 
   --font-display: "Fraunces", Georgia, serif;
   --font-body: "Inter", system-ui, -apple-system, sans-serif;
@@ -79,8 +79,8 @@ body {
   scrollbar-width: none;
 }
 
-/* gradient utility used by hero / membership */
+/* gradient utility used by hero / membership — warm light */
 .csn-gradient {
-  background: radial-gradient(circle at 30% 0%, rgba(255, 140, 0, 0.18), transparent 55%),
-    linear-gradient(160deg, #1f1206 0%, #131313 55%, #0e0e0e 100%);
+  background: radial-gradient(circle at 25% 0%, rgba(232, 112, 32, 0.12), transparent 55%),
+    linear-gradient(160deg, #fff6ee 0%, #ffffff 60%);
 }

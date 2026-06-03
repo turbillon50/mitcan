@@ -16,18 +16,18 @@ import {
   Legend,
 } from "recharts";
 
-const AXIS = { fontSize: 11, fill: "#b39080" };
-const GRID = "rgba(255,210,180,0.08)";
+const AXIS = { fontSize: 11, fill: "#7A5040" };
+const GRID = "rgba(100,30,15,0.10)";
 const TOOLTIP = {
   contentStyle: {
-    background: "#1b1b1b",
-    border: "1px solid rgba(255,210,180,0.15)",
+    background: "#ffffff",
+    border: "1px solid rgba(100,30,15,0.15)",
     borderRadius: 12,
-    color: "#fff6ee",
+    color: "#1A0A05",
     fontSize: 12,
   },
 };
-const PALETTE = ["#ff8c00", "#ffb77d", "#cc2b18", "#e8a23a", "#9a5b2a", "#5a3020"];
+const PALETTE = ["#E87020", "#CC2B18", "#E8A23A", "#9A5B2A", "#C0410F", "#6B3E2A"];
 
 export function VentasArea({
   data,
