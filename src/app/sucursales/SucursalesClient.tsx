@@ -98,7 +98,7 @@ export default function SucursalesClient({
                 {g.items.map((s) => (
                   <article key={s.id} className="glass-card rounded-2xl p-4">
                     <div className="flex items-start gap-3">
-                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-primary/20 bg-gradient-to-br from-[#3a1c00] to-[#0e0e0e] text-sm font-bold text-primary">
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-primary/20 bg-primary/10 text-sm font-bold text-primary">
                         {String(s.id).padStart(2, "0")}
                       </div>
                       <div className="min-w-0 flex-1">

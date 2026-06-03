@@ -19,7 +19,7 @@ const config: Config = {
         "on-bg": "rgb(var(--on-bg) / <alpha-value>)",
         "on-bg-muted": "rgb(var(--on-bg-muted) / <alpha-value>)",
         "on-primary": "rgb(var(--on-primary) / <alpha-value>)",
-        hairline: "rgba(255, 210, 180, 0.12)",
+        hairline: "rgba(100, 30, 15, 0.12)",
         brand: {
           orange: "#ff8c00",
           peach: "#ffb77d",
@@ -36,8 +36,8 @@ const config: Config = {
         "3xl": "30px",
       },
       boxShadow: {
-        card: "0 20px 40px -18px rgba(0,0,0,0.6)",
-        glow: "0 0 18px rgba(255,140,0,0.35)",
+        card: "0 12px 28px -14px rgba(100,30,15,0.18), 0 2px 6px -3px rgba(100,30,15,0.08)",
+        glow: "0 0 18px rgba(232,112,32,0.30)",
       },
       keyframes: {
         "fade-in": {

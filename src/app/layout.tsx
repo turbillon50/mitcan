@@ -18,7 +18,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#131313",
+  themeColor: "#ffffff",
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
@@ -38,17 +38,17 @@ export default function RootLayout({
       afterSignOutUrl="/"
       appearance={{
         variables: {
-          colorPrimary: "#ff8c00",
-          colorBackground: "#131313",
-          colorInputBackground: "#1b1b1b",
-          colorText: "#fff6ee",
-          colorTextSecondary: "#b39080",
-          colorInputText: "#fff6ee",
+          colorPrimary: "#E87020",
+          colorBackground: "#ffffff",
+          colorInputBackground: "#ffffff",
+          colorText: "#1A0A05",
+          colorTextSecondary: "#7A5040",
+          colorInputText: "#1A0A05",
           borderRadius: "12px",
         },
       }}
     >
-      <html lang="es" data-theme="dark">
+      <html lang="es">
         <head>
           <link rel="preconnect" href="https://fonts.googleapis.com" />
           <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />

@@ -87,7 +87,7 @@ export default async function DashboardPage() {
 
       {/* Membership QR */}
       <section className="card flex flex-col items-center gap-4 p-7 text-center">
-        <div className="rounded-2xl bg-gradient-to-br from-[#2a1705] to-[#0e0e0e] p-3">
+        <div className="rounded-2xl border border-hairline bg-surface-2 p-3">
           {user ? <MembershipQR value={membershipUrl(user.id)} size={196} /> : null}
         </div>
         <div>

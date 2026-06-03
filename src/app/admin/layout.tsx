@@ -17,12 +17,12 @@ export const metadata: Metadata = {
   appleWebApp: {
     capable: true,
     title: "CSN Admin",
-    statusBarStyle: "black-translucent",
+    statusBarStyle: "default",
   },
 };
 
 export const viewport: Viewport = {
-  themeColor: "#131313",
+  themeColor: "#ffffff",
 };
 
 export default async function AdminLayout({

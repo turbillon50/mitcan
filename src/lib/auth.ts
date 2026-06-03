@@ -4,28 +4,18 @@ import { prisma } from "./prisma";
 import { sendEmail, welcomeEmail } from "./resend";
 import type { user_role } from "@prisma/client";
 
-// Owner emails that are always promoted to admin on sign-in.
+// Emails always promoted to admin on sign-in (owner allowlist).
 const ADMIN_EMAILS = (process.env.CSN_ADMIN_EMAILS ?? "")
   .split(",")
   .map((e) => e.trim().toLowerCase())
   .filter(Boolean);
 
-async function noAdminExists() {
-  try {
-    return (await prisma.users.count({ where: { rol: "admin" } })) === 0;
-  } catch {
-    return false;
-  }
-}
-
 /**
  * Resolve (and lazily provision) the local `users` row for the signed-in
- * Clerk user. The DB is the source of truth for roles & points; Clerk
- * publicMetadata.role seeds the role on first sign-in.
- *
- * Admin bootstrap: the very first account (or any email in CSN_ADMIN_EMAILS)
- * becomes `admin`, so the owner can reach /admin and invite the rest of the
- * staff. Once an admin exists, new accounts default to `cliente`.
+ * Clerk user. The DB is the source of truth for roles. New sign-ups default
+ * to `cliente`; admin is granted only via the allowlist (CSN_ADMIN_EMAILS),
+ * the admin Usuarios panel, or an explicit promotion — never automatically,
+ * so customers who register stay customers.
  */
 export async function getCurrentDbUser() {
   const { userId } = await auth();
@@ -46,7 +36,6 @@ export async function getCurrentDbUser() {
 
     let rol = (cu?.publicMetadata?.role as user_role | undefined) ?? "cliente";
     if (email && ADMIN_EMAILS.includes(email.toLowerCase())) rol = "admin";
-    else if (rol === "cliente" && (await noAdminExists())) rol = "admin";
 
     try {
       // users.id is a (non-defaulted) text PK; we key it to the Clerk user id.
@@ -74,12 +63,10 @@ export async function getCurrentDbUser() {
     }
   }
 
-  // Promote owner emails, or bootstrap the first admin if none exists yet.
+  // Keep allowlisted owner emails as admin.
   if (dbUser && dbUser.rol !== "admin") {
     const email = dbUser.email?.toLowerCase();
-    const isOwnerEmail = !!email && ADMIN_EMAILS.includes(email);
-    const isBootstrap = !isStaff(dbUser.rol) && (await noAdminExists());
-    if (isOwnerEmail || isBootstrap) {
+    if (email && ADMIN_EMAILS.includes(email)) {
       dbUser = await prisma.users.update({
         where: { id: dbUser.id },
         data: { rol: "admin" },

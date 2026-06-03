@@ -37,7 +37,7 @@ export default function SucursalesMap({
 
       map = new mapboxgl.Map({
         container: ref.current,
-        style: "mapbox://styles/mapbox/dark-v11",
+        style: "mapbox://styles/mapbox/streets-v12",
         center: [avgLng, avgLat],
         zoom: 6,
       });
