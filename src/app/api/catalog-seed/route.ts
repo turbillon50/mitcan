@@ -200,6 +200,41 @@ export async function GET(req: Request) {
       });
     }
 
+    if (phase === "cleanup") {
+      // Deactivate leftover demo products: real catalog SKUs are numeric,
+      // so anything active without a numeric SKU is stale demo data.
+      const activos = await prisma.productos.findMany({
+        where: { activo: true },
+        select: { id: true, sku: true, nombre: true },
+      });
+      const stale = activos.filter((p) => !p.sku || !/^\d+$/.test(p.sku));
+      if (stale.length) {
+        await prisma.productos.updateMany({
+          where: { id: { in: stale.map((p) => p.id) } },
+          data: { activo: false },
+        });
+      }
+      // Also deactivate empty demo categorias (no active products left)
+      const catsConActivos = await prisma.productos.findMany({
+        where: { activo: true, categoria_id: { not: null } },
+        select: { categoria_id: true },
+        distinct: ["categoria_id"],
+      });
+      const usadas = new Set(catsConActivos.map((c) => c.categoria_id));
+      const catsDesactivadas = await prisma.categorias.updateMany({
+        where: { activa: true, id: { notIn: [...usadas] as number[] } },
+        data: { activa: false },
+      });
+      const restantes = await prisma.productos.count({ where: { activo: true } });
+      return NextResponse.json({
+        phase,
+        desactivados: stale.length,
+        nombres: stale.map((p) => p.nombre),
+        categorias_desactivadas: catsDesactivadas.count,
+        productos_activos_restantes: restantes,
+      });
+    }
+
     return NextResponse.json({ error: "phase desconocida" }, { status: 400 });
   } catch (e) {
     return NextResponse.json(
