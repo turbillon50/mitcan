@@ -67,6 +67,7 @@ export async function GET(req: Request) {
       const nombres = [...new Set(ROWS.map((r) => r.categoria))];
       const existing = await prisma.categorias.findMany();
       const byName = new Map(existing.map((c) => [c.nombre, c]));
+      const usedSlugs = new Set(existing.map((c) => c.slug));
       let creadas = 0;
       let actualizadas = 0;
       for (const nombre of nombres) {
@@ -79,14 +80,12 @@ export async function GET(req: Request) {
           });
           actualizadas++;
         } else {
+          let slug = slugCat(nombre);
+          let n = 2;
+          while (usedSlugs.has(slug)) slug = `${slugCat(nombre)}-${n++}`;
+          usedSlugs.add(slug);
           await prisma.categorias.create({
-            data: {
-              nombre,
-              slug: slugCat(nombre),
-              icono: meta.icono,
-              orden: meta.orden,
-              activa: true,
-            },
+            data: { nombre, slug, icono: meta.icono, orden: meta.orden, activa: true },
           });
           creadas++;
         }
