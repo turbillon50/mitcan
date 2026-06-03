@@ -4,6 +4,8 @@ import { prisma } from "@/lib/prisma";
 import { formatMXN } from "@/lib/format";
 import FormDialog from "@/components/admin/FormDialog";
 import DeleteButton from "@/components/admin/DeleteButton";
+import ImageUpload from "@/components/admin/ImageUpload";
+import ExportCsv from "@/components/admin/ExportCsv";
 import { saveProducto, deleteProducto } from "../actions";
 
 export const dynamic = "force-dynamic";
@@ -61,10 +63,7 @@ function Fields({ p, cats }: { p?: Prod; cats: Cat[] }) {
           required
         />
       </div>
-      <div>
-        <label className="label">URL de imagen</label>
-        <input name="imagen_url" defaultValue={p?.imagen_url ?? ""} className="input" placeholder="https://…" />
-      </div>
+      <ImageUpload defaultUrl={p?.imagen_url} />
       <label className="flex items-center gap-2 text-sm">
         <input type="checkbox" name="activo" defaultChecked={p?.activo ?? true} />
         Disponible
@@ -88,17 +87,29 @@ export default async function AdminProductos() {
           <h1 className="section-title text-2xl">Productos</h1>
           <p className="text-sm text-on-bg-muted">{productos.length} productos</p>
         </div>
-        <FormDialog
-          title="Nuevo producto"
-          triggerLabel={
-            <>
-              <Plus size={16} /> Nuevo
-            </>
-          }
-          action={saveProducto}
-        >
-          <Fields cats={cats} />
-        </FormDialog>
+        <div className="flex gap-2">
+          <ExportCsv
+            filename="productos"
+            rows={productos.map((p) => ({
+              nombre: p.nombre,
+              categoria: p.categoria?.nombre ?? "",
+              precio: Number(p.precio),
+              unidad: p.unidad ?? "",
+              disponible: p.activo ? "sí" : "no",
+            }))}
+          />
+          <FormDialog
+            title="Nuevo producto"
+            triggerLabel={
+              <>
+                <Plus size={16} /> Nuevo
+              </>
+            }
+            action={saveProducto}
+          >
+            <Fields cats={cats} />
+          </FormDialog>
+        </div>
       </div>
 
       <div className="card overflow-x-auto">
