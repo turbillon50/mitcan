@@ -231,6 +231,37 @@ export async function deleteNotificacion(id: number) {
   revalidatePath("/admin/notificaciones");
 }
 
+/* ---------------- Precios por sucursal ---------------- */
+export async function savePreciosBatch(
+  items: { producto_id: number; sucursal_id: number; precio: number | null }[]
+) {
+  await requireAdmin();
+  for (const it of items) {
+    if (it.precio == null || !Number.isFinite(it.precio)) {
+      await prisma.precios_sucursal.deleteMany({
+        where: { producto_id: it.producto_id, sucursal_id: it.sucursal_id },
+      });
+    } else {
+      const existing = await prisma.precios_sucursal.findFirst({
+        where: { producto_id: it.producto_id, sucursal_id: it.sucursal_id },
+      });
+      if (existing) {
+        await prisma.precios_sucursal.update({
+          where: { id: existing.id },
+          data: { precio: it.precio, updated_at: new Date() },
+        });
+      } else {
+        await prisma.precios_sucursal.create({
+          data: { producto_id: it.producto_id, sucursal_id: it.sucursal_id, precio: it.precio },
+        });
+      }
+    }
+  }
+  revalidatePath("/admin/precios");
+  revalidatePath("/catalogo");
+  return { ok: true };
+}
+
 /* ---------------- Promociones ---------------- */
 export async function savePromocion(formData: FormData) {
   await requireAdmin();
