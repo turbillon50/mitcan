@@ -217,3 +217,78 @@ export async function getVentasUltimosDias(dias = 14) {
     [] as { fecha: string; ventas: number; pedidos: number }[]
   );
 }
+
+type LowStock = { producto: string; sucursal: string; stock: number; min: number };
+
+/** Operational overview: catalog, marketing and inventory health (low-stock,
+ *  out-of-stock and estimated inventory value). */
+export async function getOperacionResumen() {
+  return safe(
+    async () => {
+      const [
+        productosActivos,
+        categoriasCount,
+        promosActivas,
+        recompensasActivas,
+        redencionesCount,
+        clientes,
+        inventario,
+      ] = await Promise.all([
+        prisma.productos.count({ where: { activo: true } }),
+        prisma.categorias.count(),
+        prisma.promociones.count({ where: { activa: true } }),
+        prisma.recompensas.count({ where: { activa: true } }),
+        prisma.redenciones.count(),
+        prisma.users.count({ where: { rol: "cliente" } }),
+        prisma.inventario.findMany({ include: { producto: true, sucursal: true } }),
+      ]);
+
+      let valorInventario = 0;
+      let agotados = 0;
+      const lowStock: LowStock[] = [];
+      for (const i of inventario) {
+        const stock = Number(i.stock ?? 0);
+        const min = Number(i.min_stock ?? 0);
+        const precio = Number(i.precio ?? i.producto?.precio ?? 0);
+        valorInventario += stock * precio;
+        if (stock <= 0) agotados++;
+        else if (min > 0 && stock <= min) {
+          lowStock.push({
+            producto: i.producto?.nombre ?? "—",
+            sucursal: i.sucursal?.nombre ?? "—",
+            stock,
+            min,
+          });
+        }
+      }
+      lowStock.sort((a, b) => a.stock - b.stock);
+
+      return {
+        productosActivos,
+        categoriasCount,
+        promosActivas,
+        recompensasActivas,
+        redencionesCount,
+        clientes,
+        inventarioItems: inventario.length,
+        valorInventario,
+        agotados,
+        lowStockCount: lowStock.length,
+        lowStock: lowStock.slice(0, 8),
+      };
+    },
+    {
+      productosActivos: 0,
+      categoriasCount: 0,
+      promosActivas: 0,
+      recompensasActivas: 0,
+      redencionesCount: 0,
+      clientes: 0,
+      inventarioItems: 0,
+      valorInventario: 0,
+      agotados: 0,
+      lowStockCount: 0,
+      lowStock: [] as LowStock[],
+    }
+  );
+}
