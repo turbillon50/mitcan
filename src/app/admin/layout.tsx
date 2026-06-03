@@ -33,19 +33,26 @@ export default async function AdminLayout({
   const admin = await requireAdmin();
 
   return (
-    <div className="flex min-h-dvh">
+    <div className="flex min-h-dvh bg-bg">
       <AdminSidebar />
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="hidden items-center justify-between border-b border-hairline px-6 py-3.5 lg:flex">
-          <span className="text-sm text-on-bg-muted">
-            Panel de administración · CSN
+        <header className="sticky top-0 z-30 hidden items-center justify-between border-b border-hairline bg-surface/80 px-6 py-3 backdrop-blur-xl lg:flex">
+          <span className="text-sm font-medium text-on-bg-muted">
+            Panel de administración
           </span>
           <div className="flex items-center gap-3">
-            <span className="text-sm font-medium">{admin.nombre ?? admin.email}</span>
+            <div className="text-right">
+              <p className="text-sm font-semibold leading-tight">
+                {admin.nombre ?? admin.email}
+              </p>
+              <p className="text-[11px] capitalize text-on-bg-muted">{admin.rol}</p>
+            </div>
             <UserButton afterSignOutUrl="/" />
           </div>
         </header>
-        <main className="min-w-0 flex-1 px-4 py-6 lg:px-8">{children}</main>
+        <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-6 lg:px-8 lg:py-8">
+          {children}
+        </main>
       </div>
     </div>
   );
