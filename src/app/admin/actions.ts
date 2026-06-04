@@ -64,6 +64,7 @@ export async function saveSucursal(formData: FormData) {
   if (id) await prisma.sucursales.update({ where: { id }, data });
   else await prisma.sucursales.create({ data });
   revalidatePath("/admin/sucursales");
+  revalidatePath("/admin/c4");
   revalidatePath("/sucursales");
 }
 
@@ -110,6 +111,51 @@ export async function saveProducto(formData: FormData) {
   else await prisma.productos.create({ data: { ...data, slug: slugify(nombre) || `producto-${Date.now()}` } });
   revalidatePath("/admin/productos");
   revalidatePath("/catalogo");
+}
+
+/** Copy a branch's stock (stock + min) as a baseline to every other active
+ *  branch. Idempotent when soloVacias=true (skips products a branch already
+ *  has), so it can be re-run to finish if it times out. */
+export async function replicarInventario(fromSucursalId: number, soloVacias = true) {
+  await requireAdmin();
+  const source = await prisma.inventario.findMany({
+    where: { sucursal_id: fromSucursalId, producto_id: { not: null } },
+  });
+  if (!source.length) return { ok: false, copiados: 0 };
+
+  const branches = await prisma.sucursales.findMany({ where: { activa: true } });
+  const targets = branches.filter((b) => b.id !== fromSucursalId);
+  let copiados = 0;
+
+  for (const t of targets) {
+    const existing = await prisma.inventario.findMany({
+      where: { sucursal_id: t.id },
+      select: { producto_id: true },
+    });
+    const have = new Set(existing.map((e) => e.producto_id));
+    for (const r of source) {
+      if (soloVacias && have.has(r.producto_id)) continue;
+      const upd = await prisma.inventario.updateMany({
+        where: { producto_id: r.producto_id!, sucursal_id: t.id },
+        data: { stock: r.stock, min_stock: r.min_stock, updated_at: new Date() },
+      });
+      if (upd.count === 0) {
+        await prisma.inventario.create({
+          data: {
+            producto_id: r.producto_id,
+            sucursal_id: t.id,
+            stock: r.stock,
+            min_stock: r.min_stock,
+            fuente: "manual",
+          },
+        });
+      }
+      copiados++;
+    }
+  }
+  revalidatePath("/admin/inventario");
+  revalidatePath("/admin/c4");
+  return { ok: true, copiados, sucursales: targets.length };
 }
 
 export async function deleteProducto(id: number) {

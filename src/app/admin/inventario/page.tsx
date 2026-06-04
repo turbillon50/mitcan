@@ -2,6 +2,7 @@ import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { formatMXN } from "@/lib/format";
 import InventarioCell from "@/components/admin/InventarioCell";
+import ReplicarInventario from "@/components/admin/ReplicarInventario";
 
 export const dynamic = "force-dynamic";
 
@@ -34,11 +35,21 @@ export default async function AdminInventario({
 
   return (
     <div className="flex flex-col gap-6">
-      <div>
-        <h1 className="section-title text-2xl">Inventario</h1>
-        <p className="text-sm text-on-bg-muted">
-          Stock por sucursal · {productos.length} productos
-        </p>
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h1 className="section-title text-2xl">Inventario</h1>
+          <p className="text-sm text-on-bg-muted">
+            Stock por sucursal · {productos.length} productos
+          </p>
+        </div>
+        {sucursalId && (
+          <ReplicarInventario
+            sucursalId={sucursalId}
+            sucursalNombre={
+              sucursales.find((x) => x.id === sucursalId)?.nombre ?? "esta sucursal"
+            }
+          />
+        )}
       </div>
 
       {/* Sucursal selector */}

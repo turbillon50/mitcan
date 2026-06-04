@@ -2,8 +2,10 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
-import { Video, Pencil, MapPin, TrendingUp, Boxes, AlertTriangle, X } from "lucide-react";
+import { Video, Pencil, MapPin, TrendingUp, Boxes, AlertTriangle, X, Boxes as BoxIcon } from "lucide-react";
 import { formatMXN } from "@/lib/format";
+import LocationPicker from "@/components/admin/LocationPicker";
+import { saveSucursal } from "@/app/admin/actions";
 import "mapbox-gl/dist/mapbox-gl.css";
 
 export type C4Suc = {
@@ -150,7 +152,7 @@ export default function C4Map({
             <p className="text-sm">Toca una sucursal en el mapa para ver su detalle, métricas y cámaras.</p>
           </div>
         ) : (
-          <C4Detail s={sel} onClose={() => setSel(null)} />
+          <C4Detail s={sel} token={token} onClose={() => setSel(null)} />
         )}
       </div>
     </div>
@@ -180,8 +182,51 @@ function Kpi({
   );
 }
 
-function C4Detail({ s, onClose }: { s: C4Suc; onClose: () => void }) {
+function C4Detail({ s, token, onClose }: { s: C4Suc; token: string | null; onClose: () => void }) {
   const st = statusOf(s);
+  const [editing, setEditing] = useState(false);
+
+  if (editing) {
+    return (
+      <form action={saveSucursal} className="flex flex-col gap-3">
+        <div className="flex items-center justify-between">
+          <h3 className="font-bold">Editar sucursal</h3>
+          <button type="button" onClick={() => setEditing(false)} className="rounded-full p-1 text-on-bg-muted hover:bg-surface-2" aria-label="Cancelar">
+            <X size={16} />
+          </button>
+        </div>
+        <input type="hidden" name="id" value={s.id} />
+        <input type="hidden" name="area" value={s.area ?? "tepic"} />
+        <div>
+          <label className="label">Nombre</label>
+          <input name="nombre" defaultValue={s.nombre} className="input" required />
+        </div>
+        <div>
+          <label className="label">Dirección</label>
+          <input name="direccion" defaultValue={s.direccion ?? ""} className="input" />
+        </div>
+        <div className="grid grid-cols-2 gap-2">
+          <div>
+            <label className="label">Teléfono</label>
+            <input name="telefono" defaultValue={s.telefono ?? ""} className="input" />
+          </div>
+          <div>
+            <label className="label">WhatsApp</label>
+            <input name="whatsapp" defaultValue={s.whatsapp ?? ""} className="input" />
+          </div>
+        </div>
+        <div>
+          <label className="label">Ubicación (arrastra el pin)</label>
+          <LocationPicker token={token} defaultLat={s.lat} defaultLng={s.lng} />
+        </div>
+        <label className="flex items-center gap-2 text-sm">
+          <input type="checkbox" name="activa" defaultChecked={s.activa} /> Activa
+        </label>
+        <button type="submit" className="btn-primary justify-center">Guardar cambios</button>
+      </form>
+    );
+  }
+
   return (
     <div>
       <div className="flex items-start justify-between">
@@ -233,9 +278,12 @@ function C4Detail({ s, onClose }: { s: C4Suc; onClose: () => void }) {
         </p>
       </div>
 
-      <div className="mt-5 flex gap-2">
-        <Link href="/admin/sucursales" className="btn-primary flex-1 justify-center text-sm">
-          <Pencil size={14} /> Editar sucursal
+      <div className="mt-5 flex flex-wrap gap-2">
+        <button onClick={() => setEditing(true)} className="btn-primary flex-1 justify-center text-sm">
+          <Pencil size={14} /> Editar
+        </button>
+        <Link href={`/admin/inventario?sucursal=${s.id}`} className="btn-ghost justify-center text-sm">
+          <BoxIcon size={14} /> Inventario
         </Link>
         {s.lat != null && s.lng != null && (
           <a
