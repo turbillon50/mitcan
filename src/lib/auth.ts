@@ -1,8 +1,24 @@
 import { auth, currentUser } from "@clerk/nextjs/server";
+import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { prisma } from "./prisma";
 import { sendEmail, welcomeEmail } from "./resend";
 import type { user_role } from "@prisma/client";
+
+// The admin area is gated by a secret key (link `?k=...` -> cookie). Anyone who
+// opens that link is granted admin access — so the owner can hand the panel to
+// staff/clients without manually promoting each account.
+const ADMIN_KEY = process.env.CSN_ADMIN_KEY ?? "mitcan";
+const ADMIN_COOKIE = "csn_ak";
+
+async function hasAdminKey(): Promise<boolean> {
+  try {
+    const c = await cookies();
+    return c.get(ADMIN_COOKIE)?.value === ADMIN_KEY;
+  } catch {
+    return false;
+  }
+}
 
 // Emails always promoted to admin on sign-in (owner allowlist).
 const ADMIN_EMAILS = (process.env.CSN_ADMIN_EMAILS ?? "")
@@ -104,6 +120,23 @@ export async function getStaffOrNull() {
 export async function requireAdmin() {
   const user = await getCurrentDbUser();
   if (!user) redirect("/sign-in");
-  if (!isStaff(user.rol)) redirect("/app/dashboard");
+  if (!isStaff(user.rol)) {
+    // Anyone holding the secret admin key (opened the admin link) gets in and
+    // is promoted to admin, so role-based features work for them too.
+    if (await hasAdminKey()) {
+      if (user.rol !== "admin") {
+        try {
+          return await prisma.users.update({
+            where: { id: user.id },
+            data: { rol: "admin" },
+          });
+        } catch {
+          return { ...user, rol: "admin" as user_role };
+        }
+      }
+      return user;
+    }
+    redirect("/app/dashboard");
+  }
   return user;
 }
