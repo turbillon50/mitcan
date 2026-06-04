@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { formatMXN } from "@/lib/format";
 import FormDialog from "@/components/admin/FormDialog";
 import DeleteButton from "@/components/admin/DeleteButton";
-import ImageUpload from "@/components/admin/ImageUpload";
+import GalleryUpload from "@/components/admin/GalleryUpload";
 import ExportCsv from "@/components/admin/ExportCsv";
 import { saveProducto, deleteProducto } from "../actions";
 
@@ -18,9 +18,17 @@ type Prod = {
   precio: unknown;
   unidad: string | null;
   imagen_url: string | null;
+  imagenes: unknown;
+  es_nuevo: boolean | null;
   activo: boolean | null;
 };
 type Cat = { id: number; nombre: string };
+
+function toUrls(imagenes: unknown, cover: string | null): string[] {
+  const arr = Array.isArray(imagenes) ? (imagenes as unknown[]).filter((x): x is string => typeof x === "string") : [];
+  if (arr.length) return arr;
+  return cover ? [cover] : [];
+}
 
 function Fields({ p, cats }: { p?: Prod; cats: Cat[] }) {
   return (
@@ -32,7 +40,12 @@ function Fields({ p, cats }: { p?: Prod; cats: Cat[] }) {
       </div>
       <div>
         <label className="label">Descripción</label>
-        <input name="descripcion" defaultValue={p?.descripcion ?? ""} className="input" />
+        <textarea
+          name="descripcion"
+          defaultValue={p?.descripcion ?? ""}
+          className="input min-h-[90px]"
+          placeholder="Describe el producto, corte, presentación, recomendaciones de preparación…"
+        />
       </div>
       <div className="grid grid-cols-2 gap-3">
         <div>
@@ -63,11 +76,17 @@ function Fields({ p, cats }: { p?: Prod; cats: Cat[] }) {
           required
         />
       </div>
-      <ImageUpload defaultUrl={p?.imagen_url} />
-      <label className="flex items-center gap-2 text-sm">
-        <input type="checkbox" name="activo" defaultChecked={p?.activo ?? true} />
-        Disponible
-      </label>
+      <GalleryUpload defaultUrls={toUrls(p?.imagenes, p?.imagen_url ?? null)} />
+      <div className="flex flex-wrap gap-4">
+        <label className="flex items-center gap-2 text-sm">
+          <input type="checkbox" name="activo" defaultChecked={p?.activo ?? true} />
+          Disponible
+        </label>
+        <label className="flex items-center gap-2 text-sm">
+          <input type="checkbox" name="es_nuevo" defaultChecked={p?.es_nuevo ?? false} />
+          Marcar como NUEVO
+        </label>
+      </div>
     </>
   );
 }

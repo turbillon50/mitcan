@@ -112,6 +112,18 @@ export function welcomeEmail(nombre?: string | null) {
   });
 }
 
+export function notificacionEmail(titulo: string, mensaje: string) {
+  const safe = mensaje.replace(/&/g, "&amp;").replace(/</g, "&lt;");
+  return emailLayout({
+    preheader: mensaje.slice(0, 90),
+    eyebrow: "Aviso CSN",
+    titulo,
+    cuerpoHtml: `<p style="margin:0;font-size:15px;line-height:1.6;color:${MUTED};white-space:pre-line">${safe}</p>`,
+    ctaText: "Abrir mi panel",
+    ctaHref: "https://carnesn.ink/app/notificaciones",
+  });
+}
+
 export function pedidoEmail(folio: string, total: string, estado: string) {
   return emailLayout({
     preheader: `Tu pedido ${folio} — ${estado}`,

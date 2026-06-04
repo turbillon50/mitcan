@@ -85,6 +85,7 @@ model productos {
   precio       Decimal   @db.Decimal
   unidad       String?   @default("kg")
   imagen_url   String?
+  imagenes     Json?     @db.JsonB // galería de fotos (array de URLs); imagen_url = portada
   es_nuevo     Boolean?  @default(false)
   activo       Boolean?  @default(true) @map("disponible")
   created_at   DateTime? @default(now()) @db.Timestamptz(6)

@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { requireAdmin, isAdmin } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getMapboxToken, geocode } from "@/lib/mapbox";
+import { sendEmail, notificacionEmail } from "@/lib/resend";
 import type { user_role } from "@prisma/client";
 
 function num(v: FormDataEntryValue | null, def = 0) {
@@ -79,13 +80,29 @@ export async function saveProducto(formData: FormData) {
   const id = num(formData.get("id"), 0);
   const categoria_id = num(formData.get("categoria_id"), 0) || null;
   const nombre = str(formData.get("nombre")) ?? "Producto";
+
+  // Gallery: JSON array of URLs; the cover (first) is mirrored into imagen_url.
+  let imagenes: string[] = [];
+  try {
+    const raw = formData.get("imagenes");
+    if (typeof raw === "string" && raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) imagenes = parsed.filter((u) => typeof u === "string" && u);
+    }
+  } catch {
+    imagenes = [];
+  }
+  const cover = imagenes[0] ?? str(formData.get("imagen_url"));
+
   const data = {
     nombre,
     descripcion: str(formData.get("descripcion")),
     categoria_id,
     precio: num(formData.get("precio")),
     unidad: str(formData.get("unidad")) ?? "kg",
-    imagen_url: str(formData.get("imagen_url")),
+    imagen_url: cover,
+    imagenes,
+    es_nuevo: bool(formData.get("es_nuevo")),
     activo: bool(formData.get("activo")),
   };
   if (id) await prisma.productos.update({ where: { id }, data });
@@ -208,21 +225,32 @@ export async function enviarNotificacion(formData: FormData) {
   const tipo = str(formData.get("tipo")) ?? "general";
   const destino = str(formData.get("destino")); // email específico o null = todos
 
-  let userIds: string[] = [];
+  const enviarEmail = bool(formData.get("email"));
+
+  let recipients: { id: string; email: string | null }[] = [];
   if (destino) {
     const u = await prisma.users.findFirst({ where: { email: destino } });
-    if (u) userIds = [u.id];
+    if (u) recipients = [{ id: u.id, email: u.email }];
   } else {
-    const all = await prisma.users.findMany({ select: { id: true } });
-    userIds = all.map((u) => u.id);
+    recipients = await prisma.users.findMany({ select: { id: true, email: true } });
   }
 
-  if (userIds.length) {
+  if (recipients.length) {
     await prisma.notificaciones.createMany({
-      data: userIds.map((uid) => ({ user_id: uid, titulo, mensaje, tipo })),
+      data: recipients.map((u) => ({ user_id: u.id, titulo, mensaje, tipo })),
     });
+
+    // Best-effort email blast (cap to avoid timeouts).
+    if (enviarEmail) {
+      const emails = recipients.map((u) => u.email).filter((e): e is string => !!e).slice(0, 300);
+      const html = notificacionEmail(titulo, mensaje);
+      await Promise.allSettled(
+        emails.map((to) => sendEmail({ to, subject: titulo, html }))
+      );
+    }
   }
   revalidatePath("/admin/notificaciones");
+  revalidatePath("/app/notificaciones");
 }
 
 export async function deleteNotificacion(id: number) {

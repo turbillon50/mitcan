@@ -52,6 +52,10 @@ export default async function AdminNotificaciones() {
           <label className="label">Destino (email) — vacío = todos los clientes</label>
           <input name="destino" className="input" placeholder="cliente@correo.com (opcional)" />
         </div>
+        <label className="flex items-center gap-2 text-sm">
+          <input type="checkbox" name="email" defaultChecked />
+          Enviar también por correo electrónico
+        </label>
         <button type="submit" className="btn-primary self-start">
           <Send size={16} /> Enviar
         </button>

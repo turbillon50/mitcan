@@ -4,6 +4,7 @@ import { UserButton } from "@clerk/nextjs";
 import { Bell } from "lucide-react";
 import BottomNav from "@/components/BottomNav";
 import { requireUser } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
 
@@ -12,7 +13,10 @@ export default async function AppLayout({
 }: {
   children: React.ReactNode;
 }) {
-  await requireUser();
+  const user = await requireUser();
+  const unread = await prisma.notificaciones
+    .count({ where: { user_id: user.id, leida: false } })
+    .catch(() => 0);
 
   return (
     <div className="min-h-dvh pb-24 md:pb-8">
@@ -28,12 +32,18 @@ export default async function AppLayout({
           </Link>
           <div className="flex items-center gap-2">
             {/* Admin lives on its own independent key-gated link, not exposed here. */}
-            <button
-              className="flex h-9 w-9 items-center justify-center rounded-full border border-hairline bg-surface-2 text-on-bg-muted"
+            <Link
+              href="/app/notificaciones"
+              className="relative flex h-9 w-9 items-center justify-center rounded-full border border-hairline bg-surface-2 text-on-bg-muted"
               aria-label="Notificaciones"
             >
               <Bell size={18} />
-            </button>
+              {unread > 0 && (
+                <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-bold text-white">
+                  {unread > 9 ? "9+" : unread}
+                </span>
+              )}
+            </Link>
             <UserButton afterSignOutUrl="/" />
           </div>
         </div>
