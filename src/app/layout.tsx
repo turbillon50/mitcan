@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { ClerkProvider } from "@clerk/nextjs";
+import { esES } from "@clerk/localizations";
 import "./globals.css";
 import { I18nProvider } from "@/components/I18nProvider";
 import { getLocale } from "@/lib/i18n-server";
@@ -36,6 +37,7 @@ export default async function RootLayout({
   const locale = await getLocale();
   return (
     <ClerkProvider
+      localization={locale === "en" ? undefined : esES}
       signInUrl="/sign-in"
       signUpUrl="/sign-up"
       signInFallbackRedirectUrl="/app/dashboard"
