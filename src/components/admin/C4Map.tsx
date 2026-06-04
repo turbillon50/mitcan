@@ -1,11 +1,14 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import Link from "next/link";
-import { Video, Pencil, MapPin, TrendingUp, Boxes, AlertTriangle, X, Boxes as BoxIcon } from "lucide-react";
+import {
+  Video, Pencil, MapPin, TrendingUp, Boxes, AlertTriangle, X, Boxes as BoxIcon,
+  Plus, Trash2, Loader2,
+} from "lucide-react";
 import { formatMXN } from "@/lib/format";
 import LocationPicker from "@/components/admin/LocationPicker";
-import { saveSucursal } from "@/app/admin/actions";
+import { saveSucursal, saveCamaras, type Camara } from "@/app/admin/actions";
 import "mapbox-gl/dist/mapbox-gl.css";
 
 export type C4Suc = {
@@ -26,7 +29,6 @@ export type C4Suc = {
   pedidos: number;
 };
 
-// Status color by inventory health.
 function statusOf(s: C4Suc): { color: string; label: string } {
   if (!s.activa) return { color: "#9aa0a6", label: "Inactiva" };
   if (s.agotados > 0) return { color: "#dc2626", label: "Agotados" };
@@ -37,13 +39,14 @@ function statusOf(s: C4Suc): { color: string; label: string } {
 export default function C4Map({
   token,
   sucursales,
+  camaras,
 }: {
   token: string | null;
   sucursales: C4Suc[];
+  camaras: Record<number, Camara[]>;
 }) {
   const elRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<import("mapbox-gl").Map | null>(null);
-  const mapboxRef = useRef<(typeof import("mapbox-gl"))["default"] | null>(null);
   const [sel, setSel] = useState<C4Suc | null>(null);
 
   const withCoords = useMemo(
@@ -67,7 +70,6 @@ export default function C4Map({
     (async () => {
       const mapboxgl = (await import("mapbox-gl")).default;
       if (cancelled || !elRef.current) return;
-      mapboxRef.current = mapboxgl;
       mapboxgl.accessToken = token;
       const map = new mapboxgl.Map({
         container: elRef.current,
@@ -87,13 +89,17 @@ export default function C4Map({
         });
       }
       mapRef.current = map;
-      map.once("load", () => {
+      const fit = () => {
+        map.resize();
         if (withCoords.length > 1) {
           const b = new mapboxgl.LngLatBounds();
           withCoords.forEach((s) => b.extend([s.lng!, s.lat!]));
-          map.fitBounds(b, { padding: 60, maxZoom: 12, duration: 0 });
+          map.fitBounds(b, { padding: 40, maxZoom: 12, duration: 0 });
         }
-      });
+      };
+      map.once("load", fit);
+      // Mobile: the container often lays out after init -> force a resize.
+      setTimeout(() => map.resize(), 300);
     })();
     return () => {
       cancelled = true;
@@ -104,24 +110,24 @@ export default function C4Map({
   }, [token]);
 
   return (
-    <div className="grid gap-4 lg:grid-cols-[1fr_360px]">
+    <div className="grid min-w-0 gap-4 lg:grid-cols-[1fr_minmax(320px,380px)]">
       {/* Map + summary */}
-      <div className="flex flex-col gap-3">
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-          <Kpi label="Valor inventario" value={formatMXN(totales.valor)} icon={<Boxes size={15} />} />
-          <Kpi label="Ventas" value={formatMXN(totales.ventas)} icon={<TrendingUp size={15} />} />
-          <Kpi label="Stock bajo" value={String(totales.bajo)} icon={<AlertTriangle size={15} />} tone="amber" />
-          <Kpi label="Agotados" value={String(totales.agotados)} icon={<AlertTriangle size={15} />} tone="red" />
+      <div className="flex min-w-0 flex-col gap-3">
+        <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-4">
+          <Kpi label="Valor inventario" value={formatMXN(totales.valor)} icon={<Boxes size={14} />} />
+          <Kpi label="Ventas" value={formatMXN(totales.ventas)} icon={<TrendingUp size={14} />} />
+          <Kpi label="Stock bajo" value={String(totales.bajo)} icon={<AlertTriangle size={14} />} tone="amber" />
+          <Kpi label="Agotados" value={String(totales.agotados)} icon={<AlertTriangle size={14} />} tone="red" />
         </div>
         {token ? (
-          <div ref={elRef} className="h-[460px] w-full overflow-hidden rounded-2xl border border-hairline" />
+          <div ref={elRef} className="h-[300px] w-full overflow-hidden rounded-2xl border border-hairline sm:h-[440px]" />
         ) : (
-          <div className="flex h-[460px] items-center justify-center rounded-2xl border border-hairline bg-surface-2 text-center text-sm text-on-bg-muted">
+          <div className="flex h-[300px] items-center justify-center rounded-2xl border border-hairline bg-surface-2 p-4 text-center text-sm text-on-bg-muted">
             Configura el token de Mapbox (NEXT_PUBLIC_MAPBOX_TOKEN) para ver el mapa.
           </div>
         )}
         {/* Branch chips */}
-        <div className="no-scrollbar flex gap-2 overflow-x-auto pb-1">
+        <div className="no-scrollbar -mx-1 flex gap-2 overflow-x-auto px-1 pb-1">
           {sucursales.map((s) => {
             const st = statusOf(s);
             return (
@@ -145,14 +151,19 @@ export default function C4Map({
       </div>
 
       {/* Detail panel */}
-      <div className="card h-fit p-5">
+      <div className="card h-fit min-w-0 p-4 sm:p-5">
         {!sel ? (
           <div className="flex flex-col items-center gap-2 py-12 text-center text-on-bg-muted">
             <MapPin size={28} />
-            <p className="text-sm">Toca una sucursal en el mapa para ver su detalle, métricas y cámaras.</p>
+            <p className="text-sm">Toca una sucursal para ver su detalle, métricas y cámaras.</p>
           </div>
         ) : (
-          <C4Detail s={sel} token={token} onClose={() => setSel(null)} />
+          <C4Detail
+            s={sel}
+            token={token}
+            camaras={camaras[sel.id] ?? []}
+            onClose={() => setSel(null)}
+          />
         )}
       </div>
     </div>
@@ -160,29 +171,23 @@ export default function C4Map({
 }
 
 function Kpi({
-  label,
-  value,
-  icon,
-  tone,
-}: {
-  label: string;
-  value: string;
-  icon: React.ReactNode;
-  tone?: "amber" | "red";
-}) {
+  label, value, icon, tone,
+}: { label: string; value: string; icon: React.ReactNode; tone?: "amber" | "red" }) {
   const toneCls = tone === "red" ? "text-rose-500" : tone === "amber" ? "text-amber-500" : "text-primary";
   return (
-    <div className="card p-3.5">
-      <div className="flex items-center justify-between">
-        <p className="text-[11px] uppercase tracking-wide text-on-bg-muted">{label}</p>
-        <span className={toneCls}>{icon}</span>
+    <div className="card min-w-0 p-3">
+      <div className="flex items-center justify-between gap-1">
+        <p className="truncate text-[10px] uppercase tracking-wide text-on-bg-muted">{label}</p>
+        <span className={`shrink-0 ${toneCls}`}>{icon}</span>
       </div>
-      <p className={`mt-1 text-lg font-bold ${toneCls}`}>{value}</p>
+      <p className={`mt-1 truncate text-base font-bold sm:text-lg ${toneCls}`}>{value}</p>
     </div>
   );
 }
 
-function C4Detail({ s, token, onClose }: { s: C4Suc; token: string | null; onClose: () => void }) {
+function C4Detail({
+  s, token, camaras, onClose,
+}: { s: C4Suc; token: string | null; camaras: Camara[]; onClose: () => void }) {
   const st = statusOf(s);
   const [editing, setEditing] = useState(false);
 
@@ -229,18 +234,15 @@ function C4Detail({ s, token, onClose }: { s: C4Suc; token: string | null; onClo
 
   return (
     <div>
-      <div className="flex items-start justify-between">
-        <div>
-          <span
-            className="mb-1 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold text-white"
-            style={{ background: st.color }}
-          >
+      <div className="flex items-start justify-between gap-2">
+        <div className="min-w-0">
+          <span className="mb-1 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold text-white" style={{ background: st.color }}>
             {st.label}
           </span>
           <h3 className="text-lg font-bold leading-tight">{s.nombre}</h3>
           {s.direccion && <p className="text-xs text-on-bg-muted">{s.direccion}</p>}
         </div>
-        <button onClick={onClose} className="rounded-full p-1 text-on-bg-muted hover:bg-surface-2" aria-label="Cerrar">
+        <button onClick={onClose} className="shrink-0 rounded-full p-1 text-on-bg-muted hover:bg-surface-2" aria-label="Cerrar">
           <X size={16} />
         </button>
       </div>
@@ -254,29 +256,7 @@ function C4Detail({ s, token, onClose }: { s: C4Suc; token: string | null; onClo
         <Stat label="Agotados" value={String(s.agotados)} tone={s.agotados ? "red" : undefined} />
       </div>
 
-      {/* Cameras (foundation for the future C4) */}
-      <div className="mt-5">
-        <div className="mb-2 flex items-center gap-2 text-sm font-semibold">
-          <Video size={15} /> Cámaras
-          <span className="ml-auto rounded-full bg-surface-2 px-2 py-0.5 text-[10px] font-medium text-on-bg-muted">
-            Próximamente
-          </span>
-        </div>
-        <div className="grid grid-cols-2 gap-2">
-          {[1, 2, 3, 4].map((i) => (
-            <div
-              key={i}
-              className="relative flex aspect-video items-center justify-center rounded-lg border border-dashed border-hairline bg-black/30 text-on-bg-muted"
-            >
-              <Video size={18} className="opacity-40" />
-              <span className="absolute bottom-1 left-1.5 text-[9px] uppercase text-on-bg-muted/70">CAM {i}</span>
-            </div>
-          ))}
-        </div>
-        <p className="mt-2 text-[11px] text-on-bg-muted">
-          Listo para conectar cámaras (RTSP/HLS) por sucursal cuando las integremos.
-        </p>
-      </div>
+      <CamaraPanel sucursalId={s.id} initial={camaras} />
 
       <div className="mt-5 flex flex-wrap gap-2">
         <button onClick={() => setEditing(true)} className="btn-primary flex-1 justify-center text-sm">
@@ -285,17 +265,108 @@ function C4Detail({ s, token, onClose }: { s: C4Suc; token: string | null; onClo
         <Link href={`/admin/inventario?sucursal=${s.id}`} className="btn-ghost justify-center text-sm">
           <BoxIcon size={14} /> Inventario
         </Link>
-        {s.lat != null && s.lng != null && (
-          <a
-            href={`https://maps.google.com/?q=${s.lat},${s.lng}`}
-            target="_blank"
-            rel="noopener"
-            className="btn-ghost justify-center text-sm"
-          >
-            <MapPin size={14} /> Mapa
-          </a>
+      </div>
+    </div>
+  );
+}
+
+function isVideo(url: string) {
+  return /\.(m3u8|mp4|webm|mov)(\?|$)/i.test(url);
+}
+
+function CamaraPanel({ sucursalId, initial }: { sucursalId: number; initial: Camara[] }) {
+  const [cams, setCams] = useState<Camara[]>(initial);
+  const [idx, setIdx] = useState(0);
+  const [adding, setAdding] = useState(false);
+  const [nombre, setNombre] = useState("");
+  const [url, setUrl] = useState("");
+  const [pending, start] = useTransition();
+
+  // Reset when switching branch.
+  useEffect(() => { setCams(initial); setIdx(0); setAdding(false); }, [initial, sucursalId]);
+
+  const persist = (next: Camara[]) =>
+    start(async () => { await saveCamaras(sucursalId, next); });
+
+  function addCam() {
+    if (!url.trim()) return;
+    const next = [...cams, { nombre: nombre.trim() || `Cámara ${cams.length + 1}`, url: url.trim() }];
+    setCams(next); setIdx(next.length - 1); setNombre(""); setUrl(""); setAdding(false);
+    persist(next);
+  }
+  function removeCam(i: number) {
+    const next = cams.filter((_, j) => j !== i);
+    setCams(next); setIdx((p) => Math.max(0, Math.min(p, next.length - 1)));
+    persist(next);
+  }
+
+  const cur = cams[idx];
+
+  return (
+    <div className="mt-5">
+      <div className="mb-2 flex items-center gap-2 text-sm font-semibold">
+        <Video size={15} /> Cámaras
+        {pending && <Loader2 size={13} className="animate-spin text-on-bg-muted" />}
+        <button onClick={() => setAdding((a) => !a)} className="ml-auto inline-flex items-center gap-1 rounded-full bg-surface-2 px-2 py-1 text-[11px] font-medium text-on-bg-muted hover:text-primary">
+          <Plus size={12} /> Agregar
+        </button>
+      </div>
+
+      {/* Main view */}
+      <div className="relative aspect-video w-full overflow-hidden rounded-lg border border-hairline bg-black">
+        {cur ? (
+          isVideo(cur.url) ? (
+            <video src={cur.url} controls playsInline muted className="h-full w-full object-contain" />
+          ) : (
+            <iframe src={cur.url} className="h-full w-full" allow="autoplay; fullscreen" />
+          )
+        ) : (
+          <div className="flex h-full flex-col items-center justify-center gap-1 text-on-bg-muted">
+            <Video size={22} className="opacity-40" />
+            <span className="text-[11px]">Sin cámaras. Toca “Agregar”.</span>
+          </div>
         )}
       </div>
+
+      {/* Selector de cámaras */}
+      {cams.length > 0 && (
+        <div className="no-scrollbar mt-2 flex gap-2 overflow-x-auto pb-1">
+          {cams.map((c, i) => (
+            <div key={i} className="relative shrink-0">
+              <button
+                onClick={() => setIdx(i)}
+                className={`flex items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs ${
+                  i === idx ? "border-primary bg-primary/10 text-primary" : "border-hairline bg-surface-2 text-on-bg-muted"
+                }`}
+              >
+                <Video size={12} /> {c.nombre}
+              </button>
+              <button
+                onClick={() => removeCam(i)}
+                className="absolute -right-1.5 -top-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-rose-500 text-white"
+                aria-label="Quitar cámara"
+              >
+                <Trash2 size={9} />
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Add form */}
+      {adding && (
+        <div className="mt-2 flex flex-col gap-2 rounded-lg border border-hairline bg-surface-2 p-2.5">
+          <input value={nombre} onChange={(e) => setNombre(e.target.value)} placeholder="Nombre (ej. Caja, Entrada)" className="input py-1.5 text-xs" />
+          <input value={url} onChange={(e) => setUrl(e.target.value)} placeholder="URL del stream (HLS .m3u8, MP4 o embed)" className="input py-1.5 text-xs" />
+          <div className="flex gap-2">
+            <button onClick={addCam} className="btn-primary flex-1 justify-center py-1.5 text-xs">Guardar cámara</button>
+            <button onClick={() => setAdding(false)} className="btn-ghost py-1.5 text-xs">Cancelar</button>
+          </div>
+        </div>
+      )}
+      <p className="mt-1.5 text-[11px] text-on-bg-muted">
+        Pega la URL del stream de tu cámara (RTSP convertido a HLS/.m3u8, MP4, o liga embed).
+      </p>
     </div>
   );
 }
@@ -303,9 +374,9 @@ function C4Detail({ s, token, onClose }: { s: C4Suc; token: string | null; onClo
 function Stat({ label, value, tone }: { label: string; value: string; tone?: "amber" | "red" }) {
   const toneCls = tone === "red" ? "text-rose-500" : tone === "amber" ? "text-amber-500" : "text-on-bg";
   return (
-    <div className="rounded-lg border border-hairline bg-surface-2 px-3 py-2">
-      <p className="text-[10px] uppercase tracking-wide text-on-bg-muted">{label}</p>
-      <p className={`font-semibold ${toneCls}`}>{value}</p>
+    <div className="min-w-0 rounded-lg border border-hairline bg-surface-2 px-3 py-2">
+      <p className="truncate text-[10px] uppercase tracking-wide text-on-bg-muted">{label}</p>
+      <p className={`truncate font-semibold ${toneCls}`}>{value}</p>
     </div>
   );
 }

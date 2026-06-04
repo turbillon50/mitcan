@@ -165,6 +165,24 @@ export async function deleteProducto(id: number) {
   revalidatePath("/catalogo");
 }
 
+/* ---------------- C4: cámaras por sucursal ---------------- */
+export type Camara = { nombre: string; url: string };
+
+export async function saveCamaras(sucursalId: number, camaras: Camara[]) {
+  await requireAdmin();
+  const key = `c4_cam_${sucursalId}`;
+  const content = camaras
+    .filter((c) => c && c.url)
+    .map((c) => ({ nombre: (c.nombre || "Cámara").slice(0, 60), url: c.url.slice(0, 500) }));
+  await prisma.content_blocks.upsert({
+    where: { key },
+    update: { content, updated_at: new Date() },
+    create: { key, content },
+  });
+  revalidatePath("/admin/c4");
+  return { ok: true, total: content.length };
+}
+
 /* ---------------- Recompensas ---------------- */
 export async function saveRecompensa(formData: FormData) {
   await requireAdmin();
