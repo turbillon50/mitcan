@@ -20,6 +20,9 @@ export default async function CatalogoPage() {
       precio: Number(p.precio),
       unidad: p.unidad,
       imagen_url: p.imagen_url,
+      imagenes: Array.isArray(p.imagenes)
+        ? (p.imagenes as unknown[]).filter((x): x is string => typeof x === "string")
+        : [],
       es_nuevo: p.es_nuevo,
       categoria_id: p.categoria_id,
       categoria: p.categoria

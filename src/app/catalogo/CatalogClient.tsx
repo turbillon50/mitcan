@@ -14,6 +14,7 @@ type Producto = {
   precio: number;
   unidad: string | null;
   imagen_url: string | null;
+  imagenes: string[];
   es_nuevo: boolean | null;
   categoria_id: number | null;
   categoria: { id: number; nombre: string; slug: string | null; icono: string | null } | null;
@@ -35,6 +36,7 @@ export default function CatalogClient({
   const [q, setQ] = useState("");
   const [cat, setCat] = useState<number | "all">("all");
   const [limit, setLimit] = useState(PAGE);
+  const [active, setActive] = useState<Producto | null>(null);
   const dq = useDeferredValue(q);
 
   // Precompute a normalized haystack per product once.
@@ -159,7 +161,8 @@ export default function CatalogClient({
               return (
                 <article
                   key={p.id}
-                  className="card group overflow-hidden transition hover:border-primary/30"
+                  onClick={() => setActive(p)}
+                  className="card group cursor-pointer overflow-hidden transition hover:border-primary/30"
                 >
                   <div className="relative h-36 overflow-hidden bg-surface-2">
                     {photo ? (
@@ -223,6 +226,116 @@ export default function CatalogClient({
           )}
         </>
       )}
+
+      {active && <ProductModal p={active} onClose={() => setActive(null)} />}
+    </div>
+  );
+}
+
+function ProductModal({ p, onClose }: { p: Producto; onClose: () => void }) {
+  const gallery = p.imagenes.length
+    ? p.imagenes
+    : [productImage(p.imagen_url, p.categoria?.nombre)].filter(Boolean) as string[];
+  const [idx, setIdx] = useState(0);
+  const tint = categoryTint(p.categoria?.nombre);
+  const cur = gallery[idx];
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-end justify-center bg-black/60 p-0 sm:items-center sm:p-6"
+      onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+    >
+      <div
+        className="max-h-[92dvh] w-full max-w-lg overflow-y-auto rounded-t-2xl bg-bg sm:rounded-2xl"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="relative aspect-[4/3] w-full overflow-hidden bg-surface-2">
+          {cur ? (
+            <Image src={cur} alt={p.nombre} fill sizes="(max-width:640px) 100vw, 512px" className="object-cover" />
+          ) : (
+            <div
+              className="flex h-full items-center justify-center text-6xl text-white"
+              style={{ background: `linear-gradient(135deg, ${tint.from}, ${tint.to})` }}
+            >
+              {p.categoria?.icono ?? "🥩"}
+            </div>
+          )}
+          <button
+            onClick={onClose}
+            className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full bg-black/55 text-white"
+            aria-label="Cerrar"
+          >
+            <X size={18} />
+          </button>
+          {gallery.length > 1 && (
+            <>
+              <button
+                onClick={() => setIdx((i) => (i - 1 + gallery.length) % gallery.length)}
+                className="absolute left-2 top-1/2 -translate-y-1/2 flex h-9 w-9 items-center justify-center rounded-full bg-black/45 text-white"
+                aria-label="Anterior"
+              >
+                ‹
+              </button>
+              <button
+                onClick={() => setIdx((i) => (i + 1) % gallery.length)}
+                className="absolute right-2 top-1/2 -translate-y-1/2 flex h-9 w-9 items-center justify-center rounded-full bg-black/45 text-white"
+                aria-label="Siguiente"
+              >
+                ›
+              </button>
+              <div className="absolute inset-x-0 bottom-2 flex justify-center gap-1.5">
+                {gallery.map((_, i) => (
+                  <span
+                    key={i}
+                    className={`h-1.5 rounded-full transition-all ${i === idx ? "w-5 bg-white" : "w-1.5 bg-white/50"}`}
+                  />
+                ))}
+              </div>
+            </>
+          )}
+          {p.es_nuevo && (
+            <span className="absolute left-3 top-3 inline-flex items-center gap-1 rounded-full bg-primary px-2 py-0.5 text-[11px] font-bold text-white shadow">
+              <Sparkles size={11} /> NUEVO
+            </span>
+          )}
+        </div>
+
+        {gallery.length > 1 && (
+          <div className="no-scrollbar flex gap-2 overflow-x-auto px-4 pt-3">
+            {gallery.map((g, i) => (
+              <button
+                key={i}
+                onClick={() => setIdx(i)}
+                className={`relative h-14 w-14 shrink-0 overflow-hidden rounded-lg border ${i === idx ? "border-primary" : "border-hairline"}`}
+              >
+                <Image src={g} alt="" fill sizes="56px" className="object-cover" />
+              </button>
+            ))}
+          </div>
+        )}
+
+        <div className="p-5">
+          <p className="text-[11px] uppercase tracking-wide text-on-bg-muted">
+            {p.categoria?.nombre ?? "Producto"}
+          </p>
+          <h2 className="mt-0.5 text-xl font-bold">{p.nombre}</h2>
+          <p className="mt-2 text-lg font-semibold text-primary">
+            {formatMXN(p.precio)}
+            <span className="text-sm text-on-bg-muted"> /{p.unidad ?? "kg"}</span>
+          </p>
+          {p.descripcion && (
+            <p className="mt-3 whitespace-pre-line text-sm leading-relaxed text-on-bg-muted">
+              {p.descripcion}
+            </p>
+          )}
+          {p.sku && <p className="mt-3 text-xs text-on-bg-muted">Código: {p.sku}</p>}
+          <a href="/sucursales" className="btn-primary mt-5 w-full justify-center">
+            Encuéntralo en tu sucursal
+          </a>
+        </div>
+      </div>
     </div>
   );
 }
