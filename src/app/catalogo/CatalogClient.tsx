@@ -5,6 +5,7 @@ import Image from "next/image";
 import { Search, X, Plus, Sparkles } from "lucide-react";
 import { formatMXN } from "@/lib/format";
 import { productImage, categoryTint } from "@/lib/catalogo-img";
+import { useT } from "@/components/I18nProvider";
 
 type Producto = {
   id: number;
@@ -38,6 +39,7 @@ export default function CatalogClient({
   const [limit, setLimit] = useState(PAGE);
   const [active, setActive] = useState<Producto | null>(null);
   const dq = useDeferredValue(q);
+  const t = useT();
 
   // Precompute a normalized haystack per product once.
   const indexed = useMemo(
@@ -103,9 +105,9 @@ export default function CatalogClient({
           onChange={(e) => setQ(e.target.value)}
           type="search"
           enterKeyHint="search"
-          placeholder="Buscar por producto, categoría o código…"
+          placeholder={t("cat.searchPlaceholder")}
           className="input px-11"
-          aria-label="Buscar productos"
+          aria-label={t("cat.searchPlaceholder")}
         />
         {q && (
           <button
@@ -124,7 +126,7 @@ export default function CatalogClient({
           onClick={() => setCat("all")}
           className={`chip whitespace-nowrap ${cat === "all" ? "chip-active" : ""}`}
         >
-          Todos
+          {t("cat.all")}
         </button>
         {categorias.map((c) => (
           <button
@@ -141,15 +143,15 @@ export default function CatalogClient({
       {/* Result count */}
       <p className="mb-5 text-sm text-on-bg-muted">
         {filtered.length === productos.length
-          ? `${productos.length} productos`
-          : `${filtered.length} resultado${filtered.length === 1 ? "" : "s"}`}
+          ? `${productos.length} ${t("cat.products")}`
+          : `${filtered.length} ${filtered.length === 1 ? t("cat.result") : t("cat.results")}`}
       </p>
 
       {filtered.length === 0 ? (
         <div className="py-16 text-center">
-          <p className="text-on-bg-muted">No encontramos productos para “{q}”.</p>
+          <p className="text-on-bg-muted">{t("cat.noResults")} “{q}”.</p>
           <button onClick={() => { setQ(""); setCat("all"); }} className="btn-ghost mt-4">
-            Limpiar filtros
+            {t("cat.clear")}
           </button>
         </div>
       ) : (
@@ -188,13 +190,13 @@ export default function CatalogClient({
                     )}
                     {p.es_nuevo && (
                       <span className="absolute left-2 top-2 inline-flex items-center gap-1 rounded-full bg-primary px-2 py-0.5 text-[10px] font-bold text-white shadow">
-                        <Sparkles size={10} /> NUEVO
+                        <Sparkles size={10} /> {t("cat.new")}
                       </span>
                     )}
                   </div>
                   <div className="flex flex-col p-3.5">
                     <p className="text-[11px] uppercase tracking-wide text-on-bg-muted">
-                      {p.categoria?.nombre ?? "Producto"}
+                      {p.categoria?.nombre ?? t("cat.product")}
                     </p>
                     <h3 className="font-bold leading-tight line-clamp-2">{p.nombre}</h3>
                     {p.descripcion && (
@@ -220,7 +222,7 @@ export default function CatalogClient({
           {limit < filtered.length && (
             <div ref={sentinel} className="flex justify-center py-8">
               <button onClick={() => setLimit((l) => l + PAGE)} className="btn-ghost">
-                Ver más ({filtered.length - limit} restantes)
+                {t("cat.seeMore")} ({filtered.length - limit} {t("cat.remaining")})
               </button>
             </div>
           )}
@@ -233,6 +235,7 @@ export default function CatalogClient({
 }
 
 function ProductModal({ p, onClose }: { p: Producto; onClose: () => void }) {
+  const t = useT();
   const gallery = p.imagenes.length
     ? p.imagenes
     : [productImage(p.imagen_url, p.categoria?.nombre)].filter(Boolean) as string[];
@@ -297,7 +300,7 @@ function ProductModal({ p, onClose }: { p: Producto; onClose: () => void }) {
           )}
           {p.es_nuevo && (
             <span className="absolute left-3 top-3 inline-flex items-center gap-1 rounded-full bg-primary px-2 py-0.5 text-[11px] font-bold text-white shadow">
-              <Sparkles size={11} /> NUEVO
+              <Sparkles size={11} /> {t("cat.new")}
             </span>
           )}
         </div>
@@ -318,7 +321,7 @@ function ProductModal({ p, onClose }: { p: Producto; onClose: () => void }) {
 
         <div className="p-5">
           <p className="text-[11px] uppercase tracking-wide text-on-bg-muted">
-            {p.categoria?.nombre ?? "Producto"}
+            {p.categoria?.nombre ?? t("cat.product")}
           </p>
           <h2 className="mt-0.5 text-xl font-bold">{p.nombre}</h2>
           <p className="mt-2 text-lg font-semibold text-primary">
@@ -330,9 +333,9 @@ function ProductModal({ p, onClose }: { p: Producto; onClose: () => void }) {
               {p.descripcion}
             </p>
           )}
-          {p.sku && <p className="mt-3 text-xs text-on-bg-muted">Código: {p.sku}</p>}
+          {p.sku && <p className="mt-3 text-xs text-on-bg-muted">{t("cat.code")}: {p.sku}</p>}
           <a href="/sucursales" className="btn-primary mt-5 w-full justify-center">
-            Encuéntralo en tu sucursal
+            {t("cat.findAtBranch")}
           </a>
         </div>
       </div>

@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Search, Phone, Navigation, Clock, MessageCircle, MapPin } from "lucide-react";
 import { formatPhone } from "@/lib/format";
+import { useT } from "@/components/I18nProvider";
 import "mapbox-gl/dist/mapbox-gl.css";
 
 type Sucursal = {
@@ -32,6 +33,7 @@ export default function SucursalesExplorer({
 }) {
   const [q, setQ] = useState("");
   const [area, setArea] = useState<string>(areas[0]?.key ?? "all");
+  const tr = useT();
 
   const mapRef = useRef<import("mapbox-gl").Map | null>(null);
   const markers = useRef<Record<number, import("mapbox-gl").Marker>>({});
@@ -132,9 +134,9 @@ export default function SucursalesExplorer({
           value={q}
           onChange={(e) => setQ(e.target.value)}
           type="search"
-          placeholder="Busca tu sucursal (nombre, colonia, ciudad)…"
+          placeholder={tr("suc.searchPlaceholder")}
           className="input pl-11"
-          aria-label="Buscar sucursales"
+          aria-label={tr("suc.searchPlaceholder")}
         />
       </div>
 
@@ -165,7 +167,7 @@ export default function SucursalesExplorer({
       </div>
 
       {visible.length === 0 ? (
-        <p className="py-10 text-center text-on-bg-muted">No encontramos sucursales.</p>
+        <p className="py-10 text-center text-on-bg-muted">{tr("suc.none")}</p>
       ) : (
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {visible.map((s) => (
@@ -192,7 +194,7 @@ export default function SucursalesExplorer({
               <div className="mt-3 flex flex-wrap gap-2">
                 {s.whatsapp && (
                   <a href={`https://wa.me/${s.whatsapp.replace(/\D/g, "")}`} target="_blank" rel="noopener" className="btn-primary flex-1 px-2 py-2 text-xs">
-                    <MessageCircle size={14} /> WhatsApp
+                    <MessageCircle size={14} /> {tr("suc.whatsapp")}
                   </a>
                 )}
                 {s.telefono && (
@@ -202,7 +204,7 @@ export default function SucursalesExplorer({
                 )}
                 {s.direccion && (
                   <a href={mapsHref(s.direccion)} target="_blank" rel="noopener" className="btn-ghost flex-1 px-2 py-2 text-xs">
-                    <Navigation size={14} /> Cómo llegar
+                    <Navigation size={14} /> {tr("suc.directions")}
                   </a>
                 )}
               </div>

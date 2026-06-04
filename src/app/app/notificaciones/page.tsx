@@ -2,6 +2,8 @@ import { Bell, Tag, Gift, ShoppingBag, Megaphone } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/auth";
 import { formatDateTime } from "@/lib/format";
+import { getLocale } from "@/lib/i18n-server";
+import { t } from "@/lib/i18n";
 
 export const dynamic = "force-dynamic";
 
@@ -14,6 +16,7 @@ const ICON: Record<string, typeof Bell> = {
 
 export default async function NotificacionesPage() {
   const user = await requireUser();
+  const locale = await getLocale();
 
   const notis = await prisma.notificaciones
     .findMany({ where: { user_id: user.id }, orderBy: { created_at: "desc" }, take: 100 })
@@ -30,8 +33,8 @@ export default async function NotificacionesPage() {
   return (
     <div className="flex flex-col gap-5">
       <div>
-        <h1 className="section-title text-2xl">Notificaciones</h1>
-        <p className="text-sm text-on-bg-muted">Avisos, promociones y novedades del Club CSN</p>
+        <h1 className="section-title text-2xl">{t(locale, "notif.title")}</h1>
+        <p className="text-sm text-on-bg-muted">{t(locale, "notif.subtitle")}</p>
       </div>
 
       {notis.length === 0 ? (
@@ -39,7 +42,7 @@ export default async function NotificacionesPage() {
           <div className="flex h-14 w-14 items-center justify-center rounded-full bg-surface-2 text-on-bg-muted">
             <Bell size={24} />
           </div>
-          <p className="text-on-bg-muted">Aún no tienes notificaciones.</p>
+          <p className="text-on-bg-muted">{t(locale, "notif.empty")}</p>
         </div>
       ) : (
         <div className="flex flex-col gap-3">

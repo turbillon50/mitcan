@@ -3,17 +3,19 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Home, Grid3x3, ShoppingBag, MapPin, Gift } from "lucide-react";
+import { useT } from "@/components/I18nProvider";
 
 const ITEMS = [
-  { href: "/app/dashboard", label: "Inicio", icon: Home },
-  { href: "/catalogo", label: "Catálogo", icon: Grid3x3 },
-  { href: "/app/pedido", label: "Pedidos", icon: ShoppingBag },
-  { href: "/sucursales", label: "Sucursales", icon: MapPin },
-  { href: "/app/recompensas", label: "Premios", icon: Gift },
+  { href: "/app/dashboard", key: "bn.home", icon: Home },
+  { href: "/catalogo", key: "bn.catalog", icon: Grid3x3 },
+  { href: "/app/pedido", key: "bn.orders", icon: ShoppingBag },
+  { href: "/sucursales", key: "bn.branches", icon: MapPin },
+  { href: "/app/recompensas", key: "bn.rewards", icon: Gift },
 ];
 
 export default function BottomNav() {
   const pathname = usePathname();
+  const t = useT();
   return (
     <nav
       className="fixed inset-x-0 bottom-0 z-40 border-t border-hairline bg-bg/90 backdrop-blur-xl md:hidden"
@@ -21,7 +23,7 @@ export default function BottomNav() {
       aria-label="Navegación principal"
     >
       <div className="mx-auto flex max-w-md items-stretch justify-around">
-        {ITEMS.map(({ href, label, icon: Icon }) => {
+        {ITEMS.map(({ href, key, icon: Icon }) => {
           const active = pathname === href || pathname.startsWith(href + "/");
           return (
             <Link
@@ -33,7 +35,7 @@ export default function BottomNav() {
               }`}
             >
               <Icon size={22} strokeWidth={active ? 2.4 : 1.8} />
-              {label}
+              {t(key)}
             </Link>
           );
         })}

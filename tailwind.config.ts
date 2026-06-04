@@ -19,7 +19,7 @@ const config: Config = {
         "on-bg": "rgb(var(--on-bg) / <alpha-value>)",
         "on-bg-muted": "rgb(var(--on-bg-muted) / <alpha-value>)",
         "on-primary": "rgb(var(--on-primary) / <alpha-value>)",
-        hairline: "rgba(26, 26, 26, 0.10)",
+        hairline: "rgb(var(--hairline) / 0.12)",
         dorado: "#D4A853",
         negro: "#1a1a1a",
         brand: {
