@@ -18,6 +18,7 @@ import {
   Bell,
   BarChart3,
   BookOpen,
+  Radio,
   Menu,
   X,
   ExternalLink,
@@ -31,6 +32,7 @@ const SECTIONS: { titleKey: string; items: Item[] }[] = [
     titleKey: "adm.sec.ops",
     items: [
       { href: "/admin", key: "adm.dashboard", icon: LayoutDashboard },
+      { href: "/admin/c4", key: "adm.c4", icon: Radio },
       { href: "/admin/pedidos", key: "adm.orders", icon: ClipboardList },
       { href: "/admin/redenciones", key: "adm.redemptions", icon: Ticket },
     ],
