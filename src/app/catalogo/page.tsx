@@ -15,17 +15,19 @@ export default async function CatalogoPage() {
     productos.map((p) => ({
       id: p.id,
       nombre: p.nombre,
+      sku: p.sku,
       descripcion: p.descripcion,
       precio: Number(p.precio),
       unidad: p.unidad,
       imagen_url: p.imagen_url,
+      es_nuevo: p.es_nuevo,
       categoria_id: p.categoria_id,
       categoria: p.categoria
-        ? { id: p.categoria.id, nombre: p.categoria.nombre }
+        ? { id: p.categoria.id, nombre: p.categoria.nombre, slug: p.categoria.slug, icono: p.categoria.icono }
         : null,
     }))
   );
-  const cats = categorias.map((c) => ({ id: c.id, nombre: c.nombre }));
+  const cats = categorias.map((c) => ({ id: c.id, nombre: c.nombre, icono: c.icono }));
 
   return (
     <div className="min-h-dvh pb-20">
