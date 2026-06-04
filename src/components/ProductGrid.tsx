@@ -1,8 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import { Beef } from "lucide-react";
 import { StaggerContainer, StaggerItem, HoverCard } from "@/components/motion";
+import { productImage, categoryTint } from "@/lib/catalogo-img";
 
 type P = {
   id: number;
@@ -18,15 +18,21 @@ type P = {
 export default function ProductGrid({ productos }: { productos: P[] }) {
   return (
     <StaggerContainer className="grid grid-cols-2 gap-4 md:grid-cols-4">
-      {productos.map((p) => (
+      {productos.map((p) => {
+        const photo = productImage(p.imagen_url, p.categoria);
+        const tint = categoryTint(p.categoria);
+        return (
         <StaggerItem key={p.id}>
           <HoverCard className="card h-full overflow-hidden">
             <div className="relative h-36 bg-surface-2">
-              {p.imagen_url ? (
-                <Image src={p.imagen_url} alt={p.nombre} fill sizes="(max-width:768px) 50vw, 25vw" className="object-cover" />
+              {photo ? (
+                <Image src={photo} alt={p.nombre} fill sizes="(max-width:768px) 50vw, 25vw" className="object-cover" />
               ) : (
-                <div className="flex h-full items-center justify-center text-primary/30">
-                  <Beef size={40} />
+                <div
+                  className="flex h-full items-center justify-center text-2xl text-white"
+                  style={{ background: `linear-gradient(135deg, ${tint.from}, ${tint.to})` }}
+                >
+                  🥩
                 </div>
               )}
               {p.es_nuevo && (
@@ -47,7 +53,8 @@ export default function ProductGrid({ productos }: { productos: P[] }) {
             </div>
           </HoverCard>
         </StaggerItem>
-      ))}
+        );
+      })}
     </StaggerContainer>
   );
 }
