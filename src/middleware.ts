@@ -1,5 +1,6 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
+import { isValidAdminKey, ADMIN_COOKIE } from "@/lib/admin-key";
 
 // Public: landing, catalogo, sucursales, auth pages, webhooks, static.
 const isPublicRoute = createRouteMatcher([
@@ -14,20 +15,19 @@ const isPublicRoute = createRouteMatcher([
 // Protected (need a Clerk session): /app/* (usuario) and /m/* (member scan).
 const isProtectedRoute = createRouteMatcher(["/app(.*)", "/m/(.*)"]);
 
-// Admin lives behind its own independent secret link + key, on top of the
+// Admin lives behind its own independent secret magic-link token, on top of the
 // Clerk role check done in the /admin layout.
 const isAdminRoute = createRouteMatcher(["/admin(.*)"]);
-const ADMIN_KEY = process.env.CSN_ADMIN_KEY ?? "mitcan";
-const ADMIN_COOKIE = "csn_ak";
 
 export default clerkMiddleware(async (auth, req) => {
   if (isAdminRoute(req)) {
     const url = req.nextUrl;
     const provided = url.searchParams.get("k");
     const cookie = req.cookies.get(ADMIN_COOKIE)?.value;
-    const hasKey = provided === ADMIN_KEY || cookie === ADMIN_KEY;
+    const providedValid = await isValidAdminKey(provided);
+    const hasKey = providedValid || (await isValidAdminKey(cookie));
 
-    // Without the key the admin area is invisible (looks like the public site).
+    // Without the token the admin area is invisible (looks like the public site).
     if (!hasKey) {
       return NextResponse.redirect(new URL("/", req.url));
     }
@@ -38,18 +38,18 @@ export default clerkMiddleware(async (auth, req) => {
       const target = url.pathname + (provided ? `?k=${provided}` : "");
       signIn.searchParams.set("redirect_url", target);
       const res = NextResponse.redirect(signIn);
-      if (provided === ADMIN_KEY) {
-        res.cookies.set(ADMIN_COOKIE, ADMIN_KEY, cookieOpts());
+      if (providedValid && provided) {
+        res.cookies.set(ADMIN_COOKIE, provided, cookieOpts());
       }
       return res;
     }
 
-    // Persist the key as a cookie and drop it from the URL bar.
-    if (provided === ADMIN_KEY) {
+    // Persist the token as a cookie and drop it from the URL bar.
+    if (providedValid && provided) {
       const clean = new URL(url);
       clean.searchParams.delete("k");
       const res = NextResponse.redirect(clean);
-      res.cookies.set(ADMIN_COOKIE, ADMIN_KEY, cookieOpts());
+      res.cookies.set(ADMIN_COOKIE, provided, cookieOpts());
       return res;
     }
     return;

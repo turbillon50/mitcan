@@ -3,18 +3,16 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { prisma } from "./prisma";
 import { sendEmail, welcomeEmail } from "./resend";
+import { isValidAdminKey, ADMIN_COOKIE } from "./admin-key";
 import type { user_role } from "@prisma/client";
 
-// The admin area is gated by a secret key (link `?k=...` -> cookie). Anyone who
-// opens that link is granted admin access — so the owner can hand the panel to
-// staff/clients without manually promoting each account.
-const ADMIN_KEY = process.env.CSN_ADMIN_KEY ?? "mitcan";
-const ADMIN_COOKIE = "csn_ak";
-
+// The admin area is gated by a secret magic-link token (link `?k=<token>` ->
+// cookie). Anyone who opens that link is granted admin access — so the owner can
+// hand the panel to staff/clients without manually promoting each account.
 async function hasAdminKey(): Promise<boolean> {
   try {
     const c = await cookies();
-    return c.get(ADMIN_COOKIE)?.value === ADMIN_KEY;
+    return await isValidAdminKey(c.get(ADMIN_COOKIE)?.value);
   } catch {
     return false;
   }
