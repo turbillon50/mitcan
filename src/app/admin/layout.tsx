@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { UserButton } from "@clerk/nextjs";
 import AdminSidebar from "@/components/admin/AdminSidebar";
+import SettingsControls from "@/components/SettingsControls";
 import { requireAdmin } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
@@ -41,6 +42,7 @@ export default async function AdminLayout({
             Panel de administración
           </span>
           <div className="flex items-center gap-3">
+            <SettingsControls />
             <div className="text-right">
               <p className="text-sm font-semibold leading-tight">
                 {admin.nombre ?? admin.email}

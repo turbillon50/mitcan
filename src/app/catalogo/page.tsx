@@ -2,13 +2,16 @@ import PublicHeader from "@/components/PublicHeader";
 import CatalogClient from "./CatalogClient";
 import { getCategorias, getProductosConCategoria } from "@/lib/data";
 import { serialize } from "@/lib/format";
+import { getLocale } from "@/lib/i18n-server";
+import { t } from "@/lib/i18n";
 
 export const dynamic = "force-dynamic";
 
 export default async function CatalogoPage() {
-  const [productos, categorias] = await Promise.all([
+  const [productos, categorias, locale] = await Promise.all([
     getProductosConCategoria({ soloActivos: true }),
     getCategorias(),
+    getLocale(),
   ]);
 
   const data = serialize(
@@ -36,7 +39,7 @@ export default async function CatalogoPage() {
     <div className="min-h-dvh pb-20">
       <PublicHeader />
       <main className="mx-auto max-w-6xl px-5 py-8">
-        <h1 className="section-title mb-6 text-3xl">Catálogo</h1>
+        <h1 className="section-title mb-6 text-3xl">{t(locale, "cat.title")}</h1>
         <CatalogClient productos={data} categorias={cats} />
       </main>
     </div>

@@ -3,6 +3,7 @@ import Image from "next/image";
 import { UserButton } from "@clerk/nextjs";
 import { Bell } from "lucide-react";
 import BottomNav from "@/components/BottomNav";
+import SettingsControls from "@/components/SettingsControls";
 import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
@@ -31,6 +32,7 @@ export default async function AppLayout({
             />
           </Link>
           <div className="flex items-center gap-2">
+            <SettingsControls />
             {/* Admin lives on its own independent key-gated link, not exposed here. */}
             <Link
               href="/app/notificaciones"

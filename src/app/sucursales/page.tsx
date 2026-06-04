@@ -2,12 +2,15 @@ import PublicHeader from "@/components/PublicHeader";
 import SucursalesExplorer from "@/components/SucursalesExplorer";
 import { getSucursales, AREA_LABELS } from "@/lib/data";
 import { getMapboxToken } from "@/lib/mapbox";
+import { getLocale } from "@/lib/i18n-server";
+import { t } from "@/lib/i18n";
 
 export const dynamic = "force-dynamic";
 
 export default async function SucursalesPage() {
   const sucursales = await getSucursales({ soloActivas: true });
   const token = getMapboxToken();
+  const locale = await getLocale();
 
   const data = sucursales.map((s) => ({
     id: s.id,
@@ -31,7 +34,7 @@ export default async function SucursalesPage() {
     <div className="min-h-dvh pb-20">
       <PublicHeader />
       <main className="mx-auto max-w-6xl px-5 py-8">
-        <h1 className="section-title mb-2 text-3xl">Sucursales</h1>
+        <h1 className="section-title mb-2 text-3xl">{t(locale, "suc.title")}</h1>
         <p className="mb-6 text-on-bg-muted">
           {sucursales.length} sucursales · Nayarit · Sinaloa · Jalisco
         </p>

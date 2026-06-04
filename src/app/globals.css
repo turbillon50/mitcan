@@ -17,11 +17,30 @@
 
   --on-bg: 26 26 26; /* #1a1a1a negro */
   --on-bg-muted: 107 94 84; /* #6B5E54 */
+  --hairline: 26 26 26; /* base del borde sutil */
 
   --font-display: "Fraunces", Georgia, serif;
   --font-body: "Inter", system-ui, -apple-system, sans-serif;
 
   --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* ---------------- Tema oscuro (modo noche) ---------------- */
+html.dark {
+  color-scheme: dark;
+
+  --bg: 20 17 14; /* #14110E */
+  --surface: 31 27 23; /* #1F1B17 */
+  --surface-2: 43 37 31; /* #2B251F */
+  --surface-3: 58 49 41; /* #3A3129 */
+
+  --primary: 226 74 98; /* rojo CSN un poco más claro para contraste */
+  --accent: 220 178 96; /* dorado */
+  --on-primary: 255 255 255;
+
+  --on-bg: 245 240 232; /* crema clara */
+  --on-bg-muted: 184 169 155; /* #B8A99B */
+  --hairline: 245 240 232;
 }
 
 * {
@@ -100,4 +119,9 @@ body {
   background: radial-gradient(circle at 22% 0%, rgba(212, 168, 83, 0.18), transparent 55%),
     radial-gradient(circle at 90% 10%, rgba(196, 30, 58, 0.08), transparent 45%),
     linear-gradient(160deg, #faf6ee 0%, #ffffff 65%);
+}
+html.dark .csn-gradient {
+  background: radial-gradient(circle at 22% 0%, rgba(212, 168, 83, 0.14), transparent 55%),
+    radial-gradient(circle at 90% 10%, rgba(226, 74, 98, 0.12), transparent 45%),
+    linear-gradient(160deg, #1b1713 0%, #14110e 65%);
 }

@@ -1,6 +1,10 @@
 import type { Metadata, Viewport } from "next";
 import { ClerkProvider } from "@clerk/nextjs";
 import "./globals.css";
+import { I18nProvider } from "@/components/I18nProvider";
+import { getLocale } from "@/lib/i18n-server";
+
+const THEME_SCRIPT = `(function(){try{if(localStorage.getItem('csn-theme')==='dark'){document.documentElement.classList.add('dark')}}catch(e){}})();`;
 
 export const metadata: Metadata = {
   title: "CSN — Carnes Selectas Nayarit",
@@ -24,11 +28,12 @@ export const viewport: Viewport = {
   viewportFit: "cover",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const locale = await getLocale();
   return (
     <ClerkProvider
       signInUrl="/sign-in"
@@ -48,8 +53,9 @@ export default function RootLayout({
         },
       }}
     >
-      <html lang="es">
+      <html lang={locale}>
         <head>
+          <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
           <link rel="preconnect" href="https://fonts.googleapis.com" />
           <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
           <link
@@ -57,7 +63,9 @@ export default function RootLayout({
             href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700;9..144,800&family=Inter:wght@400;500;600;700;800&display=swap"
           />
         </head>
-        <body>{children}</body>
+        <body>
+          <I18nProvider locale={locale}>{children}</I18nProvider>
+        </body>
       </html>
     </ClerkProvider>
   );
