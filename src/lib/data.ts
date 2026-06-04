@@ -111,7 +111,89 @@ export function getRecompensas(opts?: { soloActivas?: boolean }) {
   );
 }
 
-/** ---- Admin KPI aggregates ---- */
+/** Per-branch aggregates for the C4 control map (real data). */
+export async function getC4Sucursales() {
+  return safe(
+    async () => {
+      const [sucs, inv, ventas] = await Promise.all([
+        prisma.sucursales.findMany({ orderBy: { id: "asc" } }),
+        prisma.inventario.findMany({
+          select: {
+            sucursal_id: true,
+            stock: true,
+            min_stock: true,
+            precio: true,
+            producto: { select: { precio: true } },
+          },
+        }),
+        prisma.pedidos.groupBy({
+          by: ["sucursal_id"],
+          _count: { _all: true },
+          _sum: { total: true },
+          where: { estado: { not: "cancelado" } },
+        }),
+      ]);
+
+      const ventasById = new Map(
+        ventas.map((v) => [
+          v.sucursal_id,
+          { pedidos: v._count._all, total: Number(v._sum.total ?? 0) },
+        ])
+      );
+
+      const agg = new Map<
+        number,
+        { valor: number; bajo: number; agotados: number; items: number }
+      >();
+      for (const r of inv) {
+        if (r.sucursal_id == null) continue;
+        const a = agg.get(r.sucursal_id) ?? { valor: 0, bajo: 0, agotados: 0, items: 0 };
+        const stock = Number(r.stock ?? 0);
+        const precio = Number(r.precio ?? r.producto?.precio ?? 0);
+        a.valor += stock * precio;
+        a.items += 1;
+        if (stock <= 0) a.agotados += 1;
+        else if (stock <= Number(r.min_stock ?? 5)) a.bajo += 1;
+        agg.set(r.sucursal_id, a);
+      }
+
+      return sucs.map((s) => ({
+        id: s.id,
+        nombre: s.nombre,
+        area: s.area,
+        direccion: s.direccion,
+        telefono: s.telefono,
+        whatsapp: s.whatsapp,
+        activa: s.activa ?? true,
+        lat: s.lat != null ? Number(s.lat) : null,
+        lng: s.lng != null ? Number(s.lng) : null,
+        valorInventario: agg.get(s.id)?.valor ?? 0,
+        items: agg.get(s.id)?.items ?? 0,
+        stockBajo: agg.get(s.id)?.bajo ?? 0,
+        agotados: agg.get(s.id)?.agotados ?? 0,
+        ventas: ventasById.get(s.id)?.total ?? 0,
+        pedidos: ventasById.get(s.id)?.pedidos ?? 0,
+      }));
+    },
+    [] as {
+      id: number;
+      nombre: string;
+      area: string | null;
+      direccion: string | null;
+      telefono: string | null;
+      whatsapp: string | null;
+      activa: boolean;
+      lat: number | null;
+      lng: number | null;
+      valorInventario: number;
+      items: number;
+      stockBajo: number;
+      agotados: number;
+      ventas: number;
+      pedidos: number;
+    }[]
+  );
+}
 export async function getAdminKpis() {
   return safe(
     async () => {
