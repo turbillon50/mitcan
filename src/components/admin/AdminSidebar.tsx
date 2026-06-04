@@ -23,42 +23,43 @@ import {
   ExternalLink,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
+import { useT } from "@/components/I18nProvider";
 
-type Item = { href: string; label: string; icon: LucideIcon };
-const SECTIONS: { title: string; items: Item[] }[] = [
+type Item = { href: string; key: string; icon: LucideIcon };
+const SECTIONS: { titleKey: string; items: Item[] }[] = [
   {
-    title: "Operación",
+    titleKey: "adm.sec.ops",
     items: [
-      { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
-      { href: "/admin/pedidos", label: "Pedidos", icon: ClipboardList },
-      { href: "/admin/redenciones", label: "Redenciones", icon: Ticket },
+      { href: "/admin", key: "adm.dashboard", icon: LayoutDashboard },
+      { href: "/admin/pedidos", key: "adm.orders", icon: ClipboardList },
+      { href: "/admin/redenciones", key: "adm.redemptions", icon: Ticket },
     ],
   },
   {
-    title: "Catálogo",
+    titleKey: "adm.sec.catalog",
     items: [
-      { href: "/admin/productos", label: "Productos", icon: Beef },
-      { href: "/admin/categorias", label: "Categorías", icon: Tags },
-      { href: "/admin/inventario", label: "Inventario", icon: Boxes },
-      { href: "/admin/precios", label: "Precios por sucursal", icon: Tags },
-      { href: "/admin/sucursales", label: "Sucursales", icon: Store },
+      { href: "/admin/productos", key: "adm.products", icon: Beef },
+      { href: "/admin/categorias", key: "adm.categories", icon: Tags },
+      { href: "/admin/inventario", key: "adm.inventory", icon: Boxes },
+      { href: "/admin/precios", key: "adm.branchPrices", icon: Tags },
+      { href: "/admin/sucursales", key: "adm.branches", icon: Store },
     ],
   },
   {
-    title: "Marketing",
+    titleKey: "adm.sec.marketing",
     items: [
-      { href: "/admin/promociones", label: "Promociones", icon: Megaphone },
-      { href: "/admin/recompensas", label: "Recompensas", icon: Gift },
-      { href: "/admin/notificaciones", label: "Notificaciones", icon: Bell },
+      { href: "/admin/promociones", key: "adm.promos", icon: Megaphone },
+      { href: "/admin/recompensas", key: "adm.rewards", icon: Gift },
+      { href: "/admin/notificaciones", key: "adm.notifications", icon: Bell },
     ],
   },
   {
-    title: "Sistema",
+    titleKey: "adm.sec.system",
     items: [
-      { href: "/admin/reportes", label: "Reportes", icon: BarChart3 },
-      { href: "/admin/usuarios", label: "Usuarios", icon: Users },
-      { href: "/admin/contenido", label: "Contenido", icon: LayoutDashboard },
-      { href: "/admin/docs", label: "API / Docs", icon: BookOpen },
+      { href: "/admin/reportes", key: "adm.reports", icon: BarChart3 },
+      { href: "/admin/usuarios", key: "adm.users", icon: Users },
+      { href: "/admin/contenido", key: "adm.content", icon: LayoutDashboard },
+      { href: "/admin/docs", key: "adm.docs", icon: BookOpen },
     ],
   },
 ];
@@ -66,6 +67,7 @@ const SECTIONS: { title: string; items: Item[] }[] = [
 export default function AdminSidebar() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const t = useT();
 
   const isActive = (href: string) =>
     href === "/admin" ? pathname === "/admin" : pathname.startsWith(href);
@@ -73,12 +75,12 @@ export default function AdminSidebar() {
   const Nav = (
     <nav className="flex flex-col gap-5">
       {SECTIONS.map((sec) => (
-        <div key={sec.title}>
+        <div key={sec.titleKey}>
           <p className="mb-1.5 px-3 text-[10px] font-semibold uppercase tracking-wider text-on-bg-muted/70">
-            {sec.title}
+            {t(sec.titleKey)}
           </p>
           <div className="flex flex-col gap-0.5">
-            {sec.items.map(({ href, label, icon: Icon }) => {
+            {sec.items.map(({ href, key, icon: Icon }) => {
               const active = isActive(href);
               return (
                 <Link
@@ -95,7 +97,7 @@ export default function AdminSidebar() {
                     <span className="absolute left-0 top-1/2 h-5 w-1 -translate-y-1/2 rounded-r-full bg-accent" />
                   )}
                   <Icon size={18} strokeWidth={active ? 2.4 : 1.9} />
-                  {label}
+                  {t(key)}
                 </Link>
               );
             })}
@@ -110,7 +112,7 @@ export default function AdminSidebar() {
       <Image src="/assets/logo-badge.png" alt="CSN" width={38} height={33} />
       <div className="leading-tight">
         <p className="font-display text-base font-bold">CSN</p>
-        <p className="text-[11px] text-on-bg-muted">Centro de control</p>
+        <p className="text-[11px] text-on-bg-muted">{t("adm.controlCenter")}</p>
       </div>
     </Link>
   );
@@ -123,7 +125,7 @@ export default function AdminSidebar() {
         <button
           onClick={() => setOpen((o) => !o)}
           className="flex h-9 w-9 items-center justify-center rounded-lg border border-hairline bg-surface-2"
-          aria-label="Menú"
+          aria-label={t("adm.menu")}
         >
           {open ? <X size={18} /> : <Menu size={18} />}
         </button>
@@ -141,7 +143,7 @@ export default function AdminSidebar() {
           href="/"
           className="mt-auto flex items-center gap-2 rounded-xl px-3 py-2.5 text-sm text-on-bg-muted transition hover:text-primary"
         >
-          <ExternalLink size={15} /> Ver sitio público
+          <ExternalLink size={15} /> {t("adm.viewSite")}
         </Link>
       </aside>
     </>

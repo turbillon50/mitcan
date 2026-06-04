@@ -7,6 +7,8 @@ import DeleteButton from "@/components/admin/DeleteButton";
 import GalleryUpload from "@/components/admin/GalleryUpload";
 import ExportCsv from "@/components/admin/ExportCsv";
 import { saveProducto, deleteProducto } from "../actions";
+import { getLocale } from "@/lib/i18n-server";
+import { t } from "@/lib/i18n";
 
 export const dynamic = "force-dynamic";
 
@@ -98,13 +100,14 @@ export default async function AdminProductos() {
       .catch(() => []),
     prisma.categorias.findMany({ orderBy: { orden: "asc" } }).catch(() => []),
   ]);
+  const locale = await getLocale();
 
   return (
     <div className="flex flex-col gap-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="section-title text-2xl">Productos</h1>
-          <p className="text-sm text-on-bg-muted">{productos.length} productos</p>
+          <h1 className="section-title text-2xl">{t(locale, "adm.products")}</h1>
+          <p className="text-sm text-on-bg-muted">{productos.length} {t(locale, "adm.sub.products")}</p>
         </div>
         <div className="flex gap-2">
           <ExportCsv

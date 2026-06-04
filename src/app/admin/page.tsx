@@ -29,6 +29,8 @@ import {
 } from "@/lib/data";
 import { prisma } from "@/lib/prisma";
 import { formatMXN, formatNumber, formatDateTime, serialize } from "@/lib/format";
+import { getLocale } from "@/lib/i18n-server";
+import { t } from "@/lib/i18n";
 
 export const dynamic = "force-dynamic";
 
@@ -56,6 +58,7 @@ export default async function AdminDashboard() {
   ]);
 
   const ticket = kpis.totalPedidos > 0 ? kpis.ventasTotal / kpis.totalPedidos : 0;
+  const locale = await getLocale();
 
   return (
     <div className="flex flex-col gap-6">
@@ -63,7 +66,7 @@ export default async function AdminDashboard() {
       <div className="csn-gradient flex flex-col gap-4 rounded-2xl border border-hairline p-5 sm:p-6">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h1 className="section-title text-2xl">Centro de control CSN</h1>
+            <h1 className="section-title text-2xl">{t(locale, "adm.dashTitle")}</h1>
             <p className="text-sm text-on-bg-muted">
               {new Date().toLocaleDateString("es-MX", {
                 weekday: "long",

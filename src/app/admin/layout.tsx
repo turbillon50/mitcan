@@ -3,6 +3,8 @@ import { UserButton } from "@clerk/nextjs";
 import AdminSidebar from "@/components/admin/AdminSidebar";
 import SettingsControls from "@/components/SettingsControls";
 import { requireAdmin } from "@/lib/auth";
+import { getLocale } from "@/lib/i18n-server";
+import { t } from "@/lib/i18n";
 
 export const dynamic = "force-dynamic";
 
@@ -32,6 +34,7 @@ export default async function AdminLayout({
   children: React.ReactNode;
 }) {
   const admin = await requireAdmin();
+  const locale = await getLocale();
 
   return (
     <div className="min-h-dvh bg-bg lg:flex">
@@ -39,7 +42,7 @@ export default async function AdminLayout({
       <div className="flex min-w-0 flex-1 flex-col">
         <header className="sticky top-0 z-30 hidden items-center justify-between border-b border-hairline bg-surface/80 px-6 py-3 backdrop-blur-xl lg:flex">
           <span className="text-sm font-medium text-on-bg-muted">
-            Panel de administración
+            {t(locale, "adm.topbar")}
           </span>
           <div className="flex items-center gap-3">
             <SettingsControls />
