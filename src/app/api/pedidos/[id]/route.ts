@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getCurrentDbUser, getStaffOrNull, isStaff } from "@/lib/auth";
+import { acreditarPuntos } from "@/lib/online";
 
 type Ctx = { params: Promise<{ id: string }> };
 
@@ -36,15 +37,15 @@ export async function PATCH(req: Request, { params }: Ctx) {
     data,
   });
 
-  // When an order is delivered, credit the earned points to the customer.
-  const ganados = pedido.puntos_ganados ?? 0;
-  if (b.estado === "entregado" && pedido.user_id && ganados > 0) {
-    await prisma.users
-      .update({
-        where: { id: pedido.user_id },
-        data: { puntos: { increment: ganados } },
-      })
-      .catch(() => null);
+  // Al entregar, acredita los puntos UNA SOLA VEZ (idempotente, vía puntos_movimientos),
+  // mismo helper que usa el admin para evitar doble acreditación.
+  if (b.estado === "entregado") {
+    await acreditarPuntos({
+      id: pedido.id,
+      user_id: pedido.user_id,
+      folio: pedido.folio,
+      puntos_ganados: pedido.puntos_ganados,
+    }).catch(() => null);
   }
 
   return NextResponse.json(pedido);
