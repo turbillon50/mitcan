@@ -1,0 +1,15 @@
+import { NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
+
+// Health check: verifica conexión a Neon con un SELECT 1.
+export async function GET() {
+  try {
+    await prisma.$queryRaw`SELECT 1`;
+    return NextResponse.json({ ok: true, db: "up", ts: new Date().toISOString() });
+  } catch {
+    return NextResponse.json(
+      { ok: false, db: "down", ts: new Date().toISOString() },
+      { status: 503 }
+    );
+  }
+}
