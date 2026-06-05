@@ -90,11 +90,28 @@ export default async function LandingPage() {
               <Link href={hero?.cta_href || "/sign-up"} className="btn-primary px-5 py-3 text-base">
                 {hero?.cta_text || "Únete gratis"} <ArrowRight size={18} />
               </Link>
-              <Link href="/catalogo" className="btn-ghost px-5 py-3 text-base">
-                Ver catálogo
+              <Link href="/pedido" className="btn-ghost px-5 py-3 text-base">
+                🛒 Pedido en línea
               </Link>
             </div>
           </SlideIn>
+        </div>
+      </section>
+
+      {/* PEDIDO EN LÍNEA */}
+      <section className="mx-auto max-w-6xl px-5 py-10">
+        <div className="card flex flex-col items-start gap-4 overflow-hidden p-6 md:flex-row md:items-center md:justify-between md:p-8">
+          <div>
+            <span className="chip chip-active mb-3">🛵 Nuevo</span>
+            <h2 className="section-title text-2xl md:text-3xl">Pedido en línea</h2>
+            <p className="mt-2 max-w-xl text-on-bg-muted">
+              Arma tu carrito por categorías, paga contra entrega y recíbelo en tu
+              domicilio en Tepic por solo $25 de envío. Acumula puntos en cada compra.
+            </p>
+          </div>
+          <Link href="/pedido" className="btn-primary shrink-0 px-6 py-3.5 text-base">
+            Pedir ahora <ArrowRight size={18} />
+          </Link>
         </div>
       </section>
 

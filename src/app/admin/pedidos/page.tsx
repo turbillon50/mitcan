@@ -12,7 +12,7 @@ import { updatePedidoEstado } from "../actions";
 
 export const dynamic = "force-dynamic";
 
-const ESTADO_OPTS = ESTADOS_PEDIDO.map((e) => ({
+const ESTADO_OPTS = ESTADOS_ADMIN.map((e) => ({
   value: e,
   label: ESTADO_LABEL[e],
 }));
@@ -23,7 +23,8 @@ export default async function AdminPedidos({
   searchParams: Promise<{ estado?: string; sucursal?: string; q?: string }>;
 }) {
   const sp = await searchParams;
-  const estado = sp.estado && ESTADOS_PEDIDO.includes(sp.estado as never) ? sp.estado : undefined;
+  const TODOS = [...new Set([...ESTADOS_ADMIN, ...ESTADOS_PEDIDO])];
+  const estado = sp.estado && TODOS.includes(sp.estado) ? sp.estado : undefined;
   const sucursalId = sp.sucursal ? parseInt(sp.sucursal) : undefined;
   const q = sp.q?.trim();
 

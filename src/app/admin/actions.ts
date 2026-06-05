@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { requireAdmin, isAdmin } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { registrarEvento, acreditarPuntos } from "@/lib/online";
 import { getMapboxToken, geocode } from "@/lib/mapbox";
 import { sendEmail, notificacionEmail } from "@/lib/resend";
 import { sendPushToAll, sendPushToUser } from "@/lib/push";
@@ -229,9 +230,41 @@ export async function deleteRecompensa(id: number) {
 /* ---------------- Pedidos ---------------- */
 export async function updatePedidoEstado(id: number, estado: string) {
   await requireAdmin();
-  await prisma.pedidos.update({ where: { id }, data: { estado } });
+  const esEntrega = estado === "ha_llegado" || estado === "entregado";
+  const pedido = await prisma.pedidos.update({
+    where: { id },
+    data: {
+      estado,
+      ...(esEntrega ? { entregado_at: new Date(), entrega_confirmada: true } : {}),
+    },
+  });
+  // Timeline + push + notificación al cliente (módulo en línea).
+  await registrarEvento(id, estado, {
+    userId: pedido.user_id,
+    folio: pedido.folio,
+  }).catch(() => null);
+  // Acreditar puntos al entregar (una sola vez).
+  if (esEntrega) {
+    await acreditarPuntos({
+      id: pedido.id,
+      user_id: pedido.user_id,
+      folio: pedido.folio,
+      puntos_ganados: pedido.puntos_ganados,
+    }).catch(() => null);
+  }
   revalidatePath("/admin/pedidos");
   revalidatePath("/admin");
+}
+
+/** Asignar repartidor a un pedido (texto libre o nombre de empleado). */
+export async function asignarRepartidor(id: number, repartidor: string) {
+  await requireAdmin();
+  await prisma.pedidos.update({
+    where: { id },
+    data: { repartidor: repartidor.trim() || null },
+  });
+  revalidatePath("/admin/pedidos");
+  revalidatePath(`/admin/pedidos/${id}`);
 }
 
 /* ---------------- Inventario (stock + precio por sucursal) ---------------- */

@@ -27,6 +27,9 @@ export default async function PublicHeader() {
         </Link>
 
         <nav className="hidden items-center gap-6 text-sm font-medium text-on-bg-muted md:flex">
+          <Link href="/pedido" className="font-semibold text-primary transition hover:brightness-110">
+            Pedido en línea
+          </Link>
           <Link href="/catalogo" className="transition hover:text-primary">
             {tr("nav.catalog")}
           </Link>

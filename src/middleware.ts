@@ -6,6 +6,9 @@ import { isValidAdminKey, ADMIN_COOKIE } from "@/lib/admin-key";
 const isPublicRoute = createRouteMatcher([
   "/",
   "/catalogo(.*)",
+  "/pedido",
+  "/pedido/c/(.*)",
+  "/pedido/carrito",
   "/sucursales(.*)",
   "/sign-in(.*)",
   "/sign-up(.*)",
@@ -13,7 +16,13 @@ const isPublicRoute = createRouteMatcher([
 ]);
 
 // Protected (need a Clerk session): /app/* (usuario) and /m/* (member scan).
-const isProtectedRoute = createRouteMatcher(["/app(.*)", "/m/(.*)"]);
+const isProtectedRoute = createRouteMatcher([
+  "/app(.*)",
+  "/m/(.*)",
+  "/pedido/checkout(.*)",
+  "/pedido/confirmado(.*)",
+  "/pedido/seguimiento(.*)",
+]);
 
 // Admin lives behind its own independent secret magic-link token, on top of the
 // Clerk role check done in the /admin layout.

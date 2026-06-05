@@ -2,14 +2,14 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Grid3x3, ShoppingBag, MapPin, Gift } from "lucide-react";
+import { Home, Grid3x3, ShoppingBag, ShoppingCart, Gift } from "lucide-react";
 import { useT } from "@/components/I18nProvider";
 
 const ITEMS = [
   { href: "/app/dashboard", key: "bn.home", icon: Home },
   { href: "/catalogo", key: "bn.catalog", icon: Grid3x3 },
+  { href: "/pedido", key: "bn.order", icon: ShoppingCart },
   { href: "/app/pedido", key: "bn.orders", icon: ShoppingBag },
-  { href: "/sucursales", key: "bn.branches", icon: MapPin },
   { href: "/app/recompensas", key: "bn.rewards", icon: Gift },
 ];
 

@@ -57,6 +57,20 @@ export const ESTADOS_PEDIDO = [
   "cancelado",
 ] as const;
 
+/** Estados del módulo PEDIDO EN LÍNEA (en orden de avance). */
+export const ESTADOS_ONLINE = [
+  "recibido",
+  "en_preparacion",
+  "entregado_repartidor",
+  "en_camino",
+  "ha_llegado",
+] as const;
+
+export const ESTADOS_ADMIN = [
+  ...ESTADOS_ONLINE,
+  "cancelado",
+] as const;
+
 export const ESTADO_LABEL: Record<string, string> = {
   nuevo: "Nuevo",
   pendiente: "Pendiente",
@@ -64,6 +78,10 @@ export const ESTADO_LABEL: Record<string, string> = {
   en_camino: "En camino",
   entregado: "Entregado",
   cancelado: "Cancelado",
+  recibido: "Recibido",
+  en_preparacion: "En preparación",
+  entregado_repartidor: "Con repartidor",
+  ha_llegado: "Ha llegado",
 };
 
 export const ESTADO_COLOR: Record<string, string> = {
@@ -73,4 +91,8 @@ export const ESTADO_COLOR: Record<string, string> = {
   en_camino: "bg-primary/15 text-primary border-primary/25",
   entregado: "bg-emerald-500/15 text-emerald-400 border-emerald-500/25",
   cancelado: "bg-rose-500/15 text-rose-400 border-rose-500/25",
+  recibido: "bg-amber-500/15 text-amber-400 border-amber-500/25",
+  en_preparacion: "bg-sky-500/15 text-sky-400 border-sky-500/25",
+  entregado_repartidor: "bg-violet-500/15 text-violet-400 border-violet-500/25",
+  ha_llegado: "bg-emerald-500/15 text-emerald-400 border-emerald-500/25",
 };

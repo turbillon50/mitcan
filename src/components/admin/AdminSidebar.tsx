@@ -58,6 +58,7 @@ const SECTIONS: { titleKey: string; items: Item[] }[] = [
   {
     titleKey: "adm.sec.system",
     items: [
+      { href: "/admin/estadisticas", key: "adm.stats", icon: BarChart3 },
       { href: "/admin/reportes", key: "adm.reports", icon: BarChart3 },
       { href: "/admin/usuarios", key: "adm.users", icon: Users },
       { href: "/admin/contenido", key: "adm.content", icon: LayoutDashboard },

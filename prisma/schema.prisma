@@ -52,12 +52,15 @@ model users {
   sucursal_id Int?
   puntos      Int?       @default(0)
   nivel       String?    @default("bronce")
+  direccion   String?
   created_at  DateTime?  @default(now()) @db.Timestamptz(6)
 
   sucursal       sucursales?      @relation(fields: [sucursal_id], references: [id])
   pedidos        pedidos[]
   redenciones    redenciones[]
   notificaciones notificaciones[]
+  encuestas      encuestas[]
+  puntos_movs    puntos_movimientos[]
 
   @@map("users")
 }
@@ -175,12 +178,22 @@ model pedidos {
   total          Decimal?  @db.Decimal
   puntos_ganados Int?      @default(0)
   notas          String?
+  tipo               String?   @default("mostrador") // mostrador | en_linea
+  envio              Decimal?  @default(0) @db.Decimal
+  metodo_pago        String?   @default("contra_entrega") // contra_entrega | tarjeta | transferencia | spei | qr (futuro)
+  direccion_entrega  String?
+  telefono_entrega   String?
+  repartidor         String?
+  entregado_at       DateTime? @db.Timestamptz(6)
+  entrega_confirmada Boolean?  @default(false)
   created_at     DateTime? @default(now()) @db.Timestamptz(6)
   updated_at     DateTime? @default(now()) @db.Timestamptz(6)
 
   user     users?         @relation(fields: [user_id], references: [id])
   sucursal sucursales?    @relation(fields: [sucursal_id], references: [id])
   items    pedido_items[]
+  eventos  pedido_eventos[]
+  encuesta encuestas?
 
   @@map("pedidos")
 }
@@ -240,4 +253,45 @@ model notificaciones {
   user users? @relation(fields: [user_id], references: [id])
 
   @@map("notificaciones")
+}
+
+model pedido_eventos {
+  id         Int       @id @default(autoincrement())
+  pedido_id  Int
+  estado     String
+  nota       String?
+  created_at DateTime? @default(now()) @db.Timestamptz(6)
+
+  pedido pedidos @relation(fields: [pedido_id], references: [id], onDelete: Cascade)
+
+  @@map("pedido_eventos")
+}
+
+model encuestas {
+  id          Int       @id @default(autoincrement())
+  pedido_id   Int       @unique
+  user_id     String?
+  completo    Boolean?
+  estrellas   Int?
+  comentarios String?
+  created_at  DateTime? @default(now()) @db.Timestamptz(6)
+
+  pedido pedidos @relation(fields: [pedido_id], references: [id], onDelete: Cascade)
+  user   users?  @relation(fields: [user_id], references: [id])
+
+  @@map("encuestas")
+}
+
+model puntos_movimientos {
+  id          Int       @id @default(autoincrement())
+  user_id     String
+  pedido_id   Int?
+  puntos      Int
+  tipo        String?   @default("compra")
+  descripcion String?
+  created_at  DateTime? @default(now()) @db.Timestamptz(6)
+
+  user users @relation(fields: [user_id], references: [id])
+
+  @@map("puntos_movimientos")
 }
