@@ -70,8 +70,18 @@ export async function saveSucursal(formData: FormData) {
 
 export async function deleteSucursal(id: number) {
   await requireAdmin();
-  await prisma.sucursales.delete({ where: { id } });
+  // Detach/clean dependent rows first so the FK constraints don't blow up.
+  await prisma.$transaction([
+    prisma.inventario.deleteMany({ where: { sucursal_id: id } }),
+    prisma.precios_sucursal.deleteMany({ where: { sucursal_id: id } }),
+    prisma.promociones.updateMany({ where: { sucursal_id: id }, data: { sucursal_id: null } }),
+    prisma.pedidos.updateMany({ where: { sucursal_id: id }, data: { sucursal_id: null } }),
+    prisma.users.updateMany({ where: { sucursal_id: id }, data: { sucursal_id: null } }),
+    prisma.content_blocks.deleteMany({ where: { key: `c4_cam_${id}` } }),
+    prisma.sucursales.delete({ where: { id } }),
+  ]);
   revalidatePath("/admin/sucursales");
+  revalidatePath("/admin/c4");
   revalidatePath("/sucursales");
 }
 
@@ -160,8 +170,16 @@ export async function replicarInventario(fromSucursalId: number, soloVacias = tr
 
 export async function deleteProducto(id: number) {
   await requireAdmin();
-  await prisma.productos.delete({ where: { id } });
+  // Detach/clean dependent rows first so the FK constraints don't blow up.
+  await prisma.$transaction([
+    prisma.inventario.deleteMany({ where: { producto_id: id } }),
+    prisma.precios_sucursal.deleteMany({ where: { producto_id: id } }),
+    prisma.promociones.updateMany({ where: { producto_id: id }, data: { producto_id: null } }),
+    prisma.pedido_items.updateMany({ where: { producto_id: id }, data: { producto_id: null } }),
+    prisma.productos.delete({ where: { id } }),
+  ]);
   revalidatePath("/admin/productos");
+  revalidatePath("/admin/c4");
   revalidatePath("/catalogo");
 }
 
