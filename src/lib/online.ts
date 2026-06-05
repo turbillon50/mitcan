@@ -4,7 +4,6 @@ import { sendPushToUser } from "./push";
 /** Módulo PEDIDO EN LÍNEA — constantes y helpers compartidos. */
 
 export { ENVIO_FIJO, TEL_PEDIDOS, TEL_PEDIDOS_DISPLAY, ESTADOS_ONLINE } from "./online-const";
-import { ENVIO_FIJO as _ENVIO } from "./online-const";
 
 export const PUSH_POR_ESTADO: Record<string, { title: string; body: string }> = {
   recibido: { title: "Pedido recibido 🥩", body: "Tu pedido fue recibido y está en cola." },

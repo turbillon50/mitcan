@@ -4,6 +4,7 @@ import {
   formatMXN,
   formatDateTime,
   ESTADOS_PEDIDO,
+  ESTADOS_ADMIN,
   ESTADO_LABEL,
 } from "@/lib/format";
 import InlineSelect from "@/components/admin/InlineSelect";
@@ -23,7 +24,7 @@ export default async function AdminPedidos({
   searchParams: Promise<{ estado?: string; sucursal?: string; q?: string }>;
 }) {
   const sp = await searchParams;
-  const TODOS = [...new Set([...ESTADOS_ADMIN, ...ESTADOS_PEDIDO])];
+  const TODOS: string[] = [...new Set<string>([...ESTADOS_ADMIN, ...ESTADOS_PEDIDO])];
   const estado = sp.estado && TODOS.includes(sp.estado) ? sp.estado : undefined;
   const sucursalId = sp.sucursal ? parseInt(sp.sucursal) : undefined;
   const q = sp.q?.trim();
