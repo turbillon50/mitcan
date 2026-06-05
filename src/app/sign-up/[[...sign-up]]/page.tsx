@@ -1,6 +1,7 @@
 import { SignUp } from "@clerk/nextjs";
 import Link from "next/link";
 import Image from "next/image";
+import { SlideIn } from "@/components/motion";
 
 export default function SignUpPage() {
   return (
@@ -8,7 +9,7 @@ export default function SignUpPage() {
       <Link href="/" className="flex items-center gap-2">
         <Image src="/assets/logo-badge.png" alt="CSN" width={56} height={48} />
       </Link>
-      <SignUp fallbackRedirectUrl="/app/dashboard" signInUrl="/sign-in" />
+      <SlideIn from="bottom"><SignUp fallbackRedirectUrl="/app/onboarding" signInUrl="/sign-in" /></SlideIn>
     </div>
   );
 }

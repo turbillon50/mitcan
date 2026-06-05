@@ -5,6 +5,7 @@ import { requireAdmin, isAdmin } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getMapboxToken, geocode } from "@/lib/mapbox";
 import { sendEmail, notificacionEmail } from "@/lib/resend";
+import { sendPushToAll, sendPushToUser } from "@/lib/push";
 import type { user_role } from "@prisma/client";
 
 function num(v: FormDataEntryValue | null, def = 0) {
@@ -329,6 +330,14 @@ export async function enviarNotificacion(formData: FormData) {
       await Promise.allSettled(
         emails.map((to) => sendEmail({ to, subject: titulo, html }))
       );
+    }
+
+    // Best-effort web push (no-op until VAPID keys are configured).
+    const payload = { title: titulo, body: mensaje, url: "/app/notificaciones" };
+    if (destino && recipients[0]) {
+      await sendPushToUser(recipients[0].id, payload).catch(() => null);
+    } else {
+      await sendPushToAll(payload).catch(() => null);
     }
   }
   revalidatePath("/admin/notificaciones");

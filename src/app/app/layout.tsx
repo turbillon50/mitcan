@@ -6,6 +6,7 @@ import BottomNav from "@/components/BottomNav";
 import SettingsControls from "@/components/SettingsControls";
 import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { PageTransition } from "@/components/motion";
 
 export const dynamic = "force-dynamic";
 
@@ -51,7 +52,9 @@ export default async function AppLayout({
         </div>
       </header>
 
-      <main className="mx-auto max-w-3xl px-5 py-6">{children}</main>
+      <main className="mx-auto max-w-3xl px-5 py-6">
+        <PageTransition>{children}</PageTransition>
+      </main>
       <BottomNav />
     </div>
   );

@@ -27,13 +27,15 @@
     "recharts": "^2.15.0",
     "resend": "^4.1.0",
     "stripe": "^17.5.0",
-    "svix": "^1.45.0"
+    "svix": "^1.45.0",
+    "web-push": "^3.6.7"
   },
   "devDependencies": {
     "@types/mapbox-gl": "^3.4.0",
     "@types/node": "^22.10.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
+    "@types/web-push": "^3.6.4",
     "autoprefixer": "^10.4.20",
     "postcss": "^8.5.0",
     "prisma": "^6.5.0",

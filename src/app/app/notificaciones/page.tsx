@@ -4,6 +4,7 @@ import { requireUser } from "@/lib/auth";
 import { formatDateTime } from "@/lib/format";
 import { getLocale } from "@/lib/i18n-server";
 import { t } from "@/lib/i18n";
+import PushToggle from "@/components/PushToggle";
 
 export const dynamic = "force-dynamic";
 
@@ -36,6 +37,8 @@ export default async function NotificacionesPage() {
         <h1 className="section-title text-2xl">{t(locale, "notif.title")}</h1>
         <p className="text-sm text-on-bg-muted">{t(locale, "notif.subtitle")}</p>
       </div>
+
+      <PushToggle />
 
       {notis.length === 0 ? (
         <div className="card flex flex-col items-center gap-3 py-16 text-center">

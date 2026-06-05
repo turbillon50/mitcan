@@ -4,6 +4,7 @@ import { esES } from "@clerk/localizations";
 import "./globals.css";
 import { I18nProvider } from "@/components/I18nProvider";
 import { getLocale } from "@/lib/i18n-server";
+import ServiceWorkerRegistrar from "@/components/ServiceWorkerRegistrar";
 
 const THEME_SCRIPT = `(function(){try{if(localStorage.getItem('csn-theme')==='dark'){document.documentElement.classList.add('dark')}}catch(e){}})();`;
 
@@ -13,6 +14,11 @@ export const metadata: Metadata = {
     "CSN Carnes Selectas Nayarit — club de recompensas, catálogo y sucursales en Nayarit, Sinaloa y Jalisco.",
   manifest: "/manifest.webmanifest",
   metadataBase: new URL("https://carnesn.ink"),
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "CSN",
+  },
   icons: {
     icon: [
       { url: "/icons/favicon.svg", type: "image/svg+xml" },
@@ -41,7 +47,7 @@ export default async function RootLayout({
       signInUrl="/sign-in"
       signUpUrl="/sign-up"
       signInFallbackRedirectUrl="/app/dashboard"
-      signUpFallbackRedirectUrl="/app/dashboard"
+      signUpFallbackRedirectUrl="/app/onboarding"
       afterSignOutUrl="/"
       appearance={{
         variables: {
@@ -67,6 +73,7 @@ export default async function RootLayout({
         </head>
         <body>
           <I18nProvider locale={locale}>{children}</I18nProvider>
+          <ServiceWorkerRegistrar />
         </body>
       </html>
     </ClerkProvider>

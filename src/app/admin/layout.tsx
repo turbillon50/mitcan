@@ -5,6 +5,7 @@ import SettingsControls from "@/components/SettingsControls";
 import { requireAdmin } from "@/lib/auth";
 import { getLocale } from "@/lib/i18n-server";
 import { t } from "@/lib/i18n";
+import { PageTransition } from "@/components/motion";
 
 export const dynamic = "force-dynamic";
 
@@ -56,7 +57,7 @@ export default async function AdminLayout({
           </div>
         </header>
         <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-6 lg:px-8 lg:py-8">
-          {children}
+          <PageTransition>{children}</PageTransition>
         </main>
       </div>
     </div>
