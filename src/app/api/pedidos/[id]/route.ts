@@ -4,16 +4,6 @@ import { getCurrentDbUser, getStaffOrNull, isStaff } from "@/lib/auth";
 
 type Ctx = { params: Promise<{ id: string }> };
 
-// Estados válidos del ciclo de vida de un pedido.
-const ESTADOS = [
-  "nuevo",
-  "confirmado",
-  "preparando",
-  "en_camino",
-  "entregado",
-  "cancelado",
-] as const;
-
 export async function GET(_req: Request, { params }: Ctx) {
   const user = await getCurrentDbUser();
   if (!user) return NextResponse.json({ error: "No autenticado" }, { status: 401 });
@@ -35,32 +25,20 @@ export async function PATCH(req: Request, { params }: Ctx) {
   const staff = await getStaffOrNull();
   if (!staff) return NextResponse.json({ error: "No autorizado" }, { status: 403 });
   const { id } = await params;
-  const pedidoId = parseInt(id);
-  if (!Number.isInteger(pedidoId)) {
-    return NextResponse.json({ error: "Pedido inválido" }, { status: 400 });
-  }
-  const b = await req.json().catch(() => ({}));
-
-  // Estado actual para detectar transiciones (evita acreditar puntos dos veces).
-  const actual = await prisma.pedidos.findUnique({ where: { id: pedidoId } });
-  if (!actual) return NextResponse.json({ error: "No encontrado" }, { status: 404 });
+  const b = await req.json();
 
   const data: Record<string, unknown> = {};
-  if (typeof b.estado === "string") {
-    if (!ESTADOS.includes(b.estado as (typeof ESTADOS)[number])) {
-      return NextResponse.json({ error: "Estado inválido" }, { status: 400 });
-    }
-    data.estado = b.estado;
-  }
+  if (typeof b.estado === "string") data.estado = b.estado;
   if (typeof b.notas === "string") data.notas = b.notas;
 
-  const pedido = await prisma.pedidos.update({ where: { id: pedidoId }, data });
+  const pedido = await prisma.pedidos.update({
+    where: { id: parseInt(id) },
+    data,
+  });
 
-  // Acredita puntos solo en la TRANSICIÓN a "entregado" (no si ya estaba entregado).
+  // When an order is delivered, credit the earned points to the customer.
   const ganados = pedido.puntos_ganados ?? 0;
-  const transicionAEntregado =
-    b.estado === "entregado" && actual.estado !== "entregado";
-  if (transicionAEntregado && pedido.user_id && ganados > 0) {
+  if (b.estado === "entregado" && pedido.user_id && ganados > 0) {
     await prisma.users
       .update({
         where: { id: pedido.user_id },
