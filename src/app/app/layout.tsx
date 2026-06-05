@@ -22,7 +22,7 @@ export default async function AppLayout({
 
   return (
     <div className="min-h-dvh pb-24 md:pb-8">
-      <header className="sticky top-0 z-40 border-b border-hairline bg-bg/80 backdrop-blur-xl">
+      <header className="sticky top-0 z-40 border-b border-hairline bg-bg/80 backdrop-blur-xl" style={{ paddingTop: "env(safe-area-inset-top, 0px)" }}>
         <div className="mx-auto flex h-16 max-w-3xl items-center justify-between px-5">
           <Link href="/app/dashboard" className="flex items-center gap-2">
             <Image

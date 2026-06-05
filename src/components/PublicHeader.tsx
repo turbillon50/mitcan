@@ -11,7 +11,7 @@ export default async function PublicHeader() {
   const tr = (k: string) => t(locale, k);
 
   return (
-    <header className="sticky top-0 z-40 border-b border-hairline bg-bg/80 backdrop-blur-xl">
+    <header className="sticky top-0 z-40 border-b border-hairline bg-bg/80 backdrop-blur-xl" style={{ paddingTop: "env(safe-area-inset-top, 0px)" }}>
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-5">
         <Link href="/" className="flex items-center gap-2" aria-label="CSN">
           <Image
