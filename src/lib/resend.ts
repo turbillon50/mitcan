@@ -26,7 +26,7 @@ export async function sendEmail(opts: {
 
 /* ---------- Plantilla "pro" reutilizable (tablas + estilos inline) ---------- */
 const ROJO = "#C41E3A";
-const DORADO = "#D4A853";
+const DORADO = "#A8172E"; // rojo CSN profundo (cero dorado)
 const CREMA = "#F5F0E8";
 const NEGRO = "#1a1a1a";
 const MUTED = "#6B5E54";

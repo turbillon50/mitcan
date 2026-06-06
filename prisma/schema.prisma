@@ -18,6 +18,7 @@ enum user_role {
   gerente
   empleado
   cliente
+  repartidor
 }
 
 model sucursales {
@@ -61,8 +62,25 @@ model users {
   notificaciones notificaciones[]
   encuestas      encuestas[]
   puntos_movs    puntos_movimientos[]
+  mensajes       mensajes[]
 
   @@map("users")
+}
+
+model mensajes {
+  id            Int       @id @default(autoincrement())
+  user_id       String // cliente dueño de la conversación
+  remitente     String // 'admin' | 'cliente'
+  cuerpo        String
+  autor_nombre  String?
+  leido_admin   Boolean?  @default(false)
+  leido_cliente Boolean?  @default(false)
+  created_at    DateTime? @default(now()) @db.Timestamptz(6)
+
+  user users @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([user_id, created_at])
+  @@map("mensajes")
 }
 
 model categorias {
@@ -183,7 +201,9 @@ model pedidos {
   metodo_pago        String?   @default("contra_entrega") // contra_entrega | tarjeta | transferencia | spei | qr (futuro)
   direccion_entrega  String?
   telefono_entrega   String?
-  repartidor         String?
+  repartidor         String?   // nombre mostrado del repartidor
+  repartidor_id      String?   // users.id del repartidor asignado
+  asignado_at        DateTime? @db.Timestamptz(6)
   entregado_at       DateTime? @db.Timestamptz(6)
   entrega_confirmada Boolean?  @default(false)
   created_at     DateTime? @default(now()) @db.Timestamptz(6)

@@ -8,6 +8,7 @@ export { ENVIO_FIJO, TEL_PEDIDOS, TEL_PEDIDOS_DISPLAY, ESTADOS_ONLINE } from "./
 export const PUSH_POR_ESTADO: Record<string, { title: string; body: string }> = {
   recibido: { title: "Pedido recibido 🥩", body: "Tu pedido fue recibido y está en cola." },
   en_preparacion: { title: "En preparación 🔪", body: "Estamos preparando tu pedido." },
+  asignado: { title: "Repartidor asignado 🛵", body: "Un repartidor en moto fue asignado a tu pedido." },
   entregado_repartidor: { title: "Listo para salir 📦", body: "Tu pedido fue entregado al repartidor." },
   en_camino: { title: "En camino 🛵", body: "Tu pedido va en camino a tu dirección." },
   ha_llegado: { title: "¡Ha llegado! 🎉", body: "Tu pedido llegó. ¡Gracias por tu compra!" },
@@ -22,6 +23,15 @@ export const PUSH_POR_ESTADO: Record<string, { title: string; body: string }> = 
 let ensured = false;
 export async function ensureOnlineSchema() {
   if (ensured) return;
+  // Nuevo rol 'repartidor'. ALTER TYPE ... ADD VALUE no corre dentro de una
+  // transacción; va aparte y es idempotente.
+  try {
+    await prisma.$executeRawUnsafe(
+      `ALTER TYPE user_role ADD VALUE IF NOT EXISTS 'repartidor'`
+    );
+  } catch {
+    /* ya existe o el tipo aún no está — inofensivo */
+  }
   const stmts = [
     `ALTER TABLE pedidos ADD COLUMN IF NOT EXISTS tipo text DEFAULT 'mostrador'`,
     `ALTER TABLE pedidos ADD COLUMN IF NOT EXISTS envio numeric DEFAULT 0`,
@@ -29,9 +39,23 @@ export async function ensureOnlineSchema() {
     `ALTER TABLE pedidos ADD COLUMN IF NOT EXISTS direccion_entrega text`,
     `ALTER TABLE pedidos ADD COLUMN IF NOT EXISTS telefono_entrega text`,
     `ALTER TABLE pedidos ADD COLUMN IF NOT EXISTS repartidor text`,
+    `ALTER TABLE pedidos ADD COLUMN IF NOT EXISTS repartidor_id text`,
+    `ALTER TABLE pedidos ADD COLUMN IF NOT EXISTS asignado_at timestamptz`,
     `ALTER TABLE pedidos ADD COLUMN IF NOT EXISTS entregado_at timestamptz`,
     `ALTER TABLE pedidos ADD COLUMN IF NOT EXISTS entrega_confirmada boolean DEFAULT false`,
     `ALTER TABLE users   ADD COLUMN IF NOT EXISTS direccion text`,
+    // Centro de mensajes admin <-> cliente (P4).
+    `CREATE TABLE IF NOT EXISTS mensajes (
+       id serial PRIMARY KEY,
+       user_id text NOT NULL,
+       remitente text NOT NULL,
+       cuerpo text NOT NULL,
+       autor_nombre text,
+       leido_admin boolean DEFAULT false,
+       leido_cliente boolean DEFAULT false,
+       created_at timestamptz DEFAULT now()
+     )`,
+    `CREATE INDEX IF NOT EXISTS mensajes_user_idx ON mensajes(user_id, created_at)`,
     `CREATE TABLE IF NOT EXISTS pedido_eventos (
        id serial PRIMARY KEY,
        pedido_id int NOT NULL,

@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { requireAdmin, isAdmin } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { registrarEvento, acreditarPuntos } from "@/lib/online";
-import { getMapboxToken, geocode } from "@/lib/mapbox";
+import { getMapboxToken, geocode, inServiceArea } from "@/lib/mapbox";
 import { sendEmail, notificacionEmail } from "@/lib/resend";
 import { sendPushToAll, sendPushToUser } from "@/lib/push";
 import type { user_role } from "@prisma/client";
@@ -40,16 +40,41 @@ export async function saveSucursal(formData: FormData) {
   let lat: number | null = formData.get("lat") ? num(formData.get("lat")) : null;
   let lng: number | null = formData.get("lng") ? num(formData.get("lng")) : null;
 
-  // Auto-geocode when coordinates aren't provided but we have something to locate.
-  if ((lat == null || lng == null)) {
+  // Reject manually-entered coordinates that fall outside the CSN service area
+  // (Nayarit / Mazatlán / Vallarta). Prevents a typo or stale value from
+  // putting a branch "fuera de área".
+  if (lat != null && lng != null && !inServiceArea(lat, lng)) {
+    lat = null;
+    lng = null;
+  }
+
+  // Auto-geocode ONLY when no valid coordinates were captured with the map
+  // picker. The geocoder is biased to the service area and refuses out-of-area
+  // hits, so an ambiguous address can no longer drift to Guadalajara.
+  if (lat == null || lng == null) {
     const token = getMapboxToken();
-    const query = direccion ?? `${nombre}, ${area}, Nayarit, México`;
+    const query = direccion
+      ? `${direccion}, Nayarit, México`
+      : `${nombre}, ${area}, Nayarit, México`;
     if (token && query) {
       const geo = await geocode(query, token);
-      if (geo) {
+      if (geo && inServiceArea(geo.lat, geo.lng)) {
         lat = geo.lat;
         lng = geo.lng;
       }
+    }
+  }
+
+  // Never overwrite a previously-valid location with an out-of-area guess: if we
+  // still couldn't resolve a valid point on edit, keep whatever the row had.
+  if (id && (lat == null || lng == null)) {
+    const prev = await prisma.sucursales.findUnique({
+      where: { id },
+      select: { lat: true, lng: true },
+    });
+    if (prev && inServiceArea(Number(prev.lat), Number(prev.lng))) {
+      lat = Number(prev.lat);
+      lng = Number(prev.lng);
     }
   }
 
@@ -68,6 +93,54 @@ export async function saveSucursal(formData: FormData) {
   revalidatePath("/admin/sucursales");
   revalidatePath("/admin/c4");
   revalidatePath("/sucursales");
+}
+
+/**
+ * Audita TODAS las sucursales: detecta coordenadas fuera del área de servicio
+ * (las que "andan fuera de área") y las re-geocodifica desde su dirección con
+ * sesgo regional. Idempotente y seguro: solo toca filas inválidas.
+ */
+export async function auditarUbicaciones() {
+  await requireAdmin();
+  const token = getMapboxToken();
+  const sucursales = await prisma.sucursales.findMany({ orderBy: { id: "asc" } });
+  const corregidas: { id: number; nombre: string; antes: string; ahora: string }[] = [];
+  const sinResolver: { id: number; nombre: string }[] = [];
+
+  for (const s of sucursales) {
+    const lat = s.lat != null ? Number(s.lat) : null;
+    const lng = s.lng != null ? Number(s.lng) : null;
+    if (inServiceArea(lat, lng)) continue; // ya está dentro del área
+
+    let nueva: { lat: number; lng: number } | null = null;
+    if (token) {
+      const query = s.direccion
+        ? `${s.direccion}, Nayarit, México`
+        : `${s.nombre}, ${s.area ?? ""}, Nayarit, México`;
+      const geo = await geocode(query, token);
+      if (geo && inServiceArea(geo.lat, geo.lng)) nueva = geo;
+    }
+
+    if (nueva) {
+      await prisma.sucursales.update({
+        where: { id: s.id },
+        data: { lat: nueva.lat, lng: nueva.lng },
+      });
+      corregidas.push({
+        id: s.id,
+        nombre: s.nombre,
+        antes: `${lat ?? "—"}, ${lng ?? "—"}`,
+        ahora: `${nueva.lat.toFixed(5)}, ${nueva.lng.toFixed(5)}`,
+      });
+    } else {
+      sinResolver.push({ id: s.id, nombre: s.nombre });
+    }
+  }
+
+  revalidatePath("/admin/sucursales");
+  revalidatePath("/admin/c4");
+  revalidatePath("/sucursales");
+  return { ok: true, total: sucursales.length, corregidas, sinResolver };
 }
 
 export async function deleteSucursal(id: number) {
@@ -256,15 +329,46 @@ export async function updatePedidoEstado(id: number, estado: string) {
   revalidatePath("/admin");
 }
 
-/** Asignar repartidor a un pedido (texto libre o nombre de empleado). */
-export async function asignarRepartidor(id: number, repartidor: string) {
+/** Asignar un repartidor (moto) a un pedido. Guarda el usuario repartidor y su
+ *  nombre, marca la asignación y notifica al cliente. */
+export async function asignarRepartidor(
+  id: number,
+  repartidorId: string,
+  nombre?: string
+) {
   await requireAdmin();
-  await prisma.pedidos.update({
+  const repId = repartidorId.trim() || null;
+
+  let display = nombre?.trim() || null;
+  if (repId && !display) {
+    const rep = await prisma.users.findUnique({
+      where: { id: repId },
+      select: { nombre: true, email: true },
+    });
+    display = rep?.nombre ?? rep?.email ?? null;
+  }
+
+  const pedido = await prisma.pedidos.update({
     where: { id },
-    data: { repartidor: repartidor.trim() || null },
+    data: {
+      repartidor_id: repId,
+      repartidor: display,
+      asignado_at: repId ? new Date() : null,
+    },
   });
+
+  // Avisar al cliente que ya hay repartidor en camino de salir.
+  if (repId) {
+    await registrarEvento(id, "asignado", {
+      userId: pedido.user_id,
+      folio: pedido.folio,
+      nota: display ? `Repartidor: ${display}` : null,
+    }).catch(() => null);
+  }
+
   revalidatePath("/admin/pedidos");
   revalidatePath(`/admin/pedidos/${id}`);
+  revalidatePath("/app/repartidor");
 }
 
 /* ---------------- Inventario (stock + precio por sucursal) ---------------- */

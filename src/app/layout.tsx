@@ -51,7 +51,7 @@ export default async function RootLayout({
       afterSignOutUrl="/"
       appearance={{
         variables: {
-          colorPrimary: "#E87020",
+          colorPrimary: "#C41E3A",
           colorBackground: "#ffffff",
           colorInputBackground: "#ffffff",
           colorText: "#1A0A05",

@@ -17,7 +17,7 @@ body {
   --surface-3: 229 220 205; /* #E5DCCD */
 
   --primary: 196 30 58; /* #C41E3A rojo CSN */
-  --accent: 212 168 83; /* #D4A853 dorado */
+  --accent: 168 23 46; /* #A8172E rojo CSN profundo (cero dorado) */
   --on-primary: 255 255 255;
 
   --on-bg: 26 26 26; /* #1a1a1a negro */
@@ -40,7 +40,7 @@ html.dark {
   --surface-3: 58 49 41; /* #3A3129 */
 
   --primary: 226 74 98; /* rojo CSN un poco más claro para contraste */
-  --accent: 220 178 96; /* dorado */
+  --accent: 240 110 130; /* rojo CSN claro como acento (cero dorado) */
   --on-primary: 255 255 255;
 
   --on-bg: 245 240 232; /* crema clara */
@@ -119,14 +119,14 @@ body {
   scrollbar-width: none;
 }
 
-/* gradient utility used by hero / membership — crema + dorado cálido */
+/* gradient utility used by hero / membership — crema + rojo CSN (cero dorado) */
 .csn-gradient {
-  background: radial-gradient(circle at 22% 0%, rgba(212, 168, 83, 0.18), transparent 55%),
+  background: radial-gradient(circle at 22% 0%, rgba(196, 30, 58, 0.12), transparent 55%),
     radial-gradient(circle at 90% 10%, rgba(196, 30, 58, 0.08), transparent 45%),
     linear-gradient(160deg, #faf6ee 0%, #ffffff 65%);
 }
 html.dark .csn-gradient {
-  background: radial-gradient(circle at 22% 0%, rgba(212, 168, 83, 0.14), transparent 55%),
-    radial-gradient(circle at 90% 10%, rgba(226, 74, 98, 0.12), transparent 45%),
+  background: radial-gradient(circle at 22% 0%, rgba(226, 74, 98, 0.14), transparent 55%),
+    radial-gradient(circle at 90% 10%, rgba(226, 74, 98, 0.10), transparent 45%),
     linear-gradient(160deg, #1b1713 0%, #14110e 65%);
 }

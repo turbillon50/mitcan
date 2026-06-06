@@ -1,4 +1,4 @@
-import { Bell, Tag, Gift, ShoppingBag, Megaphone } from "lucide-react";
+import { Bell, Tag, Gift, ShoppingBag, Megaphone, MessageCircle } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/auth";
 import { formatDateTime } from "@/lib/format";
@@ -12,6 +12,7 @@ const ICON: Record<string, typeof Bell> = {
   promo: Tag,
   puntos: Gift,
   pedido: ShoppingBag,
+  mensaje: MessageCircle,
   general: Megaphone,
 };
 

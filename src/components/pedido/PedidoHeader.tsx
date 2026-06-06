@@ -51,7 +51,7 @@ export default function PedidoHeader() {
           >
             <ShoppingCart size={17} />
             {ready && count > 0 && (
-              <span className="absolute -right-1 -top-1 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-accent px-1 text-[10px] font-bold text-negro">
+              <span className="absolute -right-1 -top-1 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-accent px-1 text-[10px] font-bold text-white">
                 {count > 99 ? "99+" : count}
               </span>
             )}

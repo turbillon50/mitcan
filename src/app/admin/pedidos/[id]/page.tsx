@@ -37,15 +37,17 @@ export default async function AdminPedidoDetalle({
     })
     .catch(() => null);
 
-  const empleados = await prisma.users
-    .findMany({ where: { rol: "empleado" }, select: { nombre: true } })
-    .catch(() => [] as { nombre: string | null }[]);
-  const repartidores = [
-    ...new Set([
-      ...empleados.map((e) => e.nombre).filter((n): n is string => Boolean(n)),
-      ...(pedido?.repartidor ? [pedido.repartidor] : []),
-    ]),
-  ];
+  const repUsers = await prisma.users
+    .findMany({
+      where: { rol: { in: ["repartidor", "empleado"] } },
+      select: { id: true, nombre: true, email: true },
+      orderBy: { nombre: "asc" },
+    })
+    .catch(() => [] as { id: string; nombre: string | null; email: string | null }[]);
+  const repartidores = repUsers.map((u) => ({
+    id: u.id,
+    nombre: u.nombre ?? u.email ?? "Repartidor",
+  }));
 
   if (!pedido) {
     return (
@@ -116,11 +118,11 @@ export default async function AdminPedidoDetalle({
               )}
               <RepartidorForm
                 pedidoId={pedido.id}
-                inicial={pedido.repartidor ?? ""}
+                inicialId={pedido.repartidor_id ?? ""}
                 repartidores={repartidores}
-                action={async (id, rep) => {
+                action={async (id, repId, nombre) => {
                   "use server";
-                  await asignarRepartidor(id, rep);
+                  await asignarRepartidor(id, repId, nombre);
                 }}
               />
             </>

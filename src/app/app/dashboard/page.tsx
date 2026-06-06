@@ -1,6 +1,6 @@
 import Link from "next/link";
-import { ChevronRight, Flame, QrCode } from "lucide-react";
-import { getCurrentDbUser } from "@/lib/auth";
+import { ChevronRight, Flame, QrCode, Bike, MessageCircle } from "lucide-react";
+import { getCurrentDbUser, isRepartidor } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getRecompensas } from "@/lib/data";
 import { formatNumber, formatMXN, serialize } from "@/lib/format";
@@ -52,8 +52,42 @@ export default async function DashboardPage() {
 
   const promos = serialize(recompensas.slice(0, 5));
 
+  const repartidor = isRepartidor(user?.rol);
+
   return (
     <div className="flex flex-col gap-7">
+      {/* Acceso rápido para repartidores (moto) */}
+      {repartidor && (
+        <Link
+          href="/app/repartidor"
+          className="card flex items-center gap-3 border-primary/30 bg-primary/5 p-4"
+        >
+          <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+            <Bike size={22} />
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="font-bold">Panel de repartidor</p>
+            <p className="text-sm text-on-bg-muted">Ver mis entregas asignadas</p>
+          </div>
+          <ChevronRight size={18} className="text-on-bg-muted" />
+        </Link>
+      )}
+
+      {/* Centro de mensajes con la tienda */}
+      <Link
+        href="/app/mensajes"
+        className="card flex items-center gap-3 p-4"
+      >
+        <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+          <MessageCircle size={22} />
+        </div>
+        <div className="min-w-0 flex-1">
+          <p className="font-bold">Mensajes</p>
+          <p className="text-sm text-on-bg-muted">Habla directo con CSN</p>
+        </div>
+        <ChevronRight size={18} className="text-on-bg-muted" />
+      </Link>
+
       {/* Greeting + points */}
       <section className="csn-gradient rounded-3xl border border-hairline p-6">
         <h1 className="font-display text-2xl font-bold">

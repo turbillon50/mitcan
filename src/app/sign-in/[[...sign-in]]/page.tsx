@@ -3,6 +3,9 @@ import Link from "next/link";
 import Image from "next/image";
 import { SlideIn } from "@/components/motion";
 
+// Render fresh per request; the form carries no SSR session state or defaults.
+export const dynamic = "force-dynamic";
+
 export default function SignInPage() {
   return (
     <div className="csn-gradient flex min-h-dvh flex-col items-center justify-center gap-6 px-5 py-12">

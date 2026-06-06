@@ -9,7 +9,7 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // CSN dark theme — surface #131313, primary #ffb77d, accent #ff8c00
+        // CSN — paleta de marca aprobada: rojo + crema (CERO dorado).
         bg: "rgb(var(--bg) / <alpha-value>)",
         surface: "rgb(var(--surface) / <alpha-value>)",
         "surface-2": "rgb(var(--surface-2) / <alpha-value>)",
@@ -20,12 +20,11 @@ const config: Config = {
         "on-bg-muted": "rgb(var(--on-bg-muted) / <alpha-value>)",
         "on-primary": "rgb(var(--on-primary) / <alpha-value>)",
         hairline: "rgb(var(--hairline) / 0.12)",
-        dorado: "#D4A853",
         negro: "#1a1a1a",
         brand: {
-          orange: "#ff8c00",
-          peach: "#ffb77d",
-          red: "#cc2b18",
+          red: "#C41E3A",
+          redDeep: "#A8172E",
+          crema: "#F5F0E8",
         },
       },
       fontFamily: {
@@ -39,7 +38,7 @@ const config: Config = {
       },
       boxShadow: {
         card: "0 12px 28px -14px rgba(100,30,15,0.18), 0 2px 6px -3px rgba(100,30,15,0.08)",
-        glow: "0 0 18px rgba(232,112,32,0.30)",
+        glow: "0 0 18px rgba(196,30,58,0.28)",
       },
       keyframes: {
         "fade-in": {

@@ -12,6 +12,7 @@ const ROL_OPTS = [
   { value: "admin", label: "Administrador" },
   { value: "gerente", label: "Gerente" },
   { value: "empleado", label: "Empleado" },
+  { value: "repartidor", label: "Repartidor" },
   { value: "cliente", label: "Cliente" },
 ];
 
@@ -19,6 +20,7 @@ const ROL_COLOR: Record<string, string> = {
   admin: "chip-active",
   gerente: "chip-active",
   empleado: "",
+  repartidor: "chip-active",
   cliente: "",
 };
 

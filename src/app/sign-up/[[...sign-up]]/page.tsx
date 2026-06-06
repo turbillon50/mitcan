@@ -3,6 +3,11 @@ import Link from "next/link";
 import Image from "next/image";
 import { SlideIn } from "@/components/motion";
 
+// SECURITY: render fresh on every request so the registration form is never
+// served with any cached/serialized session state. It carries NO defaultValue,
+// no query-param prefill and no SSR credentials — the form always starts empty.
+export const dynamic = "force-dynamic";
+
 export default function SignUpPage() {
   return (
     <div className="csn-gradient flex min-h-dvh flex-col items-center justify-center gap-6 px-5 py-12">

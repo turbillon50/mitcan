@@ -44,8 +44,10 @@ export default clerkMiddleware(async (auth, req) => {
     const { userId } = await auth();
     if (!userId) {
       const signIn = new URL("/sign-in", req.url);
-      const target = url.pathname + (provided ? `?k=${provided}` : "");
-      signIn.searchParams.set("redirect_url", target);
+      // SECURITY: never echo the secret token (`k`) into redirect_url — that
+      // would leak admin access to anyone the URL is shared with. Persist it as
+      // an httpOnly cookie instead and redirect to a clean path.
+      signIn.searchParams.set("redirect_url", url.pathname);
       const res = NextResponse.redirect(signIn);
       if (providedValid && provided) {
         res.cookies.set(ADMIN_COOKIE, provided, cookieOpts());

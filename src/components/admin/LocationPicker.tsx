@@ -37,7 +37,7 @@ export default function LocationPicker({
         zoom: defaultLat ? 14 : 11,
       });
       map.addControl(new mapboxgl.NavigationControl({ showCompass: false }), "top-right");
-      const marker = new mapboxgl.Marker({ color: "#E87020", draggable: true })
+      const marker = new mapboxgl.Marker({ color: "#C41E3A", draggable: true })
         .setLngLat([startLng, startLat])
         .addTo(map);
       marker.on("dragend", () => {

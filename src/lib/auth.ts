@@ -108,6 +108,19 @@ export function isAdmin(rol?: user_role | null) {
   return !!rol && ADMIN_ROLES.includes(rol);
 }
 
+/** Repartidores (moto): acceso al panel de reparto, no al admin. */
+export function isRepartidor(rol?: user_role | null) {
+  return rol === "repartidor";
+}
+
+/** Guard para el área del repartidor. Staff también puede entrar (supervisión). */
+export async function requireRepartidor() {
+  const user = await getCurrentDbUser();
+  if (!user) redirect("/sign-in");
+  if (!isRepartidor(user.rol) && !isStaff(user.rol)) redirect("/app/dashboard");
+  return user;
+}
+
 /** Non-redirecting guard for route handlers. Returns the staff user or null. */
 export async function getStaffOrNull() {
   const user = await getCurrentDbUser();

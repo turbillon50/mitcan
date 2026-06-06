@@ -6,7 +6,8 @@ import FormDialog from "@/components/admin/FormDialog";
 import DeleteButton from "@/components/admin/DeleteButton";
 import LocationPicker from "@/components/admin/LocationPicker";
 import { getMapboxToken } from "@/lib/mapbox";
-import { saveSucursal, deleteSucursal } from "../actions";
+import AuditarUbicaciones from "@/components/admin/AuditarUbicaciones";
+import { saveSucursal, deleteSucursal, auditarUbicaciones } from "../actions";
 
 export const dynamic = "force-dynamic";
 
@@ -83,17 +84,25 @@ export default async function AdminSucursales() {
           <h1 className="section-title text-2xl">Sucursales</h1>
           <p className="text-sm text-on-bg-muted">{sucursales.length} sucursales</p>
         </div>
-        <FormDialog
-          title="Nueva sucursal"
-          triggerLabel={
-            <>
-              <Plus size={16} /> Nueva
-            </>
-          }
-          action={saveSucursal}
-        >
-          <Fields token={token} />
-        </FormDialog>
+        <div className="flex flex-col items-end gap-2 sm:flex-row sm:items-center">
+          <AuditarUbicaciones
+            action={async () => {
+              "use server";
+              return auditarUbicaciones();
+            }}
+          />
+          <FormDialog
+            title="Nueva sucursal"
+            triggerLabel={
+              <>
+                <Plus size={16} /> Nueva
+              </>
+            }
+            action={saveSucursal}
+          >
+            <Fields token={token} />
+          </FormDialog>
+        </div>
       </div>
 
       <div className="card overflow-x-auto">
