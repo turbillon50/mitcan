@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ChevronRight, Flame, QrCode, Bike, MessageCircle } from "lucide-react";
+import { ChevronRight, Flame, QrCode, Bike, MessageCircle, AlertTriangle } from "lucide-react";
 import { getCurrentDbUser, isRepartidor } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getRecompensas } from "@/lib/data";
@@ -84,6 +84,21 @@ export default async function DashboardPage() {
         <div className="min-w-0 flex-1">
           <p className="font-bold">Mensajes</p>
           <p className="text-sm text-on-bg-muted">Habla directo con CSN</p>
+        </div>
+        <ChevronRight size={18} className="text-on-bg-muted" />
+      </Link>
+
+      {/* Reportar un problema (reusa el centro de mensajes admin<->cliente) */}
+      <Link
+        href="/app/mensajes?reportar=1"
+        className="card flex items-center gap-3 p-4"
+      >
+        <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+          <AlertTriangle size={22} />
+        </div>
+        <div className="min-w-0 flex-1">
+          <p className="font-bold">Reportar un problema</p>
+          <p className="text-sm text-on-bg-muted">Pedidos, cobros, productos o entregas</p>
         </div>
         <ChevronRight size={18} className="text-on-bg-muted" />
       </Link>

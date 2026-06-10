@@ -36,6 +36,17 @@ export default function MensajesClient() {
     return () => clearInterval(t);
   }, [load]);
 
+  // Modo "Reportar": prefill del compositor reusando el mismo centro de mensajes
+  // (admin<->cliente). NO crea tabla nueva; el reporte es un mensaje normal.
+  const [reportMode, setReportMode] = useState(false);
+  useEffect(() => {
+    const sp = new URLSearchParams(window.location.search);
+    if (sp.get("reportar")) {
+      setReportMode(true);
+      setTexto((t) => (t ? t : "🚩 Reporte: "));
+    }
+  }, []);
+
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [mensajes.length]);
@@ -69,6 +80,15 @@ export default function MensajesClient() {
   return (
     <div className="flex h-[calc(100dvh-13rem)] flex-col">
       <div className="flex-1 overflow-y-auto">
+        {reportMode && (
+          <div className="card mb-3 border-primary/30 bg-primary/5 p-3 text-sm">
+            <p className="font-bold text-primary">Reportar un problema</p>
+            <p className="text-on-bg-muted">
+              Cuéntanos qué pasó (pedido, cobro, producto o entrega) y el equipo de
+              CSN te responde aquí mismo.
+            </p>
+          </div>
+        )}
         {loaded && mensajes.length === 0 && (
           <div className="card mx-auto flex max-w-sm flex-col items-center gap-3 py-12 text-center">
             <div className="flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 text-primary">
