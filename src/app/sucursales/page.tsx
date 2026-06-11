@@ -32,7 +32,7 @@ export default async function SucursalesPage() {
   const areas = [...ordered, ...extras].map((key) => ({ key, label: AREA_LABELS[key] ?? key }));
 
   return (
-    <div className="min-h-dvh pb-24 md:pb-8">
+    <div className="min-h-dvh pb-24 lg:pb-8">
       <PublicHeader />
       <main className="mx-auto max-w-6xl px-5 py-8">
         <h1 className="section-title mb-2 text-3xl">{t(locale, "suc.title")}</h1>

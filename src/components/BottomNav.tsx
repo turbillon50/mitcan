@@ -18,7 +18,7 @@ export default function BottomNav() {
   const t = useT();
   return (
     <nav
-      className="fixed inset-x-0 bottom-0 z-40 border-t border-hairline bg-bg/90 backdrop-blur-xl md:hidden"
+      className="fixed inset-x-0 bottom-0 z-40 border-t border-hairline bg-bg/90 backdrop-blur-xl lg:hidden"
       style={{ paddingBottom: "var(--safe-bottom)" }}
       aria-label="Navegación principal"
     >

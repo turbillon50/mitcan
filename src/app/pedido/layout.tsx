@@ -13,7 +13,7 @@ export default function PedidoLayout({ children }: { children: React.ReactNode }
   return (
     <CartProvider>
       <div
-        className="min-h-dvh pb-28 md:pb-10"
+        className="min-h-dvh pb-28 lg:pb-10"
         style={{ overscrollBehavior: "none" }}
       >
         <PedidoHeader />

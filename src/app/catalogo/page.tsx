@@ -37,7 +37,7 @@ export default async function CatalogoPage() {
   const cats = categorias.map((c) => ({ id: c.id, nombre: c.nombre, icono: c.icono }));
 
   return (
-    <div className="min-h-dvh pb-24 md:pb-8">
+    <div className="min-h-dvh pb-24 lg:pb-8">
       <PublicHeader />
       <main className="mx-auto max-w-6xl px-5 py-8">
         <h1 className="section-title mb-6 text-3xl">{t(locale, "cat.title")}</h1>

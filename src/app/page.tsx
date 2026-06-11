@@ -66,7 +66,7 @@ export default async function LandingPage() {
     }));
 
   return (
-    <div className="min-h-dvh pb-24 md:pb-0">
+    <div className="min-h-dvh pb-24 lg:pb-0">
       <PublicHeader />
 
       {/* Hero */}
