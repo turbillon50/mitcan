@@ -35,7 +35,7 @@ export default function CatalogClient({
   categorias: Categoria[];
 }) {
   const [q, setQ] = useState("");
-  const [cat, setCat] = useState<number | "all">("all");
+  const [cat, setCat] = useState<number | "all">(() => categorias[0]?.id ?? "all");
   const [limit, setLimit] = useState(PAGE);
   const [active, setActive] = useState<Producto | null>(null);
   const dq = useDeferredValue(q);
@@ -122,16 +122,10 @@ export default function CatalogClient({
 
       {/* Category chips */}
       <div className="no-scrollbar -mx-5 mb-4 flex gap-2 overflow-x-auto px-5">
-        <button
-          onClick={() => setCat("all")}
-          className={`chip whitespace-nowrap ${cat === "all" ? "chip-active" : ""}`}
-        >
-          {t("cat.all")}
-        </button>
         {categorias.map((c) => (
           <button
             key={c.id}
-            onClick={() => setCat((prev) => (prev === c.id ? "all" : c.id))}
+            onClick={() => setCat(c.id)}
             className={`chip whitespace-nowrap ${cat === c.id ? "chip-active" : ""}`}
           >
             {c.icono ? `${c.icono} ` : ""}
@@ -150,13 +144,13 @@ export default function CatalogClient({
       {filtered.length === 0 ? (
         <div className="py-16 text-center">
           <p className="text-on-bg-muted">{t("cat.noResults")} “{q}”.</p>
-          <button onClick={() => { setQ(""); setCat("all"); }} className="btn-ghost mt-4">
+          <button onClick={() => { setQ(""); setCat(categorias[0]?.id ?? "all"); }} className="btn-ghost mt-4">
             {t("cat.clear")}
           </button>
         </div>
       ) : (
         <>
-          <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-3">
             {shown.map((p) => {
               const photo = productImage(p.imagen_url, p.categoria?.nombre);
               const tint = categoryTint(p.categoria?.nombre);
@@ -172,7 +166,7 @@ export default function CatalogClient({
                         src={photo}
                         alt={p.nombre}
                         fill
-                        sizes="(max-width:768px) 50vw, 25vw"
+                        sizes="(max-width:640px) 50vw, 33vw"
                         className="object-cover transition duration-500 group-hover:scale-105"
                       />
                     ) : (

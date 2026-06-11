@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { MapPin, Gift, QrCode, ArrowRight, Flame, Beef } from "lucide-react";
 import PublicHeader from "@/components/PublicHeader";
+import BottomNav from "@/components/BottomNav";
 import PromoCarousel from "@/components/PromoCarousel";
 import ProductGrid from "@/components/ProductGrid";
 import SucursalesMap from "@/components/SucursalesMap";
@@ -65,7 +66,7 @@ export default async function LandingPage() {
     }));
 
   return (
-    <div className="min-h-dvh">
+    <div className="min-h-dvh pb-24 md:pb-0">
       <PublicHeader />
 
       {/* Hero */}
@@ -189,6 +190,7 @@ export default async function LandingPage() {
       <footer className="border-t border-hairline py-8 text-center text-sm text-on-bg-muted">
         © {new Date().getFullYear()} CSN — Carnes Selectas Nayarit · carnesn.ink
       </footer>
+      <BottomNav />
     </div>
   );
 }

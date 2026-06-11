@@ -1,4 +1,5 @@
 import PublicHeader from "@/components/PublicHeader";
+import BottomNav from "@/components/BottomNav";
 import SucursalesExplorer from "@/components/SucursalesExplorer";
 import { getSucursales, AREA_LABELS } from "@/lib/data";
 import { getMapboxToken } from "@/lib/mapbox";
@@ -31,7 +32,7 @@ export default async function SucursalesPage() {
   const areas = [...ordered, ...extras].map((key) => ({ key, label: AREA_LABELS[key] ?? key }));
 
   return (
-    <div className="min-h-dvh pb-20">
+    <div className="min-h-dvh pb-24 md:pb-8">
       <PublicHeader />
       <main className="mx-auto max-w-6xl px-5 py-8">
         <h1 className="section-title mb-2 text-3xl">{t(locale, "suc.title")}</h1>
@@ -40,6 +41,7 @@ export default async function SucursalesPage() {
         </p>
         <SucursalesExplorer token={token} sucursales={data} areas={areas} />
       </main>
+      <BottomNav />
     </div>
   );
 }
