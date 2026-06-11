@@ -15,6 +15,10 @@ export default function SignUpPage() {
         <Image src="/assets/logo-badge.png" alt="CSN" width={56} height={48} />
       </Link>
       <SlideIn from="bottom"><SignUp fallbackRedirectUrl="/app/onboarding" signInUrl="/sign-in" /></SlideIn>
+      <p className="text-sm text-on-bg-muted">¿Ya tienes cuenta?</p>
+      <Link href="/sign-in" className="btn-ghost px-6 py-2.5">
+        Ya estoy registrado — Iniciar sesión
+      </Link>
     </div>
   );
 }

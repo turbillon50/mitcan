@@ -187,8 +187,41 @@ export default async function LandingPage() {
         )}
       </section>
 
-      <footer className="border-t border-hairline py-8 text-center text-sm text-on-bg-muted">
-        © {new Date().getFullYear()} CSN — Carnes Selectas Nayarit · carnesn.ink
+      <footer id="contacto" className="border-t border-hairline bg-surface-2/30">
+        <div className="mx-auto grid max-w-6xl gap-8 px-5 py-12 sm:grid-cols-2 md:grid-cols-4">
+          <div>
+            <h3 className="font-display text-lg font-bold">Carnes Selectas Nayarit</h3>
+            <p className="mt-2 text-sm text-on-bg-muted">
+              Cortes selectos y club de recompensas, con sucursales en Nayarit, Sinaloa y Jalisco.
+            </p>
+          </div>
+          <div>
+            <h4 className="text-sm font-semibold">Explora</h4>
+            <ul className="mt-3 space-y-2 text-sm text-on-bg-muted">
+              <li><Link href="/catalogo" className="hover:text-primary">Catálogo por categorías</Link></li>
+              <li><Link href="/pedido" className="hover:text-primary">Pedido en línea</Link></li>
+              <li><Link href="/sucursales" className="hover:text-primary">Sucursales</Link></li>
+              <li><Link href="/sign-up" className="hover:text-primary">Únete al club</Link></li>
+            </ul>
+          </div>
+          <div>
+            <h4 className="text-sm font-semibold">Contacto</h4>
+            <ul className="mt-3 space-y-2 text-sm text-on-bg-muted">
+              <li><Link href="/sucursales" className="hover:text-primary">Teléfono y WhatsApp por sucursal</Link></li>
+              <li><a href="https://carnesn.ink" className="hover:text-primary">carnesn.ink</a></li>
+            </ul>
+          </div>
+          <div>
+            <h4 className="text-sm font-semibold">Legal</h4>
+            <ul className="mt-3 space-y-2 text-sm text-on-bg-muted">
+              <li><Link href="/legal#privacidad" className="hover:text-primary">Aviso de Privacidad</Link></li>
+              <li><Link href="/legal#terminos" className="hover:text-primary">Términos y Condiciones</Link></li>
+            </ul>
+          </div>
+        </div>
+        <div className="border-t border-hairline py-6 text-center text-sm text-on-bg-muted">
+          © {new Date().getFullYear()} CSN — Carnes Selectas Nayarit
+        </div>
       </footer>
       <BottomNav />
     </div>

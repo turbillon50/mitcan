@@ -1,7 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { UserButton } from "@clerk/nextjs";
-import { Bell } from "lucide-react";
+import { Bell, Globe } from "lucide-react";
 import BottomNav from "@/components/BottomNav";
 import SettingsControls from "@/components/SettingsControls";
 import { requireUser } from "@/lib/auth";
@@ -33,6 +33,14 @@ export default async function AppLayout({
             />
           </Link>
           <div className="flex items-center gap-2">
+            <Link
+              href="/"
+              className="flex h-9 items-center gap-1.5 rounded-full border border-hairline bg-surface-2 px-3 text-xs font-medium text-on-bg-muted hover:text-primary"
+              aria-label="Ir al sitio público"
+              title="Ver sitio público (contacto, info y legal)"
+            >
+              <Globe size={16} /> Sitio
+            </Link>
             <SettingsControls />
             {/* Admin lives on its own independent key-gated link, not exposed here. */}
             <Link
