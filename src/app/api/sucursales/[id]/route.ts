@@ -30,6 +30,8 @@ export async function PATCH(req: Request, { params }: Ctx) {
   if ("whatsapp" in b) data.whatsapp = b.whatsapp ?? null;
   if ("horario" in b) data.horario = b.horario ?? null;
   if (typeof b.activa === "boolean") data.activa = b.activa;
+  if (typeof b.abierta === "boolean") data.abierta = b.abierta;
+  if (b.radio_km != null && !isNaN(Number(b.radio_km))) data.radio_km = Number(b.radio_km);
 
   // Coordinates only change together and only when inside the CSN service area.
   if (b.lat != null && b.lng != null) {

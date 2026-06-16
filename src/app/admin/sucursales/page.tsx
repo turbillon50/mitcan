@@ -6,6 +6,7 @@ import FormDialog from "@/components/admin/FormDialog";
 import DeleteButton from "@/components/admin/DeleteButton";
 import LocationPicker from "@/components/admin/LocationPicker";
 import { getMapboxToken } from "@/lib/mapbox";
+import SucursalAbiertaToggle from "@/components/admin/SucursalAbiertaToggle";
 import AuditarUbicaciones from "@/components/admin/AuditarUbicaciones";
 import { saveSucursal, deleteSucursal, auditarUbicaciones } from "../actions";
 

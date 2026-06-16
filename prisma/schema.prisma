@@ -32,6 +32,8 @@ model sucursales {
   horario    String?   @default("8:00-20:00")
   whatsapp   String?
   activa     Boolean?  @default(true) @map("active")
+  abierta    Boolean?  @default(true)
+  radio_km   Decimal?  @default(100) @db.Decimal
   created_at DateTime? @default(now()) @db.Timestamptz(6)
 
   inventario      inventario[]
