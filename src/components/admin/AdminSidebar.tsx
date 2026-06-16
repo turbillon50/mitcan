@@ -19,6 +19,7 @@ import {
   MessageCircle,
   BarChart3,
   BookOpen,
+  Palette,
   Radio,
   Menu,
   X,
@@ -52,6 +53,7 @@ const SECTIONS: { titleKey: string; items: Item[] }[] = [
   {
     titleKey: "adm.sec.marketing",
     items: [
+      { href: "/admin/canvas", key: "adm.canvas", icon: Palette },
       { href: "/admin/promociones", key: "adm.promos", icon: Megaphone },
       { href: "/admin/recompensas", key: "adm.rewards", icon: Gift },
       { href: "/admin/notificaciones", key: "adm.notifications", icon: Bell },

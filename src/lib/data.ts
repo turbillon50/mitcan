@@ -26,18 +26,64 @@ export async function getContent<T = unknown>(key: string): Promise<T | null> {
   }, null);
 }
 
-export function getCategorias() {
+export function getCategorias(opts?: { soloActivas?: boolean }) {
   return safe(
-    () => prisma.categorias.findMany({ orderBy: { orden: "asc" } }),
+    () =>
+      prisma.categorias.findMany({
+        where: opts?.soloActivas ? { activa: true } : undefined,
+        orderBy: { orden: "asc" },
+      }),
     []
   );
 }
 
-export function getProductosConCategoria(opts?: { soloActivos?: boolean }) {
+export function getCategoriasConConteoProductos(opts?: {
+  soloActivas?: boolean;
+  soloProductosActivos?: boolean;
+}) {
+  return safe(
+    async () => {
+      const [categorias, counts] = await Promise.all([
+        prisma.categorias.findMany({
+          where: opts?.soloActivas ? { activa: true } : undefined,
+          orderBy: { orden: "asc" },
+        }),
+        prisma.productos.groupBy({
+          by: ["categoria_id"],
+          where: {
+            ...(opts?.soloProductosActivos ? { activo: true } : {}),
+            categoria_id: { not: null },
+          },
+          _count: { _all: true },
+        }),
+      ]);
+
+      const countByCategory = new Map<number, number>();
+      for (const row of counts) {
+        if (row.categoria_id != null) {
+          countByCategory.set(row.categoria_id, row._count._all);
+        }
+      }
+
+      return categorias.map((categoria) => ({
+        ...categoria,
+        productos_count: countByCategory.get(categoria.id) ?? 0,
+      }));
+    },
+    []
+  );
+}
+
+export function getProductosConCategoria(opts?: { soloActivos?: boolean; categoriaId?: number }) {
+  const where = {
+    ...(opts?.soloActivos ? { activo: true } : {}),
+    ...(opts?.categoriaId != null ? { categoria_id: opts.categoriaId } : {}),
+  };
+
   return safe(
     () =>
       prisma.productos.findMany({
-        where: opts?.soloActivos ? { activo: true } : undefined,
+        where: Object.keys(where).length > 0 ? where : undefined,
         include: { categoria: true },
         orderBy: { nombre: "asc" },
       }),

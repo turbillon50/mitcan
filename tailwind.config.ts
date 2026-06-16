@@ -15,6 +15,7 @@ const config: Config = {
         "surface-2": "rgb(var(--surface-2) / <alpha-value>)",
         "surface-3": "rgb(var(--surface-3) / <alpha-value>)",
         primary: "rgb(var(--primary) / <alpha-value>)",
+        "primary-dark": "rgb(var(--primary-dark) / <alpha-value>)",
         accent: "rgb(var(--accent) / <alpha-value>)",
         "on-bg": "rgb(var(--on-bg) / <alpha-value>)",
         "on-bg-muted": "rgb(var(--on-bg-muted) / <alpha-value>)",

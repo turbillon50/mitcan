@@ -2,10 +2,10 @@
 
 import { useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
-import { Search, X, Plus, Sparkles } from "lucide-react";
 import { formatMXN } from "@/lib/format";
 import { productImage, categoryTint } from "@/lib/catalogo-img";
 import { useT } from "@/components/I18nProvider";
+import { IconPlus, IconSearch, IconSparkles, IconX } from "@/components/icons";
 
 type Producto = {
   id: number;
@@ -20,7 +20,7 @@ type Producto = {
   categoria_id: number | null;
   categoria: { id: number; nombre: string; slug: string | null; icono: string | null } | null;
 };
-type Categoria = { id: number; nombre: string; icono: string | null };
+type Categoria = { id: number; nombre: string; slug: string | null; icono: string | null };
 
 const norm = (s: string) =>
   s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
@@ -29,13 +29,12 @@ const PAGE = 48;
 
 export default function CatalogClient({
   productos,
-  categorias,
+  categoria,
 }: {
   productos: Producto[];
-  categorias: Categoria[];
+  categoria: Categoria;
 }) {
   const [q, setQ] = useState("");
-  const [cat, setCat] = useState<number | "all">(() => categorias[0]?.id ?? "all");
   const [limit, setLimit] = useState(PAGE);
   const [active, setActive] = useState<Producto | null>(null);
   const dq = useDeferredValue(q);
@@ -57,7 +56,6 @@ export default function CatalogClient({
   const filtered = useMemo(() => {
     const tokens = norm(dq).split(/\s+/).filter(Boolean);
     let list = indexed;
-    if (cat !== "all") list = list.filter((x) => x.p.categoria_id === cat);
     if (tokens.length) {
       list = list.filter((x) => tokens.every((t) => x.hay.includes(t)));
       // Rank: name-prefix > name-includes > other, then alphabetical.
@@ -69,10 +67,10 @@ export default function CatalogClient({
       );
     }
     return list.map((x) => x.p);
-  }, [indexed, dq, cat]);
+  }, [indexed, dq]);
 
-  // Reset the visible window whenever the query/category changes.
-  useEffect(() => setLimit(PAGE), [dq, cat]);
+  // Reset the visible window whenever the query changes.
+  useEffect(() => setLimit(PAGE), [dq]);
 
   const shown = filtered.slice(0, limit);
 
@@ -96,7 +94,7 @@ export default function CatalogClient({
     <div>
       {/* Search */}
       <div className="relative mb-5">
-        <Search
+        <IconSearch
           size={18}
           className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-on-bg-muted"
         />
@@ -115,38 +113,28 @@ export default function CatalogClient({
             className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full p-1 text-on-bg-muted hover:bg-surface-2"
             aria-label="Limpiar búsqueda"
           >
-            <X size={16} />
+            <IconX size={16} />
           </button>
         )}
       </div>
 
-      {/* Category chips */}
-      <div className="no-scrollbar -mx-5 mb-4 flex gap-2 overflow-x-auto px-5">
-        {categorias.map((c) => (
-          <button
-            key={c.id}
-            onClick={() => setCat(c.id)}
-            className={`chip whitespace-nowrap ${cat === c.id ? "chip-active" : ""}`}
-          >
-            {c.icono ? `${c.icono} ` : ""}
-            {c.nombre}
-          </button>
-        ))}
-      </div>
-
       {/* Result count */}
       <p className="mb-5 text-sm text-on-bg-muted">
-        {filtered.length === productos.length
-          ? `${productos.length} ${t("cat.products")}`
+        {filtered.length === productos.length && !q
+          ? `${productos.length} ${t("cat.products")} en ${categoria.nombre}`
           : `${filtered.length} ${filtered.length === 1 ? t("cat.result") : t("cat.results")}`}
       </p>
 
       {filtered.length === 0 ? (
         <div className="py-16 text-center">
-          <p className="text-on-bg-muted">{t("cat.noResults")} “{q}”.</p>
-          <button onClick={() => { setQ(""); setCat(categorias[0]?.id ?? "all"); }} className="btn-ghost mt-4">
-            {t("cat.clear")}
-          </button>
+          <p className="text-on-bg-muted">
+            {q ? `${t("cat.noResults")} "${q}".` : "Esta area aun no tiene productos visibles."}
+          </p>
+          {q && (
+            <button onClick={() => setQ("")} className="btn-ghost mt-4">
+              {t("cat.clear")}
+            </button>
+          )}
         </div>
       ) : (
         <>
@@ -184,7 +172,7 @@ export default function CatalogClient({
                     )}
                     {p.es_nuevo && (
                       <span className="absolute left-2 top-2 inline-flex items-center gap-1 rounded-full bg-primary px-2 py-0.5 text-[10px] font-bold text-white shadow">
-                        <Sparkles size={10} /> {t("cat.new")}
+                        <IconSparkles size={10} /> {t("cat.new")}
                       </span>
                     )}
                   </div>
@@ -204,7 +192,7 @@ export default function CatalogClient({
                         <span className="text-on-bg-muted"> /{p.unidad ?? "kg"}</span>
                       </span>
                       <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/15 text-primary">
-                        <Plus size={16} />
+                        <IconPlus size={16} />
                       </span>
                     </div>
                   </div>
@@ -264,7 +252,7 @@ function ProductModal({ p, onClose }: { p: Producto; onClose: () => void }) {
             className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full bg-black/55 text-white"
             aria-label="Cerrar"
           >
-            <X size={18} />
+            <IconX size={18} />
           </button>
           {gallery.length > 1 && (
             <>
@@ -294,7 +282,7 @@ function ProductModal({ p, onClose }: { p: Producto; onClose: () => void }) {
           )}
           {p.es_nuevo && (
             <span className="absolute left-3 top-3 inline-flex items-center gap-1 rounded-full bg-primary px-2 py-0.5 text-[11px] font-bold text-white shadow">
-              <Sparkles size={11} /> {t("cat.new")}
+              <IconSparkles size={11} /> {t("cat.new")}
             </span>
           )}
         </div>

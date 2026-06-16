@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Moon, Sun } from "lucide-react";
 import { LANG_COOKIE } from "@/lib/i18n";
 import { useLocale } from "@/components/I18nProvider";
+import { IconMoon, IconSun } from "@/components/icons";
 
 /** Compact theme (claro/oscuro) + language (ES/EN) switch for headers. */
 export default function SettingsControls({ className = "" }: { className?: string }) {
@@ -39,7 +39,7 @@ export default function SettingsControls({ className = "" }: { className?: strin
         aria-label={dark ? "Modo claro" : "Modo oscuro"}
         className="flex h-9 w-9 items-center justify-center rounded-full border border-hairline bg-surface-2 text-on-bg-muted transition hover:text-primary"
       >
-        {dark ? <Sun size={16} /> : <Moon size={16} />}
+        {dark ? <IconSun size={16} /> : <IconMoon size={16} />}
       </button>
       <div className="flex items-center overflow-hidden rounded-full border border-hairline bg-surface-2 text-xs font-semibold">
         <button

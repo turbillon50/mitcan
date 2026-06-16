@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { Flame } from "lucide-react";
+import { IconFlame } from "@/components/icons";
 
 type Promo = {
   id: number;
@@ -32,7 +32,7 @@ export default function PromoCarousel({ promos }: { promos: Promo[] }) {
               <Image src={p.imagen_url} alt={p.titulo} fill sizes="280px" className="object-cover" />
             ) : (
               <div className="flex h-full items-center justify-center text-primary/30">
-                <Flame size={40} />
+                <IconFlame size={40} />
               </div>
             )}
             <span className="absolute left-2 top-2 rounded-full bg-primary px-2.5 py-1 text-[10px] font-bold uppercase text-white">

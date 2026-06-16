@@ -1,7 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { UserButton } from "@clerk/nextjs";
-import { Bell, Globe } from "lucide-react";
+import { IconBell, IconGlobe } from "@/components/icons";
 import BottomNav from "@/components/BottomNav";
 import SettingsControls from "@/components/SettingsControls";
 import { requireUser } from "@/lib/auth";
@@ -36,10 +36,10 @@ export default async function AppLayout({
             <Link
               href="/"
               className="flex h-9 items-center gap-1.5 rounded-full border border-hairline bg-surface-2 px-3 text-xs font-medium text-on-bg-muted hover:text-primary"
-              aria-label="Ir al sitio público"
-              title="Ver sitio público (contacto, info y legal)"
+              aria-label="Ver página pública / Inicio"
+              title="Volver a la landing pública (Inicio)"
             >
-              <Globe size={16} /> Sitio
+              <IconGlobe size={16} /> Inicio
             </Link>
             <SettingsControls />
             {/* Admin lives on its own independent key-gated link, not exposed here. */}
@@ -48,7 +48,7 @@ export default async function AppLayout({
               className="relative flex h-9 w-9 items-center justify-center rounded-full border border-hairline bg-surface-2 text-on-bg-muted"
               aria-label="Notificaciones"
             >
-              <Bell size={18} />
+              <IconBell size={18} />
               {unread > 0 && (
                 <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-bold text-white">
                   {unread > 9 ? "9+" : unread}

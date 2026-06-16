@@ -10,6 +10,14 @@ body {
 :root {
   color-scheme: light;
 
+  --brand-primary: #C41E3A;
+  --brand-primary-dark: #A8172E;
+  --brand-bg: #F5F0E8;
+  --brand-surface: #FFFFFF;
+  --brand-text: #1A1A1A;
+  --brand-muted: #6B5E54;
+  --brand-accent: #A8172E;
+
   /* CSN — modo día, paleta de marca. RGB triplets para opacidad. */
   --bg: 245 240 232; /* #F5F0E8 crema */
   --surface: 255 255 255; /* #ffffff */
@@ -17,6 +25,7 @@ body {
   --surface-3: 229 220 205; /* #E5DCCD */
 
   --primary: 196 30 58; /* #C41E3A rojo CSN */
+  --primary-dark: 168 23 46; /* #A8172E rojo CSN profundo */
   --accent: 168 23 46; /* #A8172E rojo CSN profundo (cero dorado) */
   --on-primary: 255 255 255;
 
@@ -40,6 +49,7 @@ html.dark {
   --surface-3: 58 49 41; /* #3A3129 */
 
   --primary: 226 74 98; /* rojo CSN un poco más claro para contraste */
+  --primary-dark: 196 30 58;
   --accent: 240 110 130; /* rojo CSN claro como acento (cero dorado) */
   --on-primary: 255 255 255;
 
@@ -121,12 +131,12 @@ body {
 
 /* gradient utility used by hero / membership — crema + rojo CSN (cero dorado) */
 .csn-gradient {
-  background: radial-gradient(circle at 22% 0%, rgba(196, 30, 58, 0.12), transparent 55%),
-    radial-gradient(circle at 90% 10%, rgba(196, 30, 58, 0.08), transparent 45%),
-    linear-gradient(160deg, #faf6ee 0%, #ffffff 65%);
+  background: radial-gradient(circle at 22% 0%, rgb(var(--primary) / 0.12), transparent 55%),
+    radial-gradient(circle at 90% 10%, rgb(var(--accent) / 0.08), transparent 45%),
+    linear-gradient(160deg, rgb(var(--bg)) 0%, rgb(var(--surface)) 65%);
 }
 html.dark .csn-gradient {
-  background: radial-gradient(circle at 22% 0%, rgba(226, 74, 98, 0.14), transparent 55%),
-    radial-gradient(circle at 90% 10%, rgba(226, 74, 98, 0.10), transparent 45%),
-    linear-gradient(160deg, #1b1713 0%, #14110e 65%);
+  background: radial-gradient(circle at 22% 0%, rgb(var(--primary) / 0.14), transparent 55%),
+    radial-gradient(circle at 90% 10%, rgb(var(--accent) / 0.10), transparent 45%),
+    linear-gradient(160deg, rgb(var(--surface)) 0%, rgb(var(--bg)) 65%);
 }
