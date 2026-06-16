@@ -33,9 +33,9 @@ export default async function TicketsPage() {
   ]);
 
   return <TicketsDashboard
-    cuadre={serialize(cuadreRaw[0])}
-    tickets={serialize(ultimosRaw)}
-    sorteos={serialize(sorteosRaw)}
+    cuadre={serialize(cuadreRaw[0]) as unknown as {total:number;en_caja:number;en_salida:number;pendientes_caja:number;monto_cerrado:number}}
+    tickets={serialize(ultimosRaw) as unknown as {id:number;numero:string;estado:string;monto:number|null;created_at:string;cliente_nombre:string|null}[]}
+    sorteos={serialize(sorteosRaw) as unknown as {id:number;titulo:string;premio:string;estado:string;numero_ganador:number|null;ganador_nombre:string|null}[]}
     fecha={hoy}
   />;
 }

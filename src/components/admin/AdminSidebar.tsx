@@ -1,32 +1,16 @@
 "use client";
 
-import { ScanLine, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { ScanLine, usePathname } from "next/navigation";
-import { ScanLine,
-  LayoutDashboard,
-  Store,
-  Beef,
-  Tags,
-  ClipboardList,
-  Boxes,
-  Users,
-  Gift,
-  Ticket,
-  Megaphone,
-  Bell,
-  MessageCircle,
-  BarChart3,
-  BookOpen,
-  Palette,
-  Radio,
-  Menu,
-  X,
-  ExternalLink,
+import { usePathname } from "next/navigation";
+import {
+  LayoutDashboard, Store, Beef, Tags, ClipboardList, Boxes,
+  Users, Gift, Ticket, Megaphone, Bell, MessageCircle,
+  BarChart3, BookOpen, Palette, Radio, Menu, X, ExternalLink, ScanLine,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
-import { ScanLine, useT } from "@/components/I18nProvider";
+import { useT } from "@/components/I18nProvider";
 
 type Item = { href: string; key: string; icon: LucideIcon };
 const SECTIONS: { titleKey: string; items: Item[] }[] = [
@@ -37,6 +21,7 @@ const SECTIONS: { titleKey: string; items: Item[] }[] = [
       { href: "/admin/c4", key: "adm.c4", icon: Radio },
       { href: "/admin/pedidos", key: "adm.orders", icon: ClipboardList },
       { href: "/admin/mensajes", key: "adm.messages", icon: MessageCircle },
+      { href: "/admin/tickets", key: "adm.tickets", icon: ScanLine },
       { href: "/admin/redenciones", key: "adm.redemptions", icon: Ticket },
     ],
   },
@@ -126,7 +111,6 @@ export default function AdminSidebar() {
 
   return (
     <>
-      {/* Mobile top bar */}
       <div className="sticky top-0 z-40 flex items-center justify-between border-b border-hairline bg-surface/90 px-4 py-3 backdrop-blur-xl lg:hidden" style={{ paddingTop: "calc(env(safe-area-inset-top, 0px) + 0.75rem)" }}>
         {Brand}
         <button
@@ -137,19 +121,13 @@ export default function AdminSidebar() {
           {open ? <X size={18} /> : <Menu size={18} />}
         </button>
       </div>
-
       {open && (
         <div className="border-b border-hairline bg-surface px-4 py-4 lg:hidden">{Nav}</div>
       )}
-
-      {/* Desktop sidebar */}
       <aside className="sticky top-0 hidden h-dvh w-64 shrink-0 flex-col gap-6 overflow-y-auto border-r border-hairline bg-surface px-4 py-6 lg:flex">
         {Brand}
         {Nav}
-        <Link
-          href="/"
-          className="mt-auto flex items-center gap-2 rounded-xl px-3 py-2.5 text-sm text-on-bg-muted transition hover:text-primary"
-        >
+        <Link href="/" className="mt-auto flex items-center gap-2 rounded-xl px-3 py-2.5 text-sm text-on-bg-muted transition hover:text-primary">
           <ExternalLink size={15} /> {t("adm.viewSite")}
         </Link>
       </aside>
