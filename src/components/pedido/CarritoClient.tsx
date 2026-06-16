@@ -41,8 +41,9 @@ export default function CarritoClient() {
   const total = subtotal + ENVIO_FIJO;
 
   return (
-    <div className="grid gap-6 pb-6 lg:grid-cols-[1fr_360px]">
-      <section className="flex flex-col gap-3">
+    <div className="flex flex-col gap-6 pb-6 lg:grid lg:grid-cols-[1fr_340px]">
+      {/* Lista de productos */}
+      <section className="flex min-w-0 flex-col gap-3">
         <h1 className="section-title text-2xl">Tu carrito</h1>
         <AnimatePresence initial={false}>
           {items.map((it) => (
@@ -52,49 +53,50 @@ export default function CarritoClient() {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, x: -30 }}
-              className="card flex items-center gap-3 p-3"
+              className="card flex min-w-0 items-center gap-3 overflow-hidden p-3"
             >
-              <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-xl bg-surface-2">
+              {/* Foto */}
+              <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-xl bg-surface-2">
                 {it.imagen_url ? (
-                  <Image src={it.imagen_url} alt={it.nombre} fill sizes="64px" className="object-cover" />
+                  <Image src={it.imagen_url} alt={it.nombre} fill sizes="56px" className="object-cover" />
                 ) : (
                   <div className="flex h-full items-center justify-center text-on-bg-muted/40">
-                    <Beef size={22} />
+                    <Beef size={20} />
                   </div>
                 )}
               </div>
-              <div className="min-w-0 flex-1">
-                <h3 className="truncate text-sm font-bold">{it.nombre}</h3>
-                <p className="text-xs text-on-bg-muted">
-                  {formatMXN(it.precio)} / {it.unidad}
-                </p>
-                <p className="text-sm font-extrabold text-primary">
-                  {formatMXN(it.precio * it.cantidad)}
-                </p>
+
+              {/* Info */}
+              <div className="min-w-0 flex-1 overflow-hidden">
+                <h3 className="truncate text-sm font-bold leading-tight">{it.nombre}</h3>
+                <p className="text-xs text-on-bg-muted">{formatMXN(it.precio)} / {it.unidad}</p>
+                <p className="text-sm font-extrabold text-primary">{formatMXN(it.precio * it.cantidad)}</p>
               </div>
+
+              {/* Controles */}
               <div className="flex shrink-0 flex-col items-end gap-2">
                 <button
                   onClick={() => remove(it.producto_id)}
                   aria-label={`Quitar ${it.nombre}`}
                   className="text-on-bg-muted transition hover:text-rose-400"
                 >
-                  <Trash2 size={16} />
+                  <Trash2 size={15} />
                 </button>
-                <div className="flex items-center gap-1 rounded-full border border-hairline bg-surface-2 p-1">
+                <div className="flex items-center rounded-full border border-hairline bg-surface-2">
                   <button
                     onClick={() => setCantidad(it.producto_id, it.cantidad - 1)}
                     aria-label="Menos"
                     className="flex h-8 w-8 items-center justify-center rounded-full transition hover:bg-surface-3"
                   >
-                    <Minus size={14} />
+                    <Minus size={13} />
                   </button>
-                  <span className="w-7 text-center text-sm font-bold">{it.cantidad}</span>
+                  <span className="w-6 text-center text-sm font-bold">{it.cantidad}</span>
                   <button
                     onClick={() => setCantidad(it.producto_id, it.cantidad + 1)}
                     aria-label="Más"
                     className="flex h-8 w-8 items-center justify-center rounded-full transition hover:bg-surface-3"
                   >
-                    <Plus size={14} />
+                    <Plus size={13} />
                   </button>
                 </div>
               </div>
@@ -103,30 +105,30 @@ export default function CarritoClient() {
         </AnimatePresence>
       </section>
 
-      {/* Resumen */}
-      <aside className="lg:sticky lg:top-24 lg:self-start">
+      {/* Resumen — debajo en mobile, sticky en desktop */}
+      <aside className="w-full lg:sticky lg:top-24 lg:self-start">
         <div className="card flex flex-col gap-3 p-5">
           <h2 className="font-display text-lg font-bold">Resumen</h2>
-          <div className="flex justify-between text-sm">
+          <div className="flex items-center justify-between text-sm">
             <span className="text-on-bg-muted">Subtotal</span>
             <span className="font-semibold">{formatMXN(subtotal)}</span>
           </div>
-          <div className="flex justify-between text-sm">
+          <div className="flex items-center justify-between text-sm">
             <span className="text-on-bg-muted">Costo de entrega</span>
             <span className="font-semibold">{formatMXN(ENVIO_FIJO)}</span>
           </div>
-          <div className="flex justify-between border-t border-hairline pt-3 text-base">
+          <div className="flex items-center justify-between border-t border-hairline pt-3 text-base">
             <span className="font-bold">Total</span>
             <span className="font-extrabold text-primary">{formatMXN(total)}</span>
           </div>
-          <Link href="/pedido/checkout" className="btn-primary w-full py-3 text-base">
+          <Link href="/pedido/checkout" className="btn-primary flex w-full items-center justify-center gap-2 py-3.5 text-base">
             Continuar <ArrowRight size={16} />
           </Link>
           <Link href="/pedido" className="btn-ghost w-full">
             Seguir comprando
           </Link>
           <p className="text-center text-[11px] text-on-bg-muted">
-            Pago contra entrega · Entrega a domicilio en Tepic
+            Pago contra entrega · Entrega a domicilio
           </p>
         </div>
       </aside>
