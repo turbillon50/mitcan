@@ -75,9 +75,16 @@ export async function POST(req: Request) {
         );
       } else {
         // users.id is a non-defaulted text PK keyed to the Clerk user id.
+        // Asignar numero_cliente secuencial (solo para clientes)
+        const maxRow = await withRetry(() =>
+          prisma.$queryRawUnsafe<{max:number}[]>(
+            `SELECT COALESCE(MAX(numero_cliente),0) as max FROM users`
+          )
+        );
+        const nextNum = Number((maxRow as {max:number}[])[0]?.max ?? 0) + 1;
         await withRetry(() =>
           prisma.users.create({
-            data: { id: data.id, clerk_id: data.id, email, nombre, rol },
+            data: { id: data.id, clerk_id: data.id, email, nombre, rol, numero_cliente: nextNum },
           })
         );
         if (email) {

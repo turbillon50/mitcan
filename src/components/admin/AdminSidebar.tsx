@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { ScanLine, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { usePathname } from "next/navigation";
-import {
+import { ScanLine, usePathname } from "next/navigation";
+import { ScanLine,
   LayoutDashboard,
   Store,
   Beef,
@@ -26,7 +26,7 @@ import {
   ExternalLink,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
-import { useT } from "@/components/I18nProvider";
+import { ScanLine, useT } from "@/components/I18nProvider";
 
 type Item = { href: string; key: string; icon: LucideIcon };
 const SECTIONS: { titleKey: string; items: Item[] }[] = [

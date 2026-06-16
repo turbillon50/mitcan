@@ -51,7 +51,8 @@ model users {
   telefono    String?    @map("phone")
   rol         user_role? @default(cliente) @map("role")
   sucursal_id Int?
-  puntos      Int?       @default(0)
+  puntos         Int?       @default(0)
+  numero_cliente  Int?       @default(autoincrement())
   nivel       String?    @default("bronce")
   direccion   String?
   created_at  DateTime?  @default(now()) @db.Timestamptz(6)
