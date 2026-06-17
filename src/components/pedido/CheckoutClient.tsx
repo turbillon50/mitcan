@@ -17,6 +17,87 @@ type CoberturaResult = {
   sucursal?: SucursalInfo | null; mensaje: string;
 };
 
+function MapaCheckout({
+  mapboxToken, sucursal, userLat, userLng,
+}: {
+  mapboxToken: string;
+  sucursal: SucursalInfo;
+  userLat: number | null;
+  userLng: number | null;
+}) {
+  const mapRef = useRef<HTMLDivElement>(null);
+  const [mounted, setMounted] = useState(false);
+
+  // Esperar a que el DOM esté listo antes de inicializar Mapbox
+  useEffect(() => {
+    const t = setTimeout(() => setMounted(true), 300);
+    return () => clearTimeout(t);
+  }, []);
+
+  useEffect(() => {
+    if (!mounted || !mapboxToken || !mapRef.current) return;
+    let cancelled = false;
+    (async () => {
+      const mapboxgl = (await import("mapbox-gl")).default;
+      if (cancelled || !mapRef.current) return;
+      (mapboxgl as unknown as { accessToken: string }).accessToken = mapboxToken;
+
+      type MBMap = { resize: () => void; fitBounds: (b: unknown, o: unknown) => void };
+      type MBMapCtor = new (o: unknown) => MBMap;
+      type MBMarkerCtor = new (el: HTMLElement) => { setLngLat: (c: [number, number]) => { addTo: (m: unknown) => void } };
+      type LngLatBoundsCtor = new () => { extend: (c: [number, number]) => void };
+
+      const MapCtor = (mapboxgl as unknown as { Map: MBMapCtor }).Map;
+      const map = new MapCtor({
+        container: mapRef.current!,
+        style: "mapbox://styles/mapbox/streets-v12",
+        center: [sucursal.lng, sucursal.lat],
+        zoom: 13,
+        attributionControl: false,
+      });
+
+      const MarkerCtor = (mapboxgl as unknown as { Marker: MBMarkerCtor }).Marker;
+      const BoundsCtor = (mapboxgl as unknown as { LngLatBounds: LngLatBoundsCtor }).LngLatBounds;
+
+      // Marcador sucursal — azul
+      const elS = document.createElement("div");
+      elS.style.cssText = "width:14px;height:14px;border-radius:50%;background:#2563eb;border:3px solid #fff;box-shadow:0 0 0 5px rgba(37,99,235,.25);flex-shrink:0";
+      new MarkerCtor(elS).setLngLat([sucursal.lng, sucursal.lat]).addTo(map);
+
+      // Marcador cliente — rojo (solo si hay GPS)
+      if (userLat != null && userLng != null) {
+        const elC = document.createElement("div");
+        elC.style.cssText = "width:14px;height:14px;border-radius:50%;background:#ef4444;border:3px solid #fff;box-shadow:0 0 0 5px rgba(239,68,68,.25);flex-shrink:0";
+        new MarkerCtor(elC).setLngLat([userLng, userLat]).addTo(map);
+
+        // Ajustar para mostrar ambos puntos
+        const bounds = new BoundsCtor();
+        bounds.extend([sucursal.lng, sucursal.lat]);
+        bounds.extend([userLng, userLat]);
+        map.fitBounds(bounds, { padding: 50, maxZoom: 14, duration: 0 });
+      }
+
+      // Resize después de montar para asegurar que el mapa llena el contenedor
+      setTimeout(() => (map as MBMap).resize(), 100);
+      setTimeout(() => (map as MBMap).resize(), 500);
+    })();
+    return () => { cancelled = true; };
+  }, [mounted, mapboxToken, sucursal, userLat, userLng]);
+
+  return (
+    <div
+      ref={mapRef}
+      style={{
+        height: "200px",
+        width: "100%",
+        display: "block",
+        position: "relative",
+        minHeight: "200px",
+      }}
+    />
+  );
+}
+
 export default function CheckoutClient({
   defaults, mapboxToken,
 }: {
@@ -34,30 +115,21 @@ export default function CheckoutClient({
   const [error, setError] = useState<string | null>(null);
   const [fieldErr, setFieldErr] = useState<{ direccion?: string; telefono?: string }>({});
 
-  // GPS del cliente — solo para el mapa, no bloquea el pedido
   const [userLat, setUserLat] = useState<number | null>(null);
   const [userLng, setUserLng] = useState<number | null>(null);
-
-  // Sucursal más cercana abierta — se carga una sola vez al montar
   const [sucursal, setSucursal] = useState<SucursalInfo | null>(null);
 
-  const mapRef = useRef<HTMLDivElement>(null);
-  const mapInst = useRef<unknown>(null);
-
-  // 1. GPS silencioso — solo para el mapa, no bloquea nada
+  // GPS silencioso — solo para el mapa
   useEffect(() => {
     if (!navigator.geolocation) return;
     navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        setUserLat(pos.coords.latitude);
-        setUserLng(pos.coords.longitude);
-      },
-      () => { /* ignorar error — el pedido sigue funcionando */ },
+      (pos) => { setUserLat(pos.coords.latitude); setUserLng(pos.coords.longitude); },
+      () => {},
       { timeout: 8000, maximumAge: 120000 }
     );
   }, []);
 
-  // 2. Cargar la sucursal abierta más cercana (con coords aproximadas de México como fallback)
+  // Cargar sucursal abierta más cercana
   useEffect(() => {
     const lat = userLat ?? 21.5;
     const lng = userLng ?? -104.9;
@@ -66,51 +138,6 @@ export default function CheckoutClient({
       .then((d: CoberturaResult) => { if (d.sucursal) setSucursal(d.sucursal); })
       .catch(() => null);
   }, [userLat, userLng]);
-
-  // 3. Mapa — muestra sucursal siempre; punto del cliente solo si hay GPS
-  useEffect(() => {
-    if (!mapboxToken || !mapRef.current || !sucursal) return;
-    if (mapInst.current) return; // ya inicializado
-    let cancelled = false;
-    (async () => {
-      const mapboxgl = (await import("mapbox-gl")).default;
-      if (cancelled || !mapRef.current) return;
-      (mapboxgl as unknown as { accessToken: string }).accessToken = mapboxToken;
-
-      type MBMap = { resize: () => void };
-      type MBMapCtor = new (o: unknown) => MBMap;
-      type MBMarkerCtor = new (el: HTMLElement) => { setLngLat: (c: [number, number]) => { addTo: (m: unknown) => void } };
-
-      const centerLat = userLat != null ? (sucursal.lat + userLat) / 2 : sucursal.lat;
-      const centerLng = userLng != null ? (sucursal.lng + userLng) / 2 : sucursal.lng;
-      const zoom = userLat != null ? 11 : 13;
-
-      const MapCtor = (mapboxgl as unknown as { Map: MBMapCtor }).Map;
-      const map = new MapCtor({
-        container: mapRef.current!,
-        style: "mapbox://styles/mapbox/dark-v11",
-        center: [centerLng, centerLat],
-        zoom,
-      });
-      mapInst.current = map;
-      setTimeout(() => (map as MBMap).resize(), 200);
-
-      const MarkerCtor = (mapboxgl as unknown as { Marker: MBMarkerCtor }).Marker;
-
-      // Marcador sucursal (azul) — siempre visible
-      const elS = document.createElement("div");
-      elS.style.cssText = "width:14px;height:14px;border-radius:50%;background:#2563eb;border:3px solid #fff;box-shadow:0 0 0 5px rgba(37,99,235,.3)";
-      new MarkerCtor(elS).setLngLat([sucursal.lng, sucursal.lat]).addTo(map);
-
-      // Marcador cliente (rojo) — solo si tenemos GPS
-      if (userLat != null && userLng != null) {
-        const elC = document.createElement("div");
-        elC.style.cssText = "width:14px;height:14px;border-radius:50%;background:#ef4444;border:3px solid #fff;box-shadow:0 0 0 5px rgba(239,68,68,.3)";
-        new MarkerCtor(elC).setLngLat([userLng, userLat]).addTo(map);
-      }
-    })();
-    return () => { cancelled = true; };
-  }, [sucursal, userLat, userLng, mapboxToken]);
 
   const confirmar = async () => {
     const errs: typeof fieldErr = {};
@@ -138,14 +165,10 @@ export default function CheckoutClient({
           sucursal_id: sucursal?.id ?? null,
         }),
       });
-
-      const contentType = res.headers.get("content-type") ?? "";
-      if (!contentType.includes("application/json")) {
-        throw new Error("El servidor no respondió correctamente. Intenta de nuevo.");
-      }
+      const ct = res.headers.get("content-type") ?? "";
+      if (!ct.includes("application/json")) throw new Error("Error del servidor. Intenta de nuevo.");
       const data = await res.json();
       if (!res.ok) throw new Error(data?.error ?? "No se pudo crear el pedido");
-
       clear();
       router.push(`/pedido/confirmado/${data.folio}`);
     } catch (e) {
@@ -167,25 +190,30 @@ export default function CheckoutClient({
 
   return (
     <div className="grid gap-6 pb-6 lg:grid-cols-[1fr_380px]">
-      <section className="flex flex-col gap-5">
+      <section className="flex min-w-0 flex-col gap-5">
         <h1 className="section-title text-2xl">Confirma tu pedido</h1>
 
-        {/* Mapa informativo — sucursal que atenderá el pedido */}
-        {sucursal && (
+        {/* Mapa sucursal */}
+        {sucursal && mapboxToken && (
           <div className="overflow-hidden rounded-2xl border border-hairline">
             <div className="flex items-center justify-between border-b border-hairline bg-surface-2 px-4 py-2.5 text-xs">
-              <span>
-                <span className="mr-1.5 inline-block h-2.5 w-2.5 rounded-full bg-blue-500 align-middle" />
-                Sucursal: <strong>{sucursal.nombre}</strong>
+              <span className="flex items-center gap-1.5">
+                <span className="inline-block h-2.5 w-2.5 shrink-0 rounded-full bg-blue-500" />
+                <strong>{sucursal.nombre}</strong>
               </span>
               {userLat != null && (
-                <span>
-                  <span className="mr-1.5 inline-block h-2.5 w-2.5 rounded-full bg-red-500 align-middle" />
-                  Tu ubicación actual
+                <span className="flex items-center gap-1.5">
+                  <span className="inline-block h-2.5 w-2.5 shrink-0 rounded-full bg-red-500" />
+                  Tu ubicación
                 </span>
               )}
             </div>
-            <div ref={mapRef} style={{ height: "200px", width: "100%" }} />
+            <MapaCheckout
+              mapboxToken={mapboxToken}
+              sucursal={sucursal}
+              userLat={userLat}
+              userLng={userLng}
+            />
             <div className="border-t border-hairline bg-surface-2 px-4 py-2 text-xs text-on-bg-muted">
               Esta sucursal atenderá tu pedido · Tel: {sucursal.telefono}
             </div>
@@ -219,7 +247,7 @@ export default function CheckoutClient({
           <div>
             <label htmlFor="notas" className="label">Notas para el repartidor (opcional)</label>
             <input id="notas" className="input"
-              placeholder="Tocar timbre, portón negro, preguntar por…"
+              placeholder="Tocar timbre, portón negro…"
               value={notas} onChange={(e) => setNotas(e.target.value)} />
           </div>
         </div>
@@ -238,7 +266,7 @@ export default function CheckoutClient({
           <ul className="flex max-h-52 flex-col gap-2 overflow-y-auto text-sm">
             {items.map((it) => (
               <li key={it.producto_id} className="flex justify-between gap-3">
-                <span className="text-on-bg-muted">{it.cantidad}× {it.nombre}</span>
+                <span className="min-w-0 truncate text-on-bg-muted">{it.cantidad}× {it.nombre}</span>
                 <span className="shrink-0 font-semibold">{formatMXN(it.precio * it.cantidad)}</span>
               </li>
             ))}
@@ -261,9 +289,7 @@ export default function CheckoutClient({
               onChange={(e) => { setAcepta(e.target.checked); if (e.target.checked) setError(null); }}
               className="mt-0.5 h-4 w-4 accent-[#C41E3A]"
             />
-            <span>
-              Acepto <strong>{formatMXN(total)}</strong> (incluye ${ENVIO_FIJO} de entrega) y pagaré contra entrega.
-            </span>
+            <span>Acepto <strong>{formatMXN(total)}</strong> (incluye ${ENVIO_FIJO} de entrega) y pagaré contra entrega.</span>
           </label>
 
           {error && (
