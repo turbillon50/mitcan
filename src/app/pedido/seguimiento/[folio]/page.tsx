@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { requireUser } from "@/lib/auth";
+import { getMapboxToken } from "@/lib/mapbox";
 import SeguimientoClient from "@/components/pedido/SeguimientoClient";
 
 export const metadata: Metadata = { title: "Seguimiento — CSN" };
@@ -12,5 +13,5 @@ export default async function SeguimientoPage({
 }) {
   await requireUser();
   const { folio } = await params;
-  return <SeguimientoClient folio={folio} />;
+  return <SeguimientoClient folio={folio} mapboxToken={getMapboxToken() ?? ""} />;
 }
