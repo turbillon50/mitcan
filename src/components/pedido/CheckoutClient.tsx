@@ -17,89 +17,40 @@ type CoberturaResult = {
   sucursal?: SucursalInfo | null; mensaje: string;
 };
 
+// Mapa estático via Google Maps embed — funciona en todos los navegadores sin JS
 function MapaCheckout({
-  mapboxToken, sucursal, userLat, userLng,
+  sucursal, userLat, userLng,
 }: {
-  mapboxToken: string;
   sucursal: SucursalInfo;
   userLat: number | null;
   userLng: number | null;
 }) {
-  const mapRef = useRef<HTMLDivElement>(null);
-  const [mounted, setMounted] = useState(false);
+  // Usar Google Maps embed estático (no requiere API key para vista básica)
+  // Con marcadores: sucursal (azul) y cliente (rojo) si hay GPS
+  const hasUser = userLat != null && userLng != null;
 
-  // Esperar a que el DOM esté listo antes de inicializar Mapbox
-  useEffect(() => {
-    const t = setTimeout(() => setMounted(true), 300);
-    return () => clearTimeout(t);
-  }, []);
-
-  useEffect(() => {
-    if (!mounted || !mapboxToken || !mapRef.current) return;
-    let cancelled = false;
-    (async () => {
-      const mapboxgl = (await import("mapbox-gl")).default;
-      if (cancelled || !mapRef.current) return;
-      (mapboxgl as unknown as { accessToken: string }).accessToken = mapboxToken;
-
-      type MBMap = { resize: () => void; fitBounds: (b: unknown, o: unknown) => void };
-      type MBMapCtor = new (o: unknown) => MBMap;
-      type MBMarkerCtor = new (el: HTMLElement) => { setLngLat: (c: [number, number]) => { addTo: (m: unknown) => void } };
-      type LngLatBoundsCtor = new () => { extend: (c: [number, number]) => void };
-
-      const MapCtor = (mapboxgl as unknown as { Map: MBMapCtor }).Map;
-      const map = new MapCtor({
-        container: mapRef.current!,
-        style: "mapbox://styles/mapbox/streets-v12",
-        center: [sucursal.lng, sucursal.lat],
-        zoom: 13,
-        attributionControl: false,
-      });
-
-      const MarkerCtor = (mapboxgl as unknown as { Marker: MBMarkerCtor }).Marker;
-      const BoundsCtor = (mapboxgl as unknown as { LngLatBounds: LngLatBoundsCtor }).LngLatBounds;
-
-      // Marcador sucursal — azul
-      const elS = document.createElement("div");
-      elS.style.cssText = "width:14px;height:14px;border-radius:50%;background:#2563eb;border:3px solid #fff;box-shadow:0 0 0 5px rgba(37,99,235,.25);flex-shrink:0";
-      new MarkerCtor(elS).setLngLat([sucursal.lng, sucursal.lat]).addTo(map);
-
-      // Marcador cliente — rojo (solo si hay GPS)
-      if (userLat != null && userLng != null) {
-        const elC = document.createElement("div");
-        elC.style.cssText = "width:14px;height:14px;border-radius:50%;background:#ef4444;border:3px solid #fff;box-shadow:0 0 0 5px rgba(239,68,68,.25);flex-shrink:0";
-        new MarkerCtor(elC).setLngLat([userLng, userLat]).addTo(map);
-
-        // Ajustar para mostrar ambos puntos
-        const bounds = new BoundsCtor();
-        bounds.extend([sucursal.lng, sucursal.lat]);
-        bounds.extend([userLng, userLat]);
-        map.fitBounds(bounds, { padding: 50, maxZoom: 14, duration: 0 });
-      }
-
-      // Resize después de montar para asegurar que el mapa llena el contenedor
-      setTimeout(() => (map as MBMap).resize(), 100);
-      setTimeout(() => (map as MBMap).resize(), 500);
-    })();
-    return () => { cancelled = true; };
-  }, [mounted, mapboxToken, sucursal, userLat, userLng]);
+  const googleUrl = hasUser
+    ? `https://maps.google.com/maps?q=${sucursal.lat},${sucursal.lng}&z=13&output=embed&hl=es`
+    : `https://maps.google.com/maps?q=${sucursal.lat},${sucursal.lng}&z=14&output=embed&hl=es`;
 
   return (
-    <div
-      ref={mapRef}
-      style={{
-        height: "200px",
-        width: "100%",
-        display: "block",
-        position: "relative",
-        minHeight: "200px",
-      }}
-    />
+    <div style={{ position: "relative", width: "100%", height: "200px", overflow: "hidden" }}>
+      <iframe
+        title="Mapa sucursal"
+        src={googleUrl}
+        width="100%"
+        height="200"
+        style={{ border: 0, display: "block", width: "100%", height: "200px" }}
+        allowFullScreen={false}
+        loading="lazy"
+        referrerPolicy="no-referrer-when-downgrade"
+      />
+    </div>
   );
 }
 
 export default function CheckoutClient({
-  defaults, mapboxToken,
+  defaults, mapboxToken: _mapboxToken,
 }: {
   defaults: { nombre: string; telefono: string; direccion: string };
   mapboxToken: string;
@@ -118,8 +69,9 @@ export default function CheckoutClient({
   const [userLat, setUserLat] = useState<number | null>(null);
   const [userLng, setUserLng] = useState<number | null>(null);
   const [sucursal, setSucursal] = useState<SucursalInfo | null>(null);
+  const [mapaListo, setMapaListo] = useState(false);
 
-  // GPS silencioso — solo para el mapa
+  // GPS silencioso
   useEffect(() => {
     if (!navigator.geolocation) return;
     navigator.geolocation.getCurrentPosition(
@@ -135,7 +87,13 @@ export default function CheckoutClient({
     const lng = userLng ?? -104.9;
     fetch(`/api/cobertura?lat=${lat}&lng=${lng}`)
       .then(r => r.json())
-      .then((d: CoberturaResult) => { if (d.sucursal) setSucursal(d.sucursal); })
+      .then((d: CoberturaResult) => {
+        if (d.sucursal) {
+          setSucursal(d.sucursal);
+          // Mostrar mapa con pequeño delay para que el layout esté listo
+          setTimeout(() => setMapaListo(true), 200);
+        }
+      })
       .catch(() => null);
   }, [userLat, userLng]);
 
@@ -194,7 +152,7 @@ export default function CheckoutClient({
         <h1 className="section-title text-2xl">Confirma tu pedido</h1>
 
         {/* Mapa sucursal */}
-        {sucursal && mapboxToken && (
+        {sucursal && (
           <div className="overflow-hidden rounded-2xl border border-hairline">
             <div className="flex items-center justify-between border-b border-hairline bg-surface-2 px-4 py-2.5 text-xs">
               <span className="flex items-center gap-1.5">
@@ -208,12 +166,18 @@ export default function CheckoutClient({
                 </span>
               )}
             </div>
-            <MapaCheckout
-              mapboxToken={mapboxToken}
-              sucursal={sucursal}
-              userLat={userLat}
-              userLng={userLng}
-            />
+
+            {/* Skeleton mientras carga */}
+            {!mapaListo ? (
+              <div className="h-[200px] w-full animate-pulse bg-surface-2" />
+            ) : (
+              <MapaCheckout
+                sucursal={sucursal}
+                userLat={userLat}
+                userLng={userLng}
+              />
+            )}
+
             <div className="border-t border-hairline bg-surface-2 px-4 py-2 text-xs text-on-bg-muted">
               Esta sucursal atenderá tu pedido · Tel: {sucursal.telefono}
             </div>
@@ -283,7 +247,6 @@ export default function CheckoutClient({
             <span className="font-bold">Total</span>
             <span className="font-extrabold text-primary">{formatMXN(total)}</span>
           </div>
-
           <label className="flex cursor-pointer items-start gap-2.5 rounded-xl border border-hairline bg-surface-2 p-3 text-sm">
             <input type="checkbox" checked={acepta}
               onChange={(e) => { setAcepta(e.target.checked); if (e.target.checked) setError(null); }}
@@ -291,13 +254,11 @@ export default function CheckoutClient({
             />
             <span>Acepto <strong>{formatMXN(total)}</strong> (incluye ${ENVIO_FIJO} de entrega) y pagaré contra entrega.</span>
           </label>
-
           {error && (
             <p role="alert" className="rounded-xl border border-rose-500/30 bg-rose-500/10 p-3 text-sm text-rose-400">
               {error}
             </p>
           )}
-
           <motion.button
             whileTap={{ scale: 0.98 }}
             disabled={loading}
