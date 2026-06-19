@@ -1,4 +1,5 @@
 "use client";
+import MapaSeguimientoOSM from "@/components/MapaSeguimientoOSM";
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
@@ -31,162 +32,6 @@ type Pedido = {
   eventos: { id: number; estado: string; created_at: string }[];
   encuesta: { id: number } | null;
 };
-
-function MapaSeguimiento({
-  mapboxToken, estado, direccionEntrega, destLat, destLng,
-}: {
-  mapboxToken: string; estado: string;
-  direccionEntrega: string | null;
-  destLat: number | null; destLng: number | null;
-}) {
-  const mapRef = useRef<HTMLDivElement>(null);
-  const mapInst = useRef<unknown>(null);
-
-  const enRuta = ["entregado_repartidor", "en_camino", "ha_llegado"].includes(estado);
-  const entregado = estado === "ha_llegado";
-  const enCamino = estado === "en_camino";
-
-  useEffect(() => {
-    if (!mapboxToken || !mapRef.current || mapInst.current) return;
-    let cancelled = false;
-    (async () => {
-      const mapboxgl = (await import("mapbox-gl")).default;
-      if (cancelled || !mapRef.current) return;
-      (mapboxgl as unknown as { accessToken: string }).accessToken = mapboxToken;
-
-      type MBMap = {
-        resize: () => void;
-        addLayer: (l: unknown) => void;
-        addSource: (id: string, s: unknown) => void;
-        on: (ev: string, fn: () => void) => void;
-        fitBounds: (b: unknown, o: unknown) => void;
-      };
-      type MBMapCtor = new (o: unknown) => MBMap;
-      type MBMarkerCtor = new (el?: HTMLElement) => {
-        setLngLat: (c: [number, number]) => { addTo: (m: unknown) => void }
-      };
-      type LngLatBoundsCtor = new () => { extend: (c: [number, number]) => void };
-
-      const hasDestino = destLat != null && destLng != null;
-
-      // Centro: entre sucursal y destino si lo tenemos, sino solo sucursal
-      const cLat = hasDestino ? (SUC_LAT + destLat!) / 2 : SUC_LAT;
-      const cLng = hasDestino ? (SUC_LNG + destLng!) / 2 : SUC_LNG;
-
-      const MapCtor = (mapboxgl as unknown as { Map: MBMapCtor }).Map;
-      const map = new MapCtor({
-        container: mapRef.current!,
-        style: "mapbox://styles/mapbox/dark-v11",
-        center: [cLng, cLat],
-        zoom: hasDestino ? 12 : 14,
-      });
-      mapInst.current = map;
-      setTimeout(() => (map as MBMap).resize(), 200);
-
-      const MarkerCtor = (mapboxgl as unknown as { Marker: MBMarkerCtor }).Marker;
-
-      // Marcador sucursal — azul
-      const elS = document.createElement("div");
-      elS.innerHTML = `<div style="background:#2563eb;width:14px;height:14px;border-radius:50%;border:3px solid #fff;box-shadow:0 0 0 5px rgba(37,99,235,.25)"></div>`;
-      new MarkerCtor(elS.firstChild as HTMLElement).setLngLat([SUC_LNG, SUC_LAT]).addTo(map);
-
-      // Marcador destino — rojo (si tenemos coords geocodificadas)
-      if (hasDestino) {
-        const elD = document.createElement("div");
-        elD.innerHTML = `<div style="background:#ef4444;width:14px;height:14px;border-radius:50%;border:3px solid #fff;box-shadow:0 0 0 5px rgba(239,68,68,.25)"></div>`;
-        new MarkerCtor(elD.firstChild as HTMLElement).setLngLat([destLng!, destLat!]).addTo(map);
-      }
-
-      // Marcador repartidor — naranja pulsando (si está en ruta)
-      if (enRuta && !entregado) {
-        // Posición estimada: 40% del camino hacia el destino
-        const rLat = hasDestino ? SUC_LAT + (destLat! - SUC_LAT) * 0.4 : SUC_LAT + 0.004;
-        const rLng = hasDestino ? SUC_LNG + (destLng! - SUC_LNG) * 0.4 : SUC_LNG + 0.004;
-        const elR = document.createElement("div");
-        const color = enCamino ? "#f97316" : "#f59e0b";
-        elR.style.cssText = `width:20px;height:20px;border-radius:50%;background:${color};border:3px solid #fff;box-shadow:0 0 0 6px ${color}44;cursor:pointer`;
-        if (enCamino) {
-          elR.animate([
-            { boxShadow: `0 0 0 4px ${color}55` },
-            { boxShadow: `0 0 0 10px ${color}00` },
-          ], { duration: 1200, iterations: Infinity });
-        }
-        new MarkerCtor(elR).setLngLat([rLng, rLat]).addTo(map);
-      }
-
-      // Línea de ruta
-      map.on("load", () => {
-        const coords: [number, number][] = [[SUC_LNG, SUC_LAT]];
-        if (enRuta && !entregado) {
-          const rLat = hasDestino ? SUC_LAT + (destLat! - SUC_LAT) * 0.4 : SUC_LAT + 0.004;
-          const rLng = hasDestino ? SUC_LNG + (destLng! - SUC_LNG) * 0.4 : SUC_LNG + 0.004;
-          coords.push([rLng, rLat]);
-        }
-        if (hasDestino) coords.push([destLng!, destLat!]);
-
-        if (coords.length > 1) {
-          const lineColor = entregado ? "#10b981" : enCamino ? "#f97316" : "#6366f1";
-          map.addSource("ruta", {
-            type: "geojson",
-            data: { type: "Feature", geometry: { type: "LineString", coordinates: coords } },
-          });
-          map.addLayer({
-            id: "ruta-line",
-            type: "line",
-            source: "ruta",
-            layout: { "line-join": "round", "line-cap": "round" },
-            paint: { "line-color": lineColor, "line-width": 3, "line-dasharray": [2, 1.5] },
-          });
-        }
-
-        // Ajustar zoom para mostrar sucursal + destino
-        if (hasDestino) {
-          const BoundsCtor = (mapboxgl as unknown as { LngLatBounds: LngLatBoundsCtor }).LngLatBounds;
-          const bounds = new BoundsCtor();
-          bounds.extend([SUC_LNG, SUC_LAT]);
-          bounds.extend([destLng!, destLat!]);
-          map.fitBounds(bounds, { padding: 50, maxZoom: 14, duration: 500 });
-        }
-      });
-    })();
-    return () => { cancelled = true; };
-  }, [mapboxToken, estado, enRuta, entregado, enCamino, destLat, destLng]);
-
-  const estadoConfig = {
-    recibido: { color: "text-blue-400", msg: "📋 Pedido recibido" },
-    en_preparacion: { color: "text-indigo-400", msg: "🔪 En preparación" },
-    entregado_repartidor: { color: "text-amber-400", msg: "📦 Con repartidor" },
-    en_camino: { color: "text-orange-400", msg: "🛵 En camino a tu domicilio" },
-    ha_llegado: { color: "text-emerald-400", msg: "✓ Pedido entregado" },
-  }[estado] ?? { color: "text-on-bg-muted", msg: estado };
-
-  return (
-    <section className="overflow-hidden rounded-2xl border border-hairline">
-      <div className="flex items-center justify-between border-b border-hairline bg-surface-2 px-4 py-3">
-        <div className="flex items-center gap-2 text-xs">
-          <span className="inline-block h-2.5 w-2.5 shrink-0 rounded-full bg-blue-500" />
-          <span className="font-medium">{SUC_NOMBRE}</span>
-          {destLat && (
-            <>
-              <span className="text-on-bg-muted">→</span>
-              <span className="inline-block h-2.5 w-2.5 shrink-0 rounded-full bg-red-500" />
-              <span className="font-medium">Tu dirección</span>
-            </>
-          )}
-        </div>
-        <span className={`text-xs font-bold ${estadoConfig.color}`}>{estadoConfig.msg}</span>
-      </div>
-
-      <div ref={mapRef} style={{ height: "220px", width: "100%" }} />
-
-      {direccionEntrega && (
-        <div className="border-t border-hairline bg-surface-2 px-4 py-2.5 text-xs text-on-bg-muted">
-          📍 {direccionEntrega}
-        </div>
-      )}
-    </section>
-  );
-}
 
 export default function SeguimientoClient({
   folio, mapboxToken, destLat, destLng,
@@ -248,7 +93,7 @@ export default function SeguimientoClient({
 
       {/* Mapa */}
       {!cancelado && mapboxToken && (
-        <MapaSeguimiento
+        <MapaSeguimientoOSM
           mapboxToken={mapboxToken}
           estado={pedido.estado}
           direccionEntrega={pedido.direccion_entrega}
