@@ -4,7 +4,6 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Search, Phone, Navigation, Clock, MessageCircle, MapPin } from "lucide-react";
 import { formatPhone } from "@/lib/format";
 import { useT } from "@/components/I18nProvider";
-import "mapbox-gl/dist/mapbox-gl.css";
 
 type Sucursal = {
   id: number;
@@ -35,9 +34,9 @@ export default function SucursalesExplorer({
   const [area, setArea] = useState<string>(areas[0]?.key ?? "all");
   const tr = useT();
 
-  const mapRef = useRef<import("mapbox-gl").Map | null>(null);
-  const markers = useRef<Record<number, import("mapbox-gl").Marker>>({});
-  const mapboxRef = useRef<(typeof import("mapbox-gl"))["default"] | null>(null);
+  const mapRef = useRef<unknown>(null);
+  const markers = useRef<Record<number, unknown>>({});
+  const mapboxRef = useRef<unknown>(null);
   const elRef = useRef<HTMLDivElement>(null);
 
   const withCoords = useMemo(
@@ -58,10 +57,10 @@ export default function SucursalesExplorer({
 
   // init map once
   useEffect(() => {
-    if (!token || !elRef.current || mapRef.current) return;
+    if (!elRef.current || mapRef.current) return;
     let cancelled = false;
     (async () => {
-      const mapboxgl = (await import("mapbox-gl")).default;
+      // mapbox removed — using leaflet now
       if (cancelled || !elRef.current) return;
       mapboxRef.current = mapboxgl;
       mapboxgl.accessToken = token;

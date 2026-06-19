@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from "react";
 import { LocateFixed } from "lucide-react";
-import "mapbox-gl/dist/mapbox-gl.css";
 
 /** Pick a branch location: draggable map marker + "use my location".
  *  Writes hidden inputs `lat` and `lng` for the sucursal form. */
@@ -16,8 +15,8 @@ export default function LocationPicker({
   defaultLng?: number | null;
 }) {
   const ref = useRef<HTMLDivElement>(null);
-  const markerRef = useRef<import("mapbox-gl").Marker | null>(null);
-  const mapRef = useRef<import("mapbox-gl").Map | null>(null);
+  const markerRef = useRef<unknown>(null);
+  const mapRef = useRef<unknown>(null);
   const [lat, setLat] = useState<number | null>(defaultLat ?? null);
   const [lng, setLng] = useState<number | null>(defaultLng ?? null);
 

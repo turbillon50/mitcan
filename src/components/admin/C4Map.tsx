@@ -9,7 +9,6 @@ import {
 import { formatMXN } from "@/lib/format";
 import LocationPicker from "@/components/admin/LocationPicker";
 import { saveSucursal, saveCamaras, type Camara } from "@/app/admin/actions";
-import "mapbox-gl/dist/mapbox-gl.css";
 
 export type C4Suc = {
   id: number;
@@ -46,7 +45,7 @@ export default function C4Map({
   camaras: Record<number, Camara[]>;
 }) {
   const elRef = useRef<HTMLDivElement>(null);
-  const mapRef = useRef<import("mapbox-gl").Map | null>(null);
+  const mapRef = useRef<unknown>(null);
   const [sel, setSel] = useState<C4Suc | null>(null);
 
   const withCoords = useMemo(
