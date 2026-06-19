@@ -55,74 +55,68 @@ export default function SucursalesExplorer({
     return sucursales.filter((s) => area === "all" || s.area === area);
   }, [sucursales, q, area]);
 
-  // init map once
+  // init map once — Leaflet + OpenStreetMap
   useEffect(() => {
     if (!elRef.current || mapRef.current) return;
     let cancelled = false;
     (async () => {
-      // mapbox removed — using leaflet now
+      const L = (await import("leaflet")).default;
+      if (!document.getElementById("leaflet-css")) {
+        const link = document.createElement("link");
+        link.id = "leaflet-css"; link.rel = "stylesheet";
+        link.href = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";
+        document.head.appendChild(link);
+      }
       if (cancelled || !elRef.current) return;
-      mapboxRef.current = mapboxgl;
-      mapboxgl.accessToken = token;
-      const map = new mapboxgl.Map({
-        container: elRef.current,
-        style: "mapbox://styles/mapbox/streets-v12",
-        center: [-104.89, 21.5],
-        zoom: 11,
-      });
-      map.addControl(new mapboxgl.NavigationControl({ showCompass: false }), "top-right");
+      type LMap = { remove:()=>void; flyTo:(c:[number,number],z:number)=>void; fitBounds:(b:[number,number][], o:object)=>void; invalidateSize:()=>void };
+      const map = L.map(elRef.current, { center:[-104.89, 21.5] as [number,number], zoom:11, zoomControl:true, attributionControl:false }) as unknown as LMap;
+      mapRef.current = map;
+      (L.tileLayer as unknown as (url:string, opts:object)=>object)("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 19 }).addTo(map as unknown as object);
       for (const s of withCoords) {
         const el = document.createElement("div");
-        el.style.cssText =
-          "width:16px;height:16px;border-radius:50%;background:#C41E3A;border:2px solid #fff;box-shadow:0 0 0 4px rgba(196,30,58,.25);cursor:pointer";
-        const popup = new mapboxgl.Popup({ offset: 14, closeButton: false }).setHTML(
-          `<div style="font-family:system-ui;color:#1a1a1a"><strong>${s.nombre}</strong>${
-            s.direccion ? `<br/><span style="font-size:12px">${s.direccion}</span>` : ""
-          }</div>`
-        );
-        const m = new mapboxgl.Marker(el).setLngLat([s.lng!, s.lat!]).setPopup(popup).addTo(map);
+        el.style.cssText = "width:16px;height:16px;border-radius:50%;background:#C41E3A;border:2px solid #fff;box-shadow:0 0 0 4px rgba(196,30,58,.25);cursor:pointer";
+        const icon = L.divIcon({ html: el, className:"", iconSize:[16,16] as [number,number], iconAnchor:[8,8] as [number,number] });
+        const m = (L.marker as unknown as (c:[number,number], o:object)=>{ bindPopup:(h:string)=>{ addTo:(m:object)=>void }; openPopup:()=>void })([s.lat!, s.lng!], { icon: icon as unknown as object });
+        m.bindPopup(`<div style="font-family:system-ui"><strong>${s.nombre}</strong>${s.direccion ? `<br/><small>${s.direccion}</small>` : ""}${s.telefono ? `<br/><small>📞 ${s.telefono}</small>` : ""}</div>`).addTo(map as unknown as object);
         el.addEventListener("click", () => focus(s.id));
         markers.current[s.id] = m;
       }
-      mapRef.current = map;
-      map.once("load", () => fitTo(visible));
+      setTimeout(() => (map as LMap).invalidateSize(), 200);
     })();
     return () => {
       cancelled = true;
-      mapRef.current?.remove();
+      (mapRef.current as { remove:()=>void } | null)?.remove();
       mapRef.current = null;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [token]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [withCoords]);
 
   // move camera when the visible set changes
   const visKey = visible.map((s) => s.id).join(",");
   useEffect(() => {
     fitTo(visible);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visKey]);
 
   function fitTo(list: Sucursal[]) {
-    const map = mapRef.current;
-    const mapboxgl = mapboxRef.current;
-    if (!map || !mapboxgl) return;
+    const map = mapRef.current as { flyTo:(c:[number,number],z:number)=>void; fitBounds:(b:[number,number][], o:object)=>void } | null;
+    if (!map) return;
     const pts = list.filter((s) => s.lat != null && s.lng != null);
     if (pts.length === 0) return;
     if (pts.length === 1) {
-      map.flyTo({ center: [pts[0].lng!, pts[0].lat!], zoom: 14, duration: 700 });
+      map.flyTo([pts[0].lat!, pts[0].lng!], 14);
       return;
     }
-    const b = new mapboxgl.LngLatBounds();
-    pts.forEach((s) => b.extend([s.lng!, s.lat!]));
-    map.fitBounds(b, { padding: 60, maxZoom: 13, duration: 700 });
+    map.fitBounds(pts.map(s => [s.lat!, s.lng!]) as unknown as [number,number][], { padding: [60,60], maxZoom: 13 });
   }
 
   function focus(id: number) {
     const s = sucursales.find((x) => x.id === id);
     if (!s || s.lat == null || s.lng == null) return;
-    mapRef.current?.flyTo({ center: [s.lng, s.lat], zoom: 15, duration: 800 });
-    markers.current[id]?.togglePopup();
+    (mapRef.current as { flyTo:(c:[number,number],z:number)=>void } | null)?.flyTo([s.lat, s.lng], 15);
+    (markers.current[id] as { openPopup:()=>void } | undefined)?.openPopup();
   }
+
 
   return (
     <div className="flex flex-col gap-5">
