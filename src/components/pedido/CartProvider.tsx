@@ -1,13 +1,10 @@
 "use client";
 
 import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
+  createContext, useCallback, useContext,
+  useEffect, useMemo, useState,
 } from "react";
+import { useUser } from "@clerk/nextjs";
 
 export type CartItem = {
   producto_id: number;
@@ -31,26 +28,51 @@ type CartCtx = {
 };
 
 const Ctx = createContext<CartCtx | null>(null);
-const KEY = "csn-cart-v1";
+
+// Key única por usuario — NUNCA se comparte entre cuentas
+function cartKey(userId: string | null | undefined) {
+  return userId ? `csn-cart-v2-${userId}` : null;
+}
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
+  const { user, isLoaded } = useUser();
   const [items, setItems] = useState<CartItem[]>([]);
   const [ready, setReady] = useState(false);
+  const [loadedKey, setLoadedKey] = useState<string | null>(null);
 
+  // Cargar carrito cuando tengamos el userId
   useEffect(() => {
+    if (!isLoaded) return;
+    const key = cartKey(user?.id);
+    if (!key) {
+      // Sin sesión: carrito vacío en memoria, no persistir
+      setItems([]);
+      setReady(true);
+      setLoadedKey(null);
+      return;
+    }
+    if (key === loadedKey) return; // ya cargado para este usuario
     try {
-      const raw = localStorage.getItem(KEY);
-      if (raw) setItems(JSON.parse(raw));
-    } catch {}
+      const raw = localStorage.getItem(key);
+      setItems(raw ? JSON.parse(raw) : []);
+    } catch {
+      setItems([]);
+    }
+    setLoadedKey(key);
     setReady(true);
-  }, []);
+  }, [isLoaded, user?.id, loadedKey]);
 
+  // Persistir carrito — solo si hay key de usuario
   useEffect(() => {
-    if (!ready) return;
+    if (!ready || !loadedKey) return;
     try {
-      localStorage.setItem(KEY, JSON.stringify(items));
+      if (items.length === 0) {
+        localStorage.removeItem(loadedKey);
+      } else {
+        localStorage.setItem(loadedKey, JSON.stringify(items));
+      }
     } catch {}
-  }, [items, ready]);
+  }, [items, ready, loadedKey]);
 
   const add = useCallback((item: Omit<CartItem, "cantidad">, cantidad = 1) => {
     setItems((prev) => {
@@ -65,32 +87,44 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const setCantidad = useCallback((producto_id: number, cantidad: number) => {
-    setItems((prev) =>
-      cantidad <= 0
-        ? prev.filter((x) => x.producto_id !== producto_id)
-        : prev.map((x) => (x.producto_id === producto_id ? { ...x, cantidad: Math.min(99, cantidad) } : x))
-    );
+    if (cantidad <= 0) {
+      setItems((prev) => prev.filter((x) => x.producto_id !== producto_id));
+    } else {
+      setItems((prev) =>
+        prev.map((x) =>
+          x.producto_id === producto_id ? { ...x, cantidad: Math.min(99, cantidad) } : x
+        )
+      );
+    }
   }, []);
 
-  const remove = useCallback(
-    (producto_id: number) => setItems((prev) => prev.filter((x) => x.producto_id !== producto_id)),
-    []
-  );
-  const replaceAll = useCallback((next: CartItem[]) => setItems(next), []);
-  const clear = useCallback(() => setItems([]), []);
+  const remove = useCallback((producto_id: number) => {
+    setItems((prev) => prev.filter((x) => x.producto_id !== producto_id));
+  }, []);
 
-  const count = useMemo(() => items.reduce((a, x) => a + x.cantidad, 0), [items]);
-  const subtotal = useMemo(() => items.reduce((a, x) => a + x.precio * x.cantidad, 0), [items]);
+  const replaceAll = useCallback((newItems: CartItem[]) => {
+    setItems(newItems);
+  }, []);
 
-  const value = useMemo(
-    () => ({ items, ready, add, setCantidad, remove, replaceAll, clear, count, subtotal }),
-    [items, ready, add, setCantidad, remove, replaceAll, clear, count, subtotal]
+  const clear = useCallback(() => {
+    setItems([]);
+    if (loadedKey) {
+      try { localStorage.removeItem(loadedKey); } catch {}
+    }
+  }, [loadedKey]);
+
+  const count = useMemo(() => items.reduce((s, i) => s + i.cantidad, 0), [items]);
+  const subtotal = useMemo(() => items.reduce((s, i) => s + i.precio * i.cantidad, 0), [items]);
+
+  return (
+    <Ctx.Provider value={{ items, ready, add, setCantidad, remove, replaceAll, clear, count, subtotal }}>
+      {children}
+    </Ctx.Provider>
   );
-  return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }
 
 export function useCart() {
   const ctx = useContext(Ctx);
-  if (!ctx) throw new Error("useCart fuera de CartProvider");
+  if (!ctx) throw new Error("useCart must be inside CartProvider");
   return ctx;
 }

@@ -1,133 +1,161 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { motion } from "framer-motion";
-import { Plus, Check, Beef } from "lucide-react";
+import { Plus, Check, Beef, Search, ArrowLeft } from "lucide-react";
 import { useCart } from "./CartProvider";
 import { formatMXN } from "@/lib/format";
 
 type Producto = {
-  id: number;
-  nombre: string;
-  descripcion: string | null;
-  precio: number;
-  unidad: string;
-  imagen_url: string | null;
-  es_nuevo: boolean;
-  stock: number | null;
+  id: number; nombre: string; descripcion: string | null;
+  precio: number; unidad: string; imagen_url: string | null;
+  es_nuevo: boolean; stock: number | null;
 };
 
+const PAGE = 24; // productos por página
+
 export default function ProductosCategoria({
-  categoria,
-  productos,
+  categoria, productos,
 }: {
   categoria: string;
   productos: Producto[];
 }) {
+  const [busqueda, setBusqueda] = useState("");
+  const [pagina, setPagina] = useState(1);
+
+  const filtrados = useMemo(() => {
+    const q = busqueda.trim().toLowerCase();
+    if (!q) return productos;
+    return productos.filter(p => p.nombre.toLowerCase().includes(q));
+  }, [busqueda, productos]);
+
+  const visibles = filtrados.slice(0, pagina * PAGE);
+  const hayMas = visibles.length < filtrados.length;
+
   return (
     <div className="flex flex-col gap-5 pb-6">
-      <div>
-        <h1 className="section-title text-2xl">{categoria}</h1>
-        <p className="text-sm text-on-bg-muted">{productos.length} productos</p>
+      {/* Header */}
+      <div className="flex items-center gap-3">
+        <Link href="/pedido" className="btn-ghost p-2 -ml-1">
+          <ArrowLeft size={18} />
+        </Link>
+        <div>
+          <h1 className="section-title text-2xl">{categoria}</h1>
+          <p className="text-sm text-on-bg-muted">
+            {busqueda ? `${filtrados.length} de ${productos.length} productos` : `${productos.length} productos`}
+          </p>
+        </div>
       </div>
 
-      {productos.length === 0 && (
+      {/* Buscador */}
+      {productos.length > 8 && (
+        <div className="relative">
+          <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-on-bg-muted" />
+          <input
+            className="input pl-9"
+            placeholder={`Buscar en ${categoria.toLowerCase()}…`}
+            value={busqueda}
+            onChange={e => { setBusqueda(e.target.value); setPagina(1); }}
+          />
+        </div>
+      )}
+
+      {filtrados.length === 0 && (
         <div className="card flex flex-col items-center gap-3 p-10 text-center">
           <Beef size={36} className="text-primary/50" />
-          <p className="text-on-bg-muted">Aún no hay productos en esta categoría.</p>
+          <p className="text-on-bg-muted">
+            {busqueda ? `Sin resultados para "${busqueda}"` : "Aún no hay productos en esta categoría."}
+          </p>
+          {busqueda && (
+            <button onClick={() => setBusqueda("")} className="btn-ghost px-4 py-2 text-sm">
+              Limpiar búsqueda
+            </button>
+          )}
         </div>
       )}
 
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-        {productos.map((p, i) => (
+        {visibles.map((p, i) => (
           <ProductCard key={p.id} p={p} index={i} />
         ))}
       </div>
+
+      {/* Paginación */}
+      {hayMas && (
+        <div className="flex flex-col items-center gap-2">
+          <p className="text-xs text-on-bg-muted">
+            Mostrando {visibles.length} de {filtrados.length} productos
+          </p>
+          <button
+            onClick={() => setPagina(p => p + 1)}
+            className="btn-ghost px-6 py-3"
+          >
+            Ver más productos
+          </button>
+        </div>
+      )}
     </div>
   );
 }
 
 function ProductCard({ p, index }: { p: Producto; index: number }) {
-  const { add } = useCart();
-  const [added, setAdded] = useState(false);
-  const agotado = p.stock !== null && p.stock <= 0;
-
-  const onAdd = () => {
-    if (agotado) return;
-    add({
-      producto_id: p.id,
-      nombre: p.nombre,
-      precio: p.precio,
-      unidad: p.unidad,
-      imagen_url: p.imagen_url,
-    });
-    setAdded(true);
-    setTimeout(() => setAdded(false), 900);
-  };
+  const { add, items } = useCart();
+  const enCarrito = items.find(i => i.producto_id === p.id);
+  const sinStock = p.stock !== null && p.stock <= 0;
 
   return (
-    <motion.article
-      initial={{ opacity: 0, y: 14 }}
+    <motion.div
+      initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3, delay: Math.min(index * 0.04, 0.4), ease: "easeOut" }}
-      className="card flex flex-col overflow-hidden p-0"
+      transition={{ delay: Math.min(index * 0.03, 0.3) }}
+      className={`card flex flex-col gap-2 p-3 transition ${sinStock ? "opacity-50" : ""}`}
     >
-      <div className="relative aspect-square w-full bg-surface-2">
+      {/* Imagen */}
+      <div className="relative h-28 w-full overflow-hidden rounded-xl bg-surface-2">
         {p.imagen_url ? (
-          <Image
-            src={p.imagen_url}
-            alt={p.nombre}
-            fill
-            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-            className="object-cover"
-          />
+          <Image src={p.imagen_url} alt={p.nombre} fill sizes="(max-width:640px) 50vw, 25vw" className="object-cover" />
         ) : (
-          <div className="flex h-full items-center justify-center text-on-bg-muted/40">
-            <Beef size={40} />
-          </div>
+          <div className="flex h-full items-center justify-center text-3xl">🥩</div>
         )}
         {p.es_nuevo && (
-          <span className="absolute left-2 top-2 rounded-full bg-accent px-2 py-0.5 text-[10px] font-bold text-white">
-            NUEVO
+          <span className="absolute right-1.5 top-1.5 rounded-full bg-primary px-2 py-0.5 text-[10px] font-bold text-white">
+            Nuevo
           </span>
         )}
-        {agotado && (
-          <div className="absolute inset-0 flex items-center justify-center bg-bg/70 backdrop-blur-[2px]">
-            <span className="rounded-full border border-hairline bg-surface px-3 py-1 text-xs font-bold">
-              Agotado
-            </span>
+        {sinStock && (
+          <div className="absolute inset-0 flex items-center justify-center bg-surface-2/80">
+            <span className="text-xs font-bold text-on-bg-muted">Sin stock</span>
           </div>
         )}
       </div>
-      <div className="flex flex-1 flex-col gap-1 p-3">
-        <h3 className="line-clamp-2 text-sm font-bold leading-snug">{p.nombre}</h3>
-        {p.descripcion && (
-          <p className="line-clamp-2 text-xs text-on-bg-muted">{p.descripcion}</p>
-        )}
-        {p.stock !== null && p.stock > 0 && p.stock <= 10 && (
-          <p className="text-[11px] font-semibold text-amber-500">
-            Quedan {p.stock}
-          </p>
-        )}
-        <div className="mt-auto flex items-end justify-between pt-2">
-          <div>
-            <p className="text-base font-extrabold text-primary">{formatMXN(p.precio)}</p>
-            <p className="text-[11px] text-on-bg-muted">por {p.unidad}</p>
-          </div>
-          <motion.button
-            whileTap={{ scale: 0.92 }}
-            onClick={onAdd}
-            disabled={agotado}
-            aria-label={`Agregar ${p.nombre} al carrito`}
-            className={`flex h-11 w-11 items-center justify-center rounded-full text-white shadow-card transition disabled:opacity-40 ${
-              added ? "bg-emerald-500" : "bg-primary hover:brightness-110"
-            }`}
-          >
-            {added ? <Check size={18} /> : <Plus size={18} />}
-          </motion.button>
-        </div>
+
+      {/* Info */}
+      <div className="flex-1">
+        <h3 className="text-sm font-bold leading-snug line-clamp-2">{p.nombre}</h3>
+        <p className="mt-0.5 text-sm font-extrabold text-primary">{formatMXN(p.precio)}</p>
+        <p className="text-xs text-on-bg-muted">/ {p.unidad}</p>
       </div>
-    </motion.article>
+
+      {/* Botón */}
+      <button
+        disabled={sinStock}
+        onClick={() => !sinStock && add({ producto_id: p.id, nombre: p.nombre, precio: p.precio, unidad: p.unidad, imagen_url: p.imagen_url })}
+        className={`flex w-full items-center justify-center gap-1.5 rounded-xl py-2 text-sm font-bold transition ${
+          enCarrito
+            ? "bg-emerald-500/10 text-emerald-500"
+            : sinStock
+            ? "bg-surface-2 text-on-bg-muted cursor-not-allowed"
+            : "btn-primary"
+        }`}
+      >
+        {enCarrito ? (
+          <><Check size={14} /> En carrito ({enCarrito.cantidad})</>
+        ) : (
+          <><Plus size={14} /> Agregar</>
+        )}
+      </button>
+    </motion.div>
   );
 }
