@@ -15,7 +15,6 @@ const isPublicRoute = createRouteMatcher([
   "/api/webhooks(.*)",
 ]);
 
-// Protected (need a Clerk session): /app/* (usuario) and /m/* (member scan).
 const isProtectedRoute = createRouteMatcher([
   "/app(.*)",
   "/m/(.*)",
@@ -24,11 +23,33 @@ const isProtectedRoute = createRouteMatcher([
   "/pedido/seguimiento(.*)",
 ]);
 
-// Admin lives behind its own independent secret magic-link token, on top of the
-// Clerk role check done in the /admin layout.
 const isAdminRoute = createRouteMatcher(["/admin(.*)"]);
 
+// Rutas siempre permitidas aun en mantenimiento (para que el admin pueda entrar
+// y para que el propio aviso de mantenimiento cargue).
+const isMaintenanceAllowed = createRouteMatcher([
+  "/mantenimiento",
+  "/admin(.*)",
+  "/sign-in(.*)",
+  "/api/webhooks(.*)",
+]);
+
 export default clerkMiddleware(async (auth, req) => {
+  // === MODO MANTENIMIENTO ===
+  // Se activa poniendo la variable de entorno MAINTENANCE_MODE=on en Vercel.
+  // El público ve la página de mantenimiento; el admin (con su llave) entra normal.
+  if (process.env.MAINTENANCE_MODE === "on") {
+    const url = req.nextUrl;
+    const hasAdminKeyParam = await isValidAdminKey(url.searchParams.get("k"));
+    const hasAdminCookie = await isValidAdminKey(req.cookies.get(ADMIN_COOKIE)?.value);
+    const adminBypass = hasAdminKeyParam || hasAdminCookie;
+
+    // Si NO es admin y NO es una ruta permitida, mandar a mantenimiento.
+    if (!adminBypass && !isMaintenanceAllowed(req)) {
+      return NextResponse.rewrite(new URL("/mantenimiento", req.url));
+    }
+  }
+
   if (isAdminRoute(req)) {
     const url = req.nextUrl;
     const provided = url.searchParams.get("k");
@@ -36,7 +57,6 @@ export default clerkMiddleware(async (auth, req) => {
     const providedValid = await isValidAdminKey(provided);
     const hasKey = providedValid || (await isValidAdminKey(cookie));
 
-    // Without the token the admin area is invisible (looks like the public site).
     if (!hasKey) {
       return NextResponse.redirect(new URL("/", req.url));
     }
@@ -44,9 +64,6 @@ export default clerkMiddleware(async (auth, req) => {
     const { userId } = await auth();
     if (!userId) {
       const signIn = new URL("/sign-in", req.url);
-      // SECURITY: never echo the secret token (`k`) into redirect_url — that
-      // would leak admin access to anyone the URL is shared with. Persist it as
-      // an httpOnly cookie instead and redirect to a clean path.
       signIn.searchParams.set("redirect_url", url.pathname);
       const res = NextResponse.redirect(signIn);
       if (providedValid && provided) {
@@ -55,7 +72,6 @@ export default clerkMiddleware(async (auth, req) => {
       return res;
     }
 
-    // Persist the token as a cookie and drop it from the URL bar.
     if (providedValid && provided) {
       const clean = new URL(url);
       clean.searchParams.delete("k");
@@ -88,7 +104,6 @@ function cookieOpts() {
 
 export const config = {
   matcher: [
-    // Skip Next internals and static files, run on everything else.
     "/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)",
     "/(api|trpc)(.*)",
   ],

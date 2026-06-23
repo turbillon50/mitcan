@@ -7,6 +7,8 @@ import { formatNumber, formatDate } from "@/lib/format";
 import { membershipUrl } from "@/lib/membership";
 import MembershipQR from "@/components/MembershipQR";
 import RedeemButton from "./RedeemButton";
+import { getLocale } from "@/lib/i18n-server";
+import { t } from "@/lib/i18n";
 
 export const dynamic = "force-dynamic";
 
@@ -19,6 +21,8 @@ const TIPO_ICON: Record<string, typeof Gift> = {
 
 export default async function RecompensasPage() {
   const user = await getCurrentDbUser();
+  const locale = await getLocale();
+  const tr = (k: string) => t(locale, k);
   const puntos = user?.puntos ?? 0;
 
   const [recompensas, redenciones] = await Promise.all([
@@ -40,29 +44,27 @@ export default async function RecompensasPage() {
 
   return (
     <div className="flex flex-col gap-7">
-      <h1 className="section-title text-2xl">Mis recompensas</h1>
+      <h1 className="section-title text-2xl">{tr("rewards.title")}</h1>
 
-      {/* Stats */}
       <div className="grid grid-cols-3 gap-3">
         <div className="card p-4">
-          <p className="text-xs text-on-bg-muted">Puntos</p>
+          <p className="text-xs text-on-bg-muted">{tr("rewards.points")}</p>
           <p className="text-2xl font-bold text-primary">{formatNumber(puntos)}</p>
         </div>
         <div className="card p-4">
-          <p className="text-xs text-on-bg-muted">Disponibles</p>
+          <p className="text-xs text-on-bg-muted">{tr("rewards.available")}</p>
           <p className="text-2xl font-bold">{disponibles}</p>
         </div>
         <div className="card p-4">
-          <p className="text-xs text-on-bg-muted">Canjeadas</p>
+          <p className="text-xs text-on-bg-muted">{tr("rewards.redeemedPlural")}</p>
           <p className="text-2xl font-bold">{canjeadas}</p>
         </div>
       </div>
 
-      {/* Catálogo de recompensas */}
       <section className="flex flex-col gap-3">
-        <h2 className="text-lg font-bold">Canjea tus puntos</h2>
+        <h2 className="text-lg font-bold">{tr("rewards.redeemYourPoints")}</h2>
         {recompensas.length === 0 && (
-          <p className="text-on-bg-muted">No hay recompensas disponibles.</p>
+          <p className="text-on-bg-muted">{tr("rewards.empty")}</p>
         )}
         {recompensas.map((r) => {
           const Icon = TIPO_ICON[r.tipo ?? "descuento"] ?? Gift;
@@ -100,15 +102,14 @@ export default async function RecompensasPage() {
         })}
       </section>
 
-      {/* Membership card */}
       <section className="csn-gradient relative overflow-hidden rounded-3xl border border-hairline p-6">
         <div className="flex items-start justify-between">
           <div>
             <span className="text-[10px] font-bold uppercase tracking-widest text-primary">
-              Club CSN
+              {tr("onb.welcome")}
             </span>
             <h2 className="font-display text-xl font-bold">
-              {user?.nombre ?? "Miembro CSN"}
+              {user?.nombre ?? tr("profile.member")}
             </h2>
           </div>
           <div className="flex h-12 w-12 items-center justify-center rounded-full border-2 border-primary">
@@ -117,7 +118,7 @@ export default async function RecompensasPage() {
         </div>
         <div className="mt-8 flex items-end justify-between">
           <div>
-            <span className="text-xs text-on-bg-muted">Balance de puntos</span>
+            <span className="text-xs text-on-bg-muted">{tr("rewards.pointsBalance")}</span>
             <p className="font-display text-3xl font-extrabold text-primary">
               {formatNumber(puntos)} <small className="text-sm">pts</small>
             </p>
@@ -126,16 +127,15 @@ export default async function RecompensasPage() {
         </div>
       </section>
 
-      {/* Historial de canjes */}
       {redenciones.length > 0 && (
         <section className="flex flex-col gap-2">
-          <h2 className="text-lg font-bold">Historial</h2>
+          <h2 className="text-lg font-bold">{tr("rewards.history")}</h2>
           {redenciones.map((r) => (
             <div
               key={r.id}
               className="flex items-center justify-between rounded-xl border border-hairline bg-surface-2 px-4 py-3 text-sm"
             >
-              <span>{r.recompensa?.nombre ?? "Recompensa"}</span>
+              <span>{r.recompensa?.nombre ?? tr("rewards.title")}</span>
               <span className="text-on-bg-muted">{formatDate(r.created_at)}</span>
             </div>
           ))}
