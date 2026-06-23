@@ -7,6 +7,7 @@ import { motion } from "framer-motion";
 import { Plus, Check, Beef, Search, ArrowLeft } from "lucide-react";
 import { useCart } from "./CartProvider";
 import { formatMXN } from "@/lib/format";
+import { useT } from "@/components/I18nProvider";
 
 type Producto = {
   id: number; nombre: string; descripcion: string | null;
@@ -22,6 +23,7 @@ export default function ProductosCategoria({
   categoria: string;
   productos: Producto[];
 }) {
+  const t = useT();
   const [busqueda, setBusqueda] = useState("");
   const [pagina, setPagina] = useState(1);
 
@@ -44,7 +46,7 @@ export default function ProductosCategoria({
         <div>
           <h1 className="section-title text-2xl">{categoria}</h1>
           <p className="text-sm text-on-bg-muted">
-            {busqueda ? `${filtrados.length} de ${productos.length} productos` : `${productos.length} productos`}
+            {busqueda ? `${filtrados.length} / ${productos.length} ${t("cat.products")}` : `${productos.length} ${t("cat.products")}`}
           </p>
         </div>
       </div>
@@ -55,7 +57,7 @@ export default function ProductosCategoria({
           <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-on-bg-muted" />
           <input
             className="input pl-9"
-            placeholder={`Buscar en ${categoria.toLowerCase()}…`}
+            placeholder={`${t("cat.searchPlaceholder")}`}
             value={busqueda}
             onChange={e => { setBusqueda(e.target.value); setPagina(1); }}
           />
@@ -66,11 +68,11 @@ export default function ProductosCategoria({
         <div className="card flex flex-col items-center gap-3 p-10 text-center">
           <Beef size={36} className="text-primary/50" />
           <p className="text-on-bg-muted">
-            {busqueda ? `Sin resultados para "${busqueda}"` : "Aún no hay productos en esta categoría."}
+            {busqueda ? `{t("cat.noResults")} "${busqueda}"` : {t("rewards.empty")}}
           </p>
           {busqueda && (
             <button onClick={() => setBusqueda("")} className="btn-ghost px-4 py-2 text-sm">
-              Limpiar búsqueda
+              {t("cat.clear")}
             </button>
           )}
         </div>
@@ -86,13 +88,13 @@ export default function ProductosCategoria({
       {hayMas && (
         <div className="flex flex-col items-center gap-2">
           <p className="text-xs text-on-bg-muted">
-            Mostrando {visibles.length} de {filtrados.length} productos
+            {visibles.length} / {filtrados.length} {t("cat.products")}
           </p>
           <button
             onClick={() => setPagina(p => p + 1)}
             className="btn-ghost px-6 py-3"
           >
-            Ver más productos
+            {t("cat.seeMore")}
           </button>
         </div>
       )}
@@ -121,12 +123,12 @@ function ProductCard({ p, index }: { p: Producto; index: number }) {
         )}
         {p.es_nuevo && (
           <span className="absolute right-1.5 top-1.5 rounded-full bg-primary px-2 py-0.5 text-[10px] font-bold text-white">
-            Nuevo
+            {t("cat.new")}
           </span>
         )}
         {sinStock && (
           <div className="absolute inset-0 flex items-center justify-center bg-surface-2/80">
-            <span className="text-xs font-bold text-on-bg-muted">Sin stock</span>
+            <span className="text-xs font-bold text-on-bg-muted">{t("order.noStock")}</span>
           </div>
         )}
       </div>
@@ -151,9 +153,9 @@ function ProductCard({ p, index }: { p: Producto; index: number }) {
         }`}
       >
         {enCarrito ? (
-          <><Check size={14} /> En carrito ({enCarrito.cantidad})</>
+          <><Check size={14} /> {t("order.inCart")} ({enCarrito.cantidad})</>
         ) : (
-          <><Plus size={14} /> Agregar</>
+          <><Plus size={14} /> {t("order.add")}</>
         )}
       </button>
     </motion.div>
