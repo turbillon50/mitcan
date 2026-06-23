@@ -34,12 +34,27 @@ export default function CuadreDiario() {
   const [cierreMsg, setCierreMsg] = useState<{ ok: boolean; msg: string } | null>(null);
   const [pending, start] = useTransition();
 
+  const [errorCarga, setErrorCarga] = useState<string | null>(null);
+
   const cargar = () => {
     setLoading(true);
+    setErrorCarga(null);
     fetch("/api/tickets/cuadre")
-      .then(r => r.json())
-      .then(d => { setCuadre(d); setLoading(false); })
-      .catch(() => setLoading(false));
+      .then(async (r) => {
+        const d = await r.json().catch(() => null);
+        if (!r.ok || !d || !d.semaforo) {
+          // La API falló o devolvió algo inesperado (sesión expirada, error, etc.)
+          setErrorCarga(d?.error ?? "No se pudo cargar el cuadre");
+          setCuadre(null);
+        } else {
+          setCuadre(d);
+        }
+        setLoading(false);
+      })
+      .catch(() => {
+        setErrorCarga("Error de conexión al cargar el cuadre");
+        setLoading(false);
+      });
   };
 
   useEffect(() => { cargar(); }, []);
@@ -68,9 +83,29 @@ export default function CuadreDiario() {
   });
 
   if (loading) return <div className="card h-48 animate-pulse bg-surface-2" />;
-  if (!cuadre) return null;
 
-  const s = SEMAFORO[cuadre.semaforo];
+  // Si la API falló o no hay datos válidos, mostrar aviso en vez de tronar.
+  if (!cuadre || !cuadre.semaforo) {
+    return (
+      <div className="card p-5">
+        <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-600">
+          {errorCarga ?? "Cargando cuadre…"}
+          <button
+            onClick={cargar}
+            className="ml-3 rounded-lg bg-amber-500/20 px-3 py-1 text-xs font-semibold text-amber-700 hover:bg-amber-500/30"
+          >
+            Reintentar
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Semáforo con fallback seguro por si llega un valor inesperado.
+  const s = SEMAFORO[cuadre.semaforo] ?? SEMAFORO.verde;
+  const conteos = cuadre.conteos ?? { total_generados: 0, tickets_vitrina: 0, tickets_despachados: 0, tickets_pagados: 0, tickets_entregados: 0, tickets_invalidos: 0 };
+  const montos = cuadre.montos ?? { pagado_sistema: 0, efectivo_contado: null, diferencia: null };
+  const alarmas = Array.isArray(cuadre.alarmas) ? cuadre.alarmas : [];
 
   return (
     <div className="flex flex-col gap-5">
@@ -92,9 +127,9 @@ export default function CuadreDiario() {
         <h3 className="mb-4 font-bold">Trazabilidad del día</h3>
         <div className="flex items-center justify-between gap-2">
           {[
-            { label: "Vitrina", val: cuadre.conteos.tickets_vitrina, color: "text-amber-500", desc: "salieron" },
-            { label: "Pagados", val: cuadre.conteos.tickets_pagados, color: "text-blue-500", desc: "cobrados" },
-            { label: "Entregados", val: cuadre.conteos.tickets_entregados, color: "text-emerald-500", desc: "verificados" },
+            { label: "Vitrina", val: conteos.tickets_vitrina, color: "text-amber-500", desc: "salieron" },
+            { label: "Pagados", val: conteos.tickets_pagados, color: "text-blue-500", desc: "cobrados" },
+            { label: "Entregados", val: conteos.tickets_entregados, color: "text-emerald-500", desc: "verificados" },
           ].map((p, i) => (
             <div key={p.label} className="flex flex-1 items-center">
               <div className="flex-1 text-center">
@@ -106,19 +141,19 @@ export default function CuadreDiario() {
             </div>
           ))}
         </div>
-        {cuadre.conteos.tickets_invalidos > 0 && (
+        {conteos.tickets_invalidos > 0 && (
           <p className="mt-3 text-center text-xs text-rose-400">
-            {cuadre.conteos.tickets_invalidos} ticket(s) inválido(s)
+            {conteos.tickets_invalidos} ticket(s) inválido(s)
           </p>
         )}
       </div>
 
       {/* Alarmas */}
-      {cuadre.alarmas.length > 0 && (
+      {alarmas.length > 0 && (
         <div className="card p-5">
           <h3 className="mb-3 font-bold text-rose-400">⚠ Señales de alarma</h3>
           <div className="flex flex-col gap-2">
-            {cuadre.alarmas.map((a, i) => (
+            {alarmas.map((a, i) => (
               <div key={i} className={`rounded-xl border px-4 py-3 text-sm ${NIVEL[a.nivel] ?? NIVEL.media}`}>
                 <div className="flex items-center justify-between gap-2">
                   <span className="font-medium">{a.mensaje}</span>
@@ -130,7 +165,7 @@ export default function CuadreDiario() {
         </div>
       )}
 
-      {cuadre.alarmas.length === 0 && (
+      {alarmas.length === 0 && (
         <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-sm font-medium text-emerald-500">
           ✓ Sin anomalías detectadas hoy. Todos los tickets siguieron el flujo correcto.
         </div>
@@ -144,7 +179,7 @@ export default function CuadreDiario() {
         </p>
         <div className="mb-3 flex items-center justify-between rounded-xl bg-surface-2 px-4 py-3">
           <span className="text-sm text-on-bg-muted">Cobrado según el sistema hoy</span>
-          <span className="font-display text-xl font-bold text-primary">{formatMXN(cuadre.montos.pagado_sistema)}</span>
+          <span className="font-display text-xl font-bold text-primary">{formatMXN(montos.pagado_sistema)}</span>
         </div>
         <div className="flex gap-2">
           <input
@@ -163,15 +198,15 @@ export default function CuadreDiario() {
             cierreMsg.ok ? "bg-emerald-500/10 text-emerald-500" : "bg-rose-500/10 text-rose-400"
           }`}>{cierreMsg.msg}</p>
         )}
-        {cuadre.montos.diferencia !== null && (
+        {montos.diferencia !== null && (
           <div className={`mt-3 rounded-xl px-4 py-3 text-sm font-semibold ${
-            cuadre.montos.diferencia === 0 ? "bg-emerald-500/10 text-emerald-500" : "bg-rose-500/10 text-rose-400"
+            montos.diferencia === 0 ? "bg-emerald-500/10 text-emerald-500" : "bg-rose-500/10 text-rose-400"
           }`}>
-            {cuadre.montos.diferencia === 0
+            {montos.diferencia === 0
               ? "✓ La caja cuadró perfecto hoy"
-              : cuadre.montos.diferencia < 0
-                ? `Diferencia: faltan ${formatMXN(Math.abs(cuadre.montos.diferencia))}`
-                : `Diferencia: sobran ${formatMXN(cuadre.montos.diferencia)}`}
+              : montos.diferencia < 0
+                ? `Diferencia: faltan ${formatMXN(Math.abs(montos.diferencia))}`
+                : `Diferencia: sobran ${formatMXN(montos.diferencia)}`}
           </div>
         )}
       </div>
