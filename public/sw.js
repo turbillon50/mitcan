@@ -1,5 +1,5 @@
-/* CSN — Service Worker v2 (offline + push). */
-const VERSION = "csn-v2";
+/* CSN — Service Worker v3 (offline + push). */
+const VERSION = "csn-v3";
 const STATIC_CACHE = `${VERSION}-static`;
 const PAGES_CACHE = `${VERSION}-pages`;
 const OFFLINE_URL = "/offline.html";
@@ -37,8 +37,26 @@ self.addEventListener("fetch", (event) => {
   // Never cache API, auth or admin traffic.
   if (/^\/(api|admin|m|sign-in|sign-up)/.test(url.pathname)) return;
 
-  // Static assets: cache-first.
-  if (/\.(png|jpe?g|webp|svg|ico|woff2?|ttf|css|js)$/.test(url.pathname) || url.pathname.startsWith("/_next/static/")) {
+  // JS/CSS y chunks de Next: NETWORK-FIRST. El código nuevo de cada deploy
+  // siempre debe ganar; el caché es solo respaldo offline. Esto evita servir
+  // bundles viejos (rotos) tras un fix.
+  if (/\.(css|js)$/.test(url.pathname) || url.pathname.startsWith("/_next/static/")) {
+    event.respondWith(
+      fetch(req)
+        .then((res) => {
+          if (res.ok) {
+            const copy = res.clone();
+            caches.open(STATIC_CACHE).then((c) => c.put(req, copy));
+          }
+          return res;
+        })
+        .catch(() => caches.match(req))
+    );
+    return;
+  }
+
+  // Imágenes y fuentes: cache-first (no cambian de lógica).
+  if (/\.(png|jpe?g|webp|svg|ico|woff2?|ttf)$/.test(url.pathname)) {
     event.respondWith(
       caches.match(req).then(
         (hit) =>
@@ -105,3 +123,10 @@ self.addEventListener("notificationclick", (event) => {
     })
   );
 });
+
+self.addEventListener("message", (event) => {
+  if (event.data && event.data.type === "SKIP_WAITING") {
+    self.skipWaiting();
+  }
+});
+
