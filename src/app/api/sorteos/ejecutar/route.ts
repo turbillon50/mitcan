@@ -26,7 +26,7 @@ export async function POST(req: Request) {
 
     // Buscar usuario con ese numero_cliente
     const ganadorRow = await prisma.$queryRawUnsafe<{id:string;nombre:string|null;email:string|null}[]>(
-      `SELECT id, nombre, email FROM users WHERE numero_cliente = $1`, ganador
+      `SELECT id, name, email FROM users WHERE numero_cliente = $1`, ganador
     );
 
     const ganadorUser = ganadorRow[0] ?? null;

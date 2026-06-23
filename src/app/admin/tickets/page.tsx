@@ -21,12 +21,12 @@ export default async function TicketsPage() {
       FROM tickets WHERE created_at::date = CURRENT_DATE
     `).catch(() => [{}]),
     prisma.$queryRawUnsafe<Record<string,unknown>[]>(`
-      SELECT t.*, u.nombre as cliente_nombre
+      SELECT t.*, u.name as cliente_nombre
       FROM tickets t LEFT JOIN users u ON u.id = t.user_id
       ORDER BY t.created_at DESC LIMIT 50
     `).catch(() => []),
     prisma.$queryRawUnsafe<Record<string,unknown>[]>(`
-      SELECT s.*, u.nombre as ganador_nombre
+      SELECT s.*, u.name as ganador_nombre
       FROM sorteos s LEFT JOIN users u ON u.id = s.user_ganador_id
       ORDER BY created_at DESC LIMIT 10
     `).catch(() => []),

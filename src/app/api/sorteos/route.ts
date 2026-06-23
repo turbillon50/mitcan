@@ -27,7 +27,7 @@ export async function POST(req: Request) {
 export async function GET() {
   try {
     const rows = await prisma.$queryRawUnsafe<Record<string,unknown>[]>(
-      `SELECT s.*, u.nombre as ganador_nombre FROM sorteos s
+      `SELECT s.*, u.name as ganador_nombre FROM sorteos s
        LEFT JOIN users u ON u.id = s.user_ganador_id
        ORDER BY created_at DESC LIMIT 20`
     );
