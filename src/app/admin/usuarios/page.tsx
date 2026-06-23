@@ -11,7 +11,10 @@ export const dynamic = "force-dynamic";
 const ROL_OPTS = [
   { value: "admin", label: "Administrador" },
   { value: "gerente", label: "Gerente" },
-  { value: "empleado", label: "Empleado" },
+  { value: "vitrinero", label: "Vitrinero (despacha)" },
+  { value: "cajero", label: "Cajero (cobra)" },
+  { value: "revisor", label: "Revisor salida" },
+  { value: "empleado", label: "Empleado (general)" },
   { value: "repartidor", label: "Repartidor" },
   { value: "cliente", label: "Cliente" },
 ];
@@ -19,6 +22,9 @@ const ROL_OPTS = [
 const ROL_COLOR: Record<string, string> = {
   admin: "chip-active",
   gerente: "chip-active",
+  vitrinero: "chip-active",
+  cajero: "chip-active",
+  revisor: "chip-active",
   empleado: "",
   repartidor: "chip-active",
   cliente: "",

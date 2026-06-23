@@ -97,7 +97,7 @@ export async function requireUser() {
   return user;
 }
 
-const STAFF_ROLES: user_role[] = ["admin", "gerente", "empleado"];
+const STAFF_ROLES: user_role[] = ["admin", "gerente", "empleado", "vitrinero", "cajero", "revisor"];
 const ADMIN_ROLES: user_role[] = ["admin", "gerente"];
 
 export function isStaff(rol?: user_role | null) {
@@ -111,6 +111,17 @@ export function isAdmin(rol?: user_role | null) {
 /** Repartidores (moto): acceso al panel de reparto, no al admin. */
 export function isRepartidor(rol?: user_role | null) {
   return rol === "repartidor";
+}
+
+// === Roles operativos del sistema de tickets (separación de funciones) ===
+export function isVitrinero(rol?: user_role | null) {
+  return rol === "vitrinero" || rol === "admin" || rol === "gerente";
+}
+export function isCajero(rol?: user_role | null) {
+  return rol === "cajero" || rol === "admin" || rol === "gerente";
+}
+export function isRevisor(rol?: user_role | null) {
+  return rol === "revisor" || rol === "admin" || rol === "gerente";
 }
 
 /** Guard para el área del repartidor. Staff también puede entrar (supervisión). */
