@@ -68,7 +68,7 @@ export default function ProductosCategoria({
         <div className="card flex flex-col items-center gap-3 p-10 text-center">
           <Beef size={36} className="text-primary/50" />
           <p className="text-on-bg-muted">
-            {busqueda ? `{t("cat.noResults")} "${busqueda}"` : {t("rewards.empty")}}
+            {busqueda ? `${t("cat.noResults")} "${busqueda}"` : t("rewards.empty")}
           </p>
           {busqueda && (
             <button onClick={() => setBusqueda("")} className="btn-ghost px-4 py-2 text-sm">
