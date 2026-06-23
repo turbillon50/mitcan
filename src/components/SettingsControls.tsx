@@ -1,14 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import { LANG_COOKIE } from "@/lib/i18n";
 import { useLocale } from "@/components/I18nProvider";
 import { IconMoon, IconSun } from "@/components/icons";
 
 /** Compact theme (claro/oscuro) + language (ES/EN) switch for headers. */
 export default function SettingsControls({ className = "" }: { className?: string }) {
-  const router = useRouter();
   const locale = useLocale();
   const [dark, setDark] = useState(false);
 
@@ -27,8 +25,13 @@ export default function SettingsControls({ className = "" }: { className?: strin
 
   function setLang(l: "es" | "en") {
     if (l === locale) return;
+    // Persistir el idioma en cookie y recargar para que el render del servidor
+    // (que decide el idioma por cookie) tome el nuevo valor de forma confiable.
     document.cookie = `${LANG_COOKIE}=${l};path=/;max-age=31536000;samesite=lax`;
-    router.refresh();
+    try {
+      localStorage.setItem(LANG_COOKIE, l);
+    } catch {}
+    window.location.reload();
   }
 
   return (
