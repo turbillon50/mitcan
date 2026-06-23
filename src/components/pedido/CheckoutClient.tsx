@@ -7,6 +7,7 @@ import { motion } from "framer-motion";
 import { useCart } from "./CartProvider";
 import { formatMXN } from "@/lib/format";
 import { ENVIO_FIJO } from "@/lib/online-const";
+import { useT } from "@/components/I18nProvider";
 
 type SucursalInfo = {
   id: number; nombre: string; lat: number; lng: number;
@@ -25,6 +26,7 @@ export default function CheckoutClient({
 }) {
   const { items, ready, subtotal, clear } = useCart();
   const router = useRouter();
+  const t = useT();
 
   const [direccion, setDireccion] = useState(defaults.direccion);
   const [telefono, setTelefono] = useState(defaults.telefono);
@@ -58,12 +60,12 @@ export default function CheckoutClient({
   const confirmar = async () => {
     const errs: typeof fieldErr = {};
     if (!direccion.trim() || direccion.trim().length < 10)
-      errs.direccion = "Escribe tu dirección completa (calle, número, colonia).";
+      errs.direccion = t("checkout.errAddress");
     if (!/^[0-9]{10}$/.test(telefono.replace(/[^0-9]/g, "")))
-      errs.telefono = "Teléfono a 10 dígitos.";
+      errs.telefono = t("checkout.errPhone");
     setFieldErr(errs);
     if (Object.keys(errs).length) return;
-    if (!acepta) { setError("Confirma que aceptas el total del pedido."); return; }
+    if (!acepta) { setError(t("checkout.errAccept")); return; }
     setError(null);
     setLoading(true);
     try {
@@ -81,9 +83,9 @@ export default function CheckoutClient({
         }),
       });
       const ct = res.headers.get("content-type") ?? "";
-      if (!ct.includes("application/json")) throw new Error("Error del servidor. Intenta de nuevo.");
+      if (!ct.includes("application/json")) throw new Error(t("checkout.errorOrder"));
       const data = await res.json();
-      if (!res.ok) throw new Error(data?.error ?? "No se pudo crear el pedido");
+      if (!res.ok) throw new Error(data?.error ?? t("checkout.errorOrder"));
       clear();
       router.push(`/pedido/confirmado/${data.folio}`);
     } catch (e) {
@@ -95,8 +97,8 @@ export default function CheckoutClient({
   if (!ready) return <div className="card h-72 animate-pulse bg-surface-2" />;
   if (items.length === 0) return (
     <div className="card flex flex-col items-center gap-4 p-12 text-center">
-      <p className="text-on-bg-muted">No hay productos en tu carrito.</p>
-      <Link href="/pedido" className="btn-primary px-6 py-3">Ver categorías</Link>
+      <p className="text-on-bg-muted">{t("cart.empty")}</p>
+      <Link href="/pedido" className="btn-primary px-6 py-3">{t("cart.seeProducts")}</Link>
     </div>
   );
 
@@ -105,7 +107,7 @@ export default function CheckoutClient({
   return (
     <div className="grid gap-6 pb-6 lg:grid-cols-[1fr_380px]">
       <section className="flex min-w-0 flex-col gap-5">
-        <h1 className="section-title text-2xl">Confirma tu pedido</h1>
+        <h1 className="section-title text-2xl">{t("checkout.title")}</h1>
 
         {sucursal && (
           <div className="overflow-hidden rounded-2xl border border-hairline">
@@ -117,7 +119,7 @@ export default function CheckoutClient({
               {userLat != null && (
                 <span className="flex items-center gap-1.5">
                   <span className="inline-block h-2.5 w-2.5 shrink-0 rounded-full bg-red-500" />
-                  Tu ubicación
+                  {t("checkout.yourLocation")}
                 </span>
               )}
             </div>
@@ -128,24 +130,24 @@ export default function CheckoutClient({
               userLng={userLng}
             />
             <div className="border-t border-hairline bg-surface-2 px-4 py-2 text-xs text-on-bg-muted">
-              Esta sucursal atenderá tu pedido · Tel: {sucursal.telefono}
+              {t("checkout.branchWillServe")} · Tel: {sucursal.telefono}
             </div>
           </div>
         )}
 
         <div className="card flex flex-col gap-4 p-5">
-          <h2 className="font-display text-lg font-bold">Dirección de entrega</h2>
-          <p className="text-xs text-on-bg-muted -mt-2">Escribe la dirección donde quieres recibir tu pedido.</p>
+          <h2 className="font-display text-lg font-bold">{t("checkout.address")}</h2>
+          <p className="text-xs text-on-bg-muted -mt-2">{t("checkout.addressHint")}</p>
           <div>
-            <label htmlFor="dir" className="label">Dirección completa *</label>
+            <label htmlFor="dir" className="label">{t("checkout.address")} *</label>
             <textarea id="dir" rows={3}
               className={`input min-h-[88px] resize-none ${fieldErr.direccion ? "border-rose-500/60" : ""}`}
-              placeholder="Calle, número, colonia, referencias…"
+              placeholder={t("checkout.addressPlaceholder")}
               value={direccion} onChange={(e) => setDireccion(e.target.value)} />
             {fieldErr.direccion && <p className="mt-1 text-xs text-rose-400">{fieldErr.direccion}</p>}
           </div>
           <div>
-            <label htmlFor="tel" className="label">Teléfono *</label>
+            <label htmlFor="tel" className="label">{t("checkout.phone")} *</label>
             <input id="tel" type="tel" inputMode="numeric"
               className={`input ${fieldErr.telefono ? "border-rose-500/60" : ""}`}
               placeholder="311 000 0000"
@@ -153,21 +155,21 @@ export default function CheckoutClient({
             {fieldErr.telefono && <p className="mt-1 text-xs text-rose-400">{fieldErr.telefono}</p>}
           </div>
           <div>
-            <label htmlFor="notas" className="label">Notas (opcional)</label>
-            <input id="notas" className="input" placeholder="Tocar timbre, portón negro…"
+            <label htmlFor="notas" className="label">{t("checkout.references")}</label>
+            <input id="notas" className="input" placeholder={t("checkout.notesPlaceholder")}
               value={notas} onChange={(e) => setNotas(e.target.value)} />
           </div>
         </div>
 
         <div className="card p-4">
-          <p className="font-bold">Pago contra entrega</p>
-          <p className="text-sm text-on-bg-muted">Pagas en efectivo al recibir tu pedido.</p>
+          <p className="font-bold">{t("checkout.cash")}</p>
+          <p className="text-sm text-on-bg-muted">{t("checkout.cashHint")}</p>
         </div>
       </section>
 
       <aside className="lg:sticky lg:top-24 lg:self-start">
         <div className="card flex flex-col gap-3 p-5">
-          <h2 className="font-display text-lg font-bold">Tu pedido</h2>
+          <h2 className="font-display text-lg font-bold">{t("checkout.yourOrder")}</h2>
           <ul className="flex max-h-52 flex-col gap-2 overflow-y-auto text-sm">
             {items.map((it) => (
               <li key={it.producto_id} className="flex justify-between gap-3">
@@ -177,31 +179,31 @@ export default function CheckoutClient({
             ))}
           </ul>
           <div className="flex justify-between border-t border-hairline pt-3 text-sm">
-            <span className="text-on-bg-muted">Subtotal</span>
+            <span className="text-on-bg-muted">{t("cart.subtotal")}</span>
             <span className="font-semibold">{formatMXN(subtotal)}</span>
           </div>
           <div className="flex justify-between text-sm">
-            <span className="text-on-bg-muted">Entrega</span>
+            <span className="text-on-bg-muted">{t("cart.delivery")}</span>
             <span className="font-semibold">{formatMXN(ENVIO_FIJO)}</span>
           </div>
           <div className="flex justify-between text-base">
-            <span className="font-bold">Total</span>
+            <span className="font-bold">{t("cart.total")}</span>
             <span className="font-extrabold text-primary">{formatMXN(total)}</span>
           </div>
           <label className="flex cursor-pointer items-start gap-2.5 rounded-xl border border-hairline bg-surface-2 p-3 text-sm">
             <input type="checkbox" checked={acepta}
               onChange={(e) => { setAcepta(e.target.checked); if (e.target.checked) setError(null); }}
               className="mt-0.5 h-4 w-4 accent-[#C41E3A]" />
-            <span>Acepto <strong>{formatMXN(total)}</strong> (incluye ${ENVIO_FIJO} de entrega) y pagaré contra entrega.</span>
+            <span>{t("checkout.acceptPre")} <strong>{formatMXN(total)}</strong> {t("checkout.acceptPost")}</span>
           </label>
           {error && (
             <p role="alert" className="rounded-xl border border-rose-500/30 bg-rose-500/10 p-3 text-sm text-rose-400">{error}</p>
           )}
           <motion.button whileTap={{ scale: 0.98 }} disabled={loading} onClick={confirmar}
             className="btn-primary w-full py-3.5 text-base disabled:opacity-60">
-            {loading ? "Creando pedido…" : "Confirmar pedido"}
+            {loading ? t("checkout.placing") : t("checkout.placeOrder")}
           </motion.button>
-          <Link href="/pedido/carrito" className="btn-ghost w-full">Volver al carrito</Link>
+          <Link href="/pedido/carrito" className="btn-ghost w-full">{t("checkout.backToCart")}</Link>
         </div>
       </aside>
     </div>

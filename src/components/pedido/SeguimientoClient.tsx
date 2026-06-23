@@ -1,7 +1,7 @@
 "use client";
 import MapaSeguimientoOSM from "@/components/MapaSeguimientoOSM";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import {
@@ -9,19 +9,16 @@ import {
 } from "lucide-react";
 import { formatMXN, formatDateTime } from "@/lib/format";
 import { ESTADOS_ONLINE, TEL_PEDIDOS, TEL_PEDIDOS_DISPLAY } from "@/lib/online-const";
+import { useT } from "@/components/I18nProvider";
 
 const ICONS = [Inbox, ChefHat, Package, Bike, PartyPopper];
-const LABELS: Record<string, string> = {
-  recibido: "Recibido",
-  en_preparacion: "En preparación",
-  entregado_repartidor: "Con repartidor",
-  en_camino: "En camino",
-  ha_llegado: "Ha llegado",
+const LABEL_KEYS: Record<string, string> = {
+  recibido: "track.received",
+  en_preparacion: "track.preparing",
+  entregado_repartidor: "track.withDriver",
+  en_camino: "track.onway",
+  ha_llegado: "track.arrived",
 };
-
-const SUC_LAT = 21.475156;
-const SUC_LNG = -104.857818;
-const SUC_NOMBRE = "Nayarabastos";
 
 type Pedido = {
   id: number; folio: string; estado: string;
@@ -39,24 +36,25 @@ export default function SeguimientoClient({
   folio: string; mapboxToken: string;
   destLat: number | null; destLng: number | null;
 }) {
+  const t = useT();
   const [pedido, setPedido] = useState<Pedido | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     try {
       const res = await fetch(`/api/pedidos/track/${folio}`, { cache: "no-store" });
-      if (!res.ok) throw new Error("No encontramos este pedido");
+      if (!res.ok) throw new Error(t("track.notFound"));
       setPedido(await res.json());
       setError(null);
     } catch (e) {
       setError((e as Error).message);
     }
-  }, [folio]);
+  }, [folio, t]);
 
   useEffect(() => {
     load();
-    const t = setInterval(load, 12000);
-    return () => clearInterval(t);
+    const iv = setInterval(load, 12000);
+    return () => clearInterval(iv);
   }, [load]);
 
   if (error) {
@@ -64,7 +62,7 @@ export default function SeguimientoClient({
       <div className="card flex flex-col items-center gap-3 p-10 text-center">
         <XCircle size={36} className="text-rose-400" />
         <p className="text-on-bg-muted">{error}</p>
-        <Link href="/pedido" className="btn-primary px-6 py-3">Ir a pedido en línea</Link>
+        <Link href="/pedido" className="btn-primary px-6 py-3">{t("order.title")}</Link>
       </div>
     );
   }
@@ -86,12 +84,11 @@ export default function SeguimientoClient({
   return (
     <div className="mx-auto flex max-w-2xl flex-col gap-5 pb-6">
       <div>
-        <p className="text-sm text-on-bg-muted">Pedido</p>
+        <p className="text-sm text-on-bg-muted">{t("confirm.folio")}</p>
         <h1 className="font-display text-2xl font-bold tracking-wide text-primary">{pedido.folio}</h1>
         <p className="text-xs text-on-bg-muted">{formatDateTime(pedido.created_at)}</p>
       </div>
 
-      {/* Mapa */}
       {!cancelado && mapboxToken && (
         <MapaSeguimientoOSM
           mapboxToken={mapboxToken}
@@ -102,11 +99,10 @@ export default function SeguimientoClient({
         />
       )}
 
-      {/* Timeline */}
       <section className="card p-5">
         {cancelado ? (
           <p className="flex items-center gap-2 font-bold text-rose-400">
-            <XCircle size={20} /> Pedido cancelado
+            <XCircle size={20} /> {t("track.cancelled")}
           </p>
         ) : (
           <ol className="flex flex-col gap-0">
@@ -128,10 +124,10 @@ export default function SeguimientoClient({
                     <Icon size={17} />
                   </motion.span>
                   <div className="pt-1.5">
-                    <p className={`text-sm font-bold ${done ? "" : "text-on-bg-muted"}`}>{LABELS[e]}</p>
+                    <p className={`text-sm font-bold ${done ? "" : "text-on-bg-muted"}`}>{t(LABEL_KEYS[e])}</p>
                     {evento && <p className="text-xs text-on-bg-muted">{formatDateTime(evento.created_at)}</p>}
                     {e === "en_camino" && actual && pedido.repartidor && (
-                      <p className="text-xs text-on-bg-muted">Repartidor: <strong>{pedido.repartidor}</strong></p>
+                      <p className="text-xs text-on-bg-muted">{t("track.driver")}: <strong>{pedido.repartidor}</strong></p>
                     )}
                   </div>
                 </li>
@@ -143,34 +139,34 @@ export default function SeguimientoClient({
 
       {llego && (
         <section className="card border-emerald-500/30 bg-emerald-500/5 p-5">
-          <p className="font-bold text-emerald-500">¡Tu pedido fue entregado! 🎉</p>
+          <p className="font-bold text-emerald-500">{t("track.deliveredTitle")} 🎉</p>
           <p className="mt-1 text-sm text-on-bg-muted">
-            {pedido.entregado_at && <>Entregado el {formatDateTime(pedido.entregado_at)}. </>}
-            {pedido.repartidor && <>Repartidor: {pedido.repartidor}. </>}
-            Ganaste <strong className="text-accent">{pedido.puntos_ganados} puntos</strong>.
+            {pedido.entregado_at && <>{t("track.deliveredOn")} {formatDateTime(pedido.entregado_at)}. </>}
+            {pedido.repartidor && <>{t("track.driver")}: {pedido.repartidor}. </>}
+            {t("track.youEarned")} <strong className="text-accent">{pedido.puntos_ganados} {t("rewards.points")}</strong>.
           </p>
         </section>
       )}
 
       {llego && !pedido.encuesta && <Encuesta pedidoId={pedido.id} onDone={load} />}
       {llego && pedido.encuesta && (
-        <p className="text-center text-sm text-on-bg-muted">Gracias por contestar la encuesta 💛</p>
+        <p className="text-center text-sm text-on-bg-muted">{t("survey.thanks")} 💛</p>
       )}
 
       <section className="card p-5">
-        <h2 className="mb-3 font-display text-lg font-bold">Resumen</h2>
+        <h2 className="mb-3 font-display text-lg font-bold">{t("cart.summary")}</h2>
         <ul className="flex flex-col gap-1.5 text-sm">
           {pedido.items.map((it) => (
             <li key={it.id} className="flex justify-between gap-3">
-              <span className="text-on-bg-muted">{Number(it.cantidad)}× {it.producto?.nombre ?? "Producto"}</span>
+              <span className="text-on-bg-muted">{Number(it.cantidad)}× {it.producto?.nombre ?? t("cat.product")}</span>
               <span className="font-semibold">{formatMXN(it.subtotal)}</span>
             </li>
           ))}
         </ul>
         <div className="mt-3 flex flex-col gap-1 border-t border-hairline pt-3 text-sm">
-          <div className="flex justify-between"><span className="text-on-bg-muted">Subtotal</span><span>{formatMXN(pedido.subtotal)}</span></div>
-          <div className="flex justify-between"><span className="text-on-bg-muted">Entrega</span><span>{formatMXN(pedido.envio)}</span></div>
-          <div className="flex justify-between text-base font-bold"><span>Total</span><span className="text-primary">{formatMXN(pedido.total)}</span></div>
+          <div className="flex justify-between"><span className="text-on-bg-muted">{t("cart.subtotal")}</span><span>{formatMXN(pedido.subtotal)}</span></div>
+          <div className="flex justify-between"><span className="text-on-bg-muted">{t("cart.delivery")}</span><span>{formatMXN(pedido.envio)}</span></div>
+          <div className="flex justify-between text-base font-bold"><span>{t("cart.total")}</span><span className="text-primary">{formatMXN(pedido.total)}</span></div>
         </div>
         {pedido.direccion_entrega && (
           <p className="mt-3 text-xs text-on-bg-muted">📍 {pedido.direccion_entrega}</p>
@@ -178,13 +174,14 @@ export default function SeguimientoClient({
       </section>
 
       <a href={`tel:${TEL_PEDIDOS}`} className="btn-ghost w-full">
-        <Phone size={15} /> Llamar · {TEL_PEDIDOS_DISPLAY}
+        <Phone size={15} /> {t("track.call")} · {TEL_PEDIDOS_DISPLAY}
       </a>
     </div>
   );
 }
 
 function Encuesta({ pedidoId, onDone }: { pedidoId: number; onDone: () => void }) {
+  const t = useT();
   const [completo, setCompleto] = useState<boolean | null>(null);
   const [estrellas, setEstrellas] = useState(0);
   const [comentarios, setComentarios] = useState("");
@@ -192,32 +189,32 @@ function Encuesta({ pedidoId, onDone }: { pedidoId: number; onDone: () => void }
   const [error, setError] = useState<string | null>(null);
 
   const enviar = async () => {
-    if (completo === null || estrellas === 0) { setError("Contesta si llegó completo y tu calificación."); return; }
+    if (completo === null || estrellas === 0) { setError(t("survey.errIncomplete")); return; }
     setLoading(true); setError(null);
     try {
       const res = await fetch("/api/encuestas", {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ pedido_id: pedidoId, completo, estrellas, comentarios }),
       });
-      if (!res.ok) throw new Error("No se pudo enviar la encuesta");
+      if (!res.ok) throw new Error(t("survey.errSend"));
       onDone();
     } catch (e) { setError((e as Error).message); setLoading(false); }
   };
 
   return (
     <section className="card flex flex-col gap-4 p-5">
-      <h2 className="font-display text-lg font-bold">Cuéntanos cómo nos fue</h2>
+      <h2 className="font-display text-lg font-bold">{t("survey.title")}</h2>
       <div>
-        <p className="label">¿Tu pedido llegó completo?</p>
+        <p className="label">{t("survey.complete")}</p>
         <div className="flex gap-2">
-          {[{ v: true, l: "Sí" }, { v: false, l: "No" }].map(({ v, l }) => (
+          {[{ v: true, l: t("common.yes") }, { v: false, l: t("common.no") }].map(({ v, l }) => (
             <button key={l} onClick={() => setCompleto(v)}
               className={`chip px-5 py-2.5 text-sm ${completo === v ? "chip-active" : ""}`}>{l}</button>
           ))}
         </div>
       </div>
       <div>
-        <p className="label">Califica tu experiencia</p>
+        <p className="label">{t("survey.rate")}</p>
         <div className="flex gap-1.5">
           {[1,2,3,4,5].map((n) => (
             <button key={n} onClick={() => setEstrellas(n)} className="p-1">
@@ -227,14 +224,14 @@ function Encuesta({ pedidoId, onDone }: { pedidoId: number; onDone: () => void }
         </div>
       </div>
       <div>
-        <label htmlFor="coment" className="label">Comentarios (opcional)</label>
+        <label htmlFor="coment" className="label">{t("survey.comments")}</label>
         <textarea id="coment" rows={3} className="input min-h-[72px] resize-none"
-          placeholder="¿Algo que debamos mejorar?" value={comentarios}
+          placeholder={t("survey.commentsPlaceholder")} value={comentarios}
           onChange={(e) => setComentarios(e.target.value)} />
       </div>
       {error && <p className="text-sm text-rose-400">{error}</p>}
       <button onClick={enviar} disabled={loading} className="btn-primary w-full py-3">
-        {loading && <Loader2 size={16} className="animate-spin" />} Enviar encuesta
+        {loading && <Loader2 size={16} className="animate-spin" />} {t("survey.send")}
       </button>
     </section>
   );
